@@ -25,7 +25,13 @@ import {
     likesCount : number;*/
 
     @Column({nullable: false, type: 'varchar'})
-    type: PostType
+    type: PostType;
+
+    @Column({ nullable: true, name: "image_url" , type: 'varchar' })
+    imageUrl : string;
+
+    @Column({ nullable: true, name: "video_url", type: 'varchar' })
+    videoUrl : string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

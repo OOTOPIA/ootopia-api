@@ -28,6 +28,7 @@ export class PostsService {
             chunkSize: 50 * 1024 * 1024, // Required a minimum chunk size of 5MB, here we use 50MB.
             //resume: true,
             metadata: {
+              name: "video_teste",
               filename: "test.mp4",
               filetype: "video/mp4",
               //defaulttimestamppct: 0.5,

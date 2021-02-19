@@ -4,11 +4,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configService } from './config/config';
 import { PostsModule } from './posts/posts.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    PostsModule
+    PostsModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
