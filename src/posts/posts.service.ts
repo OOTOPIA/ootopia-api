@@ -10,7 +10,7 @@ export class PostsService {
     }
 
     async createPost(fileBuffer, postData) {
-        
+
         //Upload here
 
         console.log("test", process.env.CLOUDFLARE_ACCOUNT_ID, postData);
@@ -22,8 +22,8 @@ export class PostsService {
             endpoint: `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`,
             headers: {
               //'Authorization': `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
-              "X-Auth-Key": "4650bd2b2230283ff1f7aa440d7d740a16d8f",
-              "X-Auth-Email": "contato@devmagic.com.br",
+              "X-Auth-Key": process.env.CLOUDFLARE_API_KEY,
+              "X-Auth-Email": process.env.CLOUDFLARE_AUTH_EMAIL,
             },
             chunkSize: 50 * 1024 * 1024, // Required a minimum chunk size of 5MB, here we use 50MB.
             //resume: true,
