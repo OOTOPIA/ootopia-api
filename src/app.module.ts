@@ -5,12 +5,14 @@ import { AppService } from './app.service';
 import { configService } from './config/config';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
+import { VideoModule } from './video/video.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     PostsModule,
-    UsersModule
+    UsersModule,
+    VideoModule
   ],
   controllers: [AppController],
   providers: [AppService],

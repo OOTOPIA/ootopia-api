@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpException, Post, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -26,46 +26,21 @@ export class PostsController {
     async createPost(@UploadedFile() file, @Request() req: Request, @Body() post : CreatePostsDto) {
         try {
             
-            console.log("file!", file);
-            console.log("post!", JSON.parse(post.metadata));
-            console.log("file.buffer", file.buffer);
-
-            //throw new Error("");
-            //throw { message : "aed"};
-
-            return this.postsService.createPost(file.buffer, JSON.parse(post.metadata));
+            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata));
             
         } catch (error) {
             new ErrorHandling(error);
         }
     }
     
-    @ApiOperation({ summary: 'Like a post' })
+    @ApiOperation({ summary: 'Like/dislike a post' })
     @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Successfully registered' })
+    @ApiResponse({ status: 200, description: 'Successfully registered', type: PostLikeDto })
     @Post('/:id/like')
-    async likePost(@Request() req: Request) {
+    async likePost(@Request() req: Request, @Param('id') id) {
         try {
             
-            /*console.log("file!", file);
-            console.log("post!", post.metadata.type);
-            console.log("file.buffer", file.buffer);*/
-            
-        } catch (error) {
-            new ErrorHandling(error);
-        }
-    }
-
-    @ApiOperation({ summary: 'Dislike a post' })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Successfully registered' })
-    @Post('/:id/dislike')
-    async dislikePost(@Request() req: Request) {
-        try {
-            
-            /*console.log("file!", file);
-            console.log("post!", post.metadata.type);
-            console.log("file.buffer", file.buffer);*/
+            return await this.postsService.likePost(id, '00851c9d-fb60-40b5-8ab2-91bb59bd8163');
             
         } catch (error) {
             new ErrorHandling(error);
@@ -88,5 +63,23 @@ export class PostsController {
             new ErrorHandling(error);
         }
     }
+
+    @ApiOperation({ summary: 'Get details for a specific post' })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @Get('/:id')
+    async getPostDetails(@Request() req: Request) {
+        try {
+            
+            /*console.log("file!", file);
+            console.log("post!", post.metadata.type);
+            console.log("file.buffer", file.buffer);*/
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    
 
 }
