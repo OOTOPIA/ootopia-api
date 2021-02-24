@@ -39,6 +39,12 @@ export class Posts extends BaseEntity {
   @Column({ nullable: true, name: "thumbnail_url", type: 'varchar' })
   thumbnailUrl : string;
 
+  @Column({ nullable : true, name: "video_status", type: 'varchar' })
+  videoStatus : string;
+
+  @Column({ nullable: true, name: "stream_media_id", type: 'varchar' })
+  streamMediaId : string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
