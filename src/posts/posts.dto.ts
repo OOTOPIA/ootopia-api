@@ -47,6 +47,12 @@ export class CreatedPostDto {
     videoUrl : string;
 
     @ApiProperty()
+    streamMediaId : string;
+
+    @ApiProperty()
+    videoStatus : string;
+
+    @ApiProperty()
     thumbnailUrl : string;
 
     @ApiProperty()
@@ -109,25 +115,39 @@ export class CommentDto {
     @ApiProperty({ example: "I love it!"})
     message : string;
 
-    @ApiProperty({ enum: ['video', 'image'], example: "video" })
-    type : string;
-
-    @ApiProperty()
-    imageUrl : string;
-
-    @ApiProperty()
-    videoUrl : string;
-
-    @ApiProperty({ description: "Total number of likes" })
-    likesCount : number;
-
-    @ApiProperty({ description: "Total number of comments" })
-    commentsCount : number;
-
     @ApiProperty()
     createdAt : Date;
 
     @ApiProperty()
     updatedAt : Date;
+
+}
+
+export class WebhookDto {
+
+    @ApiProperty()
+    uid : string;
+
+    @ApiProperty()
+    readyToStream : boolean;
+
+    @ApiProperty()
+    status : any;
+
+    @ApiProperty()
+    meta : any;
+
+    @ApiProperty()
+    created : Date;
+
+    @ApiProperty()
+    modified : Date;
+
+}
+
+export class PostVideoWebhookUrl {
+
+    @ApiProperty()
+    webhookUrl : string;
 
 }

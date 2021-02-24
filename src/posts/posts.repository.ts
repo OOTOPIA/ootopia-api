@@ -16,6 +16,8 @@ export class PostsRepository extends Repository<Posts>{
         return this.save(post);
     }
 
+    //TODO: Melhorar insert utilizando ON CONFLICT com dois campos
+
     async likePost(postId : string, userId : string) {
 
         let likeResult = await getConnection().query(`
@@ -49,7 +51,6 @@ export class PostsRepository extends Repository<Posts>{
 
         }
 
-        console.log("likeResult", result);
         let likesCountResult = await this.recalculateLikesCount(postId);
 
         if (likesCountResult) {
@@ -77,9 +78,21 @@ export class PostsRepository extends Repository<Posts>{
 
     }
 
+    async updatePostVideoStatus(streamMediaId : string, status : string) {
+        let post = await this.getPostByStreamMediaId(streamMediaId);
+        post.videoStatus = status;
+        return this.save(post);
+    }
+
     getPostById(id) {
         return this.findOne({
             where: { id }
+        });
+    }
+
+    getPostByStreamMediaId(streamMediaId) {
+        return this.findOne({
+            where: { streamMediaId }
         });
     }
 
