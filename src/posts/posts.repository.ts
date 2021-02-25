@@ -112,7 +112,7 @@ export class PostsRepository extends Repository<Posts>{
             SELECT 
                 p.id, p.user_id, p.description, p.type, p.image_url, p.video_url, p.thumbnail_url, p.video_status,
                 users.photo_url, users.fullname, 
-                pl.likes_count 
+                COALESCE(pl.likes_count, 0)::integer as likes_count
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
