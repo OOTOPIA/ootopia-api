@@ -25,6 +25,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: true, type: 'date' })
     birthdate : Date;
 
+    @Column({ nullable: true, name: 'photo_url', type: 'varchar' })
+    photoUrl : string;
+
     @Column({ nullable: true, name: 'daily_learning_goal_in_minutes', type: 'numeric', default: () => "0" })
     dailyLearningGoalInMinutes : number;
 
