@@ -9,10 +9,11 @@ export class PostsService {
 
     }
 
-    async createPost(fileBuffer, postData) {
+    async createPost(fileBuffer, postData, userId) {
 
       let video : any = await this.videoService.uploadVideo(fileBuffer, postData.description);
 
+      postData.userId = userId;
       postData.videoUrl = video.playback.hls;
       postData.thumbnailUrl = video.thumbnail;
       postData.streamMediaId = video.uid;
@@ -27,6 +28,10 @@ export class PostsService {
 
     updatePostVideoStatus(streamMediaId : string, status : string) {
       return this.postsRepository.updatePostVideoStatus(streamMediaId, status)
+    }
+
+    getPostsTimeline(filters) {
+      return this.postsRepository.getPostsTimeline(filters);
     }
 
 }

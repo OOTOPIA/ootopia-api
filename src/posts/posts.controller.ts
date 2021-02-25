@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -27,7 +27,7 @@ export class PostsController {
     async createPost(@UploadedFile() file, @Request() req: Request, @Body() post : CreatePostsDto) {
         try {
             
-            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata));
+            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), '00851c9d-fb60-40b5-8ab2-91bb59bd8163');
             
         } catch (error) {
             new ErrorHandling(error);
@@ -53,12 +53,14 @@ export class PostsController {
     @ApiQuery({ type : PostsTimelineFilterDto })
     @ApiResponse({ status: 200, type: PostTimelineDto, isArray: true })
     @Get()
-    async getPosts(@Request() req: Request) {
+    async getPosts(@Request() req: Request, @Query() filters : PostsTimelineFilterDto) {
         try {
             
             /*console.log("file!", file);
             console.log("post!", post.metadata.type);
             console.log("file.buffer", file.buffer);*/
+
+            return await this.postsService.getPostsTimeline(filters);
             
         } catch (error) {
             new ErrorHandling(error);

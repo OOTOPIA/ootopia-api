@@ -24,6 +24,10 @@ export class Posts extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id : string;
 
+  @ManyToOne(type => Users, user => user.id)
+  @JoinColumn({ name: "user_id" })
+  userId : Users;
+
   @Column({ nullable: true, type: 'varchar' })
   description : string;
 

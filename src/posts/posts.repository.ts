@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { Posts } from "./posts.entity";
+import * as camelcaseKeys from 'camelcase-keys';
 
 @Injectable()
 @EntityRepository(Posts)
@@ -94,6 +95,32 @@ export class PostsRepository extends Repository<Posts>{
         return this.findOne({
             where: { streamMediaId }
         });
+    }
+
+    async getPostsTimeline(filters) {
+
+        let where = "video_status = 'ready' AND ", params = [];
+        let perPage = 10, limit = 'LIMIT ' + perPage;
+
+        if (filters.page) {
+            limit = 'LIMIT ' + perPage + ' OFFSET ' + ((filters.page > 1 ? filters.page - 1 : 0) * perPage);
+        }
+
+        where = where.substring(0, where.length - 5);
+
+        return camelcaseKeys(await getConnection().query(`
+            SELECT 
+                p.id, p.user_id, p.description, p.type, p.image_url, p.video_url, p.thumbnail_url, p.video_status,
+                users.photo_url, users.fullname, 
+                COALESCE(pl.likes_count, 0)::integer as likes_count
+            FROM posts p
+            INNER JOIN users ON users.id = p.user_id
+            LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
+            WHERE ${where}
+            ORDER BY p.created_at DESC
+            ${limit}
+        `, params), { deep : true });
+
     }
 
 }
