@@ -115,7 +115,7 @@ export class PostsRepository extends Repository<Posts>{
                 pl.likes_count 
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
-            INNER JOIN posts_likes_count pl ON pl.post_id = p.id
+            LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
             WHERE ${where}
             ORDER BY p.created_at DESC
             ${limit}
