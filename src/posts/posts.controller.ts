@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -38,6 +38,7 @@ export class PostsController {
     @ApiBearerAuth()
     @ApiResponse({ status: 200, description: 'Successfully registered', type: PostLikeDto })
     @Post('/:id/like')
+    @HttpCode(200)
     async likePost(@Request() req: Request, @Param('id') id) {
         try {
             
@@ -60,7 +61,7 @@ export class PostsController {
             console.log("post!", post.metadata.type);
             console.log("file.buffer", file.buffer);*/
 
-            return await this.postsService.getPostsTimeline(filters);
+            return await this.postsService.getPostsTimeline(filters, '00851c9d-fb60-40b5-8ab2-91bb59bd8163');
             
         } catch (error) {
             new ErrorHandling(error);

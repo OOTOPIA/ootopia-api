@@ -31,6 +31,7 @@ export class VideoService {
           chunkSize: 50 * 1024 * 1024, // Required a minimum chunk size of 5MB, here we use 50MB.
           metadata: {
             name: name,
+            thumbnailTimestampPct : "0.25"
             //watermark: "$WATERMARKUID"
           },
           uploadSize: size,

@@ -97,22 +97,32 @@ export class PostsRepository extends Repository<Posts>{
         });
     }
 
-    async getPostsTimeline(filters) {
+    async getPostsTimeline(filters, userId? : string) {
 
         let where = "video_status = 'ready' AND ", params = [];
         let perPage = 10, limit = 'LIMIT ' + perPage;
+        let columns = [
+            'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status',
+            'users.photo_url', 'users.fullname', 
+            'COALESCE(pl.likes_count, 0)::integer as likes_count'
+        ];
 
         if (filters.page) {
             limit = 'LIMIT ' + perPage + ' OFFSET ' + ((filters.page > 1 ? filters.page - 1 : 0) * perPage);
+        }
+
+        if (userId) {
+            params.push(userId);
+            columns.push(`(CASE WHEN $${params.length}=(
+                SELECT user_id from posts_likes WHERE post_id = p.id and posts_likes.user_id = $${params.length}) 
+                THEN true ELSE false END) as liked`);
         }
 
         where = where.substring(0, where.length - 5);
 
         return camelcaseKeys(await getConnection().query(`
             SELECT 
-                p.id, p.user_id, p.description, p.type, p.image_url, p.video_url, p.thumbnail_url, p.video_status,
-                users.photo_url, users.fullname, 
-                COALESCE(pl.likes_count, 0)::integer as likes_count
+                ${columns}
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
