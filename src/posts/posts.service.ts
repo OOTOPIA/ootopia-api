@@ -30,8 +30,8 @@ export class PostsService {
       return this.postsRepository.updatePostVideoStatus(streamMediaId, status)
     }
 
-    getPostsTimeline(filters) {
-      return this.postsRepository.getPostsTimeline(filters);
+    getPostsTimeline(filters, userId? : string) {
+      return this.postsRepository.getPostsTimeline(filters, userId);
     }
 
 }
