@@ -35,6 +35,10 @@ async function bootstrap() {
     .setTitle('Ootopia API')
     .setDescription('Ootopia API Doc')
     .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'Authorization Bearer Token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

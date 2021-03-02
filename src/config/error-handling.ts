@@ -6,17 +6,17 @@ interface Error {
 
 export class ErrorHandling {
   constructor(error: Error) {
-    console.log("error", error);
+    console.log("error >>>>>>", error);
     if (!error.status) {
       throw error;
     }
 
     throw new HttpException(
       {
-        status: error.status,
+        status: error.status || 400,
         error: error.message,
       },
-      error.status,
+      error.status || 400,
     );
   }
 }

@@ -37,7 +37,7 @@ export class CreatedCommentDto {
 
 export class CommentsFilterDto {
 
-    @ApiProperty({ type: "number" })
+    @ApiProperty({ type: "number", default: 1, minimum: 1, name: "page" })
     page : number;
 
 }

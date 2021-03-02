@@ -103,7 +103,7 @@ export class PostTimelineDto {
     photoUrl : string;
 
     @ApiProperty({ description: "User name"})
-    fullname : string;
+    username : string;
 
     @ApiProperty({ description: "Total number of likes" })
     likesCount : number;
