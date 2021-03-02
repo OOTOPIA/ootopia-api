@@ -55,7 +55,7 @@ export class CommentsRepository extends Repository<PostsComments>{
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
             'c.id', 'c.post_id', 'c.user_id', 'c.text', 'c.deleted', 'c.created_at', 'c.updated_at',
-            'users.photo_url', 'users.fullname'
+            'users.photo_url', 'users.fullname as username'
         ];
 
         if (filters.postId) {
