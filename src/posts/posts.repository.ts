@@ -103,7 +103,7 @@ export class PostsRepository extends Repository<Posts>{
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
             'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status',
-            'users.photo_url', 'users.fullname', 
+            'users.photo_url', 'users.fullname as username', 
             'COALESCE(pl.likes_count, 0)::integer as likes_count'
         ];
 

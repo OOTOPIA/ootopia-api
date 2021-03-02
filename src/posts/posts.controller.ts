@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
 import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl } from './posts.dto';
 import { memoryStorage } from 'multer'
@@ -9,6 +9,7 @@ import { PostsService } from './posts.service';
 import { VideoService } from 'src/video/video.service';
 import { CommentsFilterDto, CommentsListDto, CreateCommentsDto, CreatedCommentDto } from './comments.dto';
 import { CommentsService } from './services/comments.service';
+import { HttpResponseDto } from 'src/config/http-response.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -22,6 +23,9 @@ export class PostsController {
     @ApiBearerAuth()
     @ApiBody({ type: CreatePostsDto })
     @ApiResponse({ status: 201, description: 'The post was created successfully', type : CreatedPostDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @ApiConsumes('multipart/form-data')
     @Post()
     @UseInterceptors(FileInterceptor('file', {
@@ -39,7 +43,11 @@ export class PostsController {
     
     @ApiOperation({ summary: 'Like/dislike a post' })
     @ApiBearerAuth()
+    @ApiParam({name : "id", type: "string", description: "Post ID" })
     @ApiResponse({ status: 200, description: 'Successfully registered', type: PostLikeDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Post('/:id/like')
     @HttpCode(200)
     async likePost(@Request() req: Request, @Param('id') id) {
@@ -54,8 +62,11 @@ export class PostsController {
 
     @ApiOperation({ summary: 'Returns a list of posts for the timeline' })
     @ApiBearerAuth()
-    @ApiQuery({ type : PostsTimelineFilterDto })
+    @ApiQuery({ name : "page", type: "number", description: "Current Page" })
     @ApiResponse({ status: 200, type: PostTimelineDto, isArray: true })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Get()
     async getPosts(@Request() req: Request, @Query() filters : PostsTimelineFilterDto) {
         try {
@@ -73,7 +84,11 @@ export class PostsController {
 
     @ApiOperation({ summary: 'Get details for a specific post' })
     @ApiBearerAuth()
+    @ApiParam({name : "id", type: "string", description: "Post ID" })
     @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Get('/:id')
     async getPostDetails(@Request() req: Request) {
         try {
@@ -94,7 +109,10 @@ export class PostsController {
     @ApiBearerAuth()
     @ApiBody({ type: WebhookDto })
     @ApiResponse({ status: 200, description: 'The video was processed', type : CreatedPostDto })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 401, description: 'Unauthorized', type: HttpResponseDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Post('/video/webhook')
     async webhook(@Headers() headers, @Body() data: WebhookDto, @Request() req : Request) {
         try {
@@ -128,8 +146,12 @@ export class PostsController {
 
     @ApiOperation({ summary: 'Comment on a post' })
     @ApiBearerAuth()
+    @ApiParam({ name : "postId", type: "string", description: "Post ID" })
     @ApiBody({ type: CreateCommentsDto })
     @ApiResponse({ status: 201, description: 'Successfully registered', type: CreatedCommentDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Post('/:postId/comments')
     async commentPost(@Request() req: Request, @Param('postId') postId, @Body() data) {
         try {
@@ -146,8 +168,12 @@ export class PostsController {
 
     @ApiOperation({ summary: 'Returns a list of comments for the post' })
     @ApiBearerAuth()
-    @ApiQuery({ type : CommentsFilterDto })
+    @ApiParam({ name : "postId", type: "string", description: "Post ID" })
+    @ApiQuery({ name : "page", type: "number", description: "Current Page" })
     @ApiResponse({ status: 200, type: CommentsListDto, isArray: true })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Get('/:postId/comments')
     async getComments(@Request() req: Request, @Param('postId') postId, @Query() filters : CommentsFilterDto) {
         try {
@@ -161,6 +187,12 @@ export class PostsController {
 
     @ApiOperation({ summary: 'Remove a comment' })
     @ApiBearerAuth()
+    @ApiParam({ name : "postId", type: "string", description: "Post ID" })
+    @ApiParam({ name : "commentId", type: "string", description: "Comment ID" })
+    @ApiResponse({ status: 200, description: 'Successfully removed' })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Delete('/:postId/comments/:commentId')
     async deleteComment(@Request() req: Request, @Param('postId') postId, @Param('commentId') commentId) {
         try {
