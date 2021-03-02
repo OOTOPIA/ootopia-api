@@ -1,5 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Pool } from 'pg';
+import { PostsCommentsCount } from 'src/posts/entities/comments-count.entity';
+import { PostsComments } from 'src/posts/entities/comments.entity';
 import { Posts, PostsLikes, PostsLikesCount } from 'src/posts/posts.entity';
 import { Users } from 'src/users/users.entity';
 
@@ -45,7 +47,9 @@ class ConfigService {
           Users,
           Posts,
           PostsLikes,
-          PostsLikesCount
+          PostsLikesCount,
+          PostsComments,
+          PostsCommentsCount
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
