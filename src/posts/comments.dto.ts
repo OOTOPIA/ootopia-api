@@ -60,7 +60,7 @@ export class CommentsListDto {
     photoUrl : string;
 
     @ApiProperty({ description: "User name"})
-    fullname : string;
+    username : string;
 
     @ApiProperty()
     createdAt : Date;
