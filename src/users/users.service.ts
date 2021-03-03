@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import * as bcryptjs from 'bcryptjs';
 
@@ -10,6 +10,10 @@ export class UsersService {
     }
 
     async createUser(userData) {
+
+        if (!userData.acceptedTerms) {
+            throw new HttpException("You must accept the terms to register", 401);
+        }
 
         userData.password = bcryptjs.hashSync(userData.password, bcryptjs.genSaltSync(10));
 
