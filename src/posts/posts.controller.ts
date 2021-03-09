@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -10,6 +10,7 @@ import { VideoService } from 'src/video/video.service';
 import { CommentsFilterDto, CommentsListDto, CreateCommentsDto, CreatedCommentDto } from './comments.dto';
 import { CommentsService } from './services/comments.service';
 import { HttpResponseDto } from 'src/config/http-response.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -48,12 +49,13 @@ export class PostsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
     @Post('/:id/like')
     @HttpCode(200)
-    async likePost(@Request() req: Request, @Param('id') id) {
+    async likePost(@Req() { user }, @Param('id') id) {
         try {
             
-            return await this.postsService.likePost(id, '00851c9d-fb60-40b5-8ab2-91bb59bd8163');
+            return await this.postsService.likePost(id, user.id);
             
         } catch (error) {
             new ErrorHandling(error);
@@ -152,12 +154,13 @@ export class PostsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
     @Post('/:postId/comments')
-    async commentPost(@Request() req: Request, @Param('postId') postId, @Body() data) {
+    async commentPost(@Req() { user }, @Param('postId') postId, @Body() data) {
         try {
-            
+
             data.postId = postId;
-            data.userId = '00851c9d-fb60-40b5-8ab2-91bb59bd8163';
+            data.userId = user.id;
 
             return await this.commentsService.createComment(data);
             
@@ -193,11 +196,12 @@ export class PostsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
     @Delete('/:postId/comments/:commentId')
-    async deleteComment(@Request() req: Request, @Param('postId') postId, @Param('commentId') commentId) {
+    async deleteComment(@Req() { user }, @Param('postId') postId, @Param('commentId') commentId) {
         try {
 
-            return await this.commentsService.deleteComment(postId, commentId);
+            return await this.commentsService.deleteComment(user.id, postId, commentId);
             
         } catch (error) {
             new ErrorHandling(error);

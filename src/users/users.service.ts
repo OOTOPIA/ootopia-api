@@ -17,6 +17,12 @@ export class UsersService {
 
         userData.password = bcryptjs.hashSync(userData.password, bcryptjs.genSaltSync(10));
 
+        let checkEmail = await this.getUserByEmail(userData.email);
+
+        if (checkEmail != null) {
+            throw new HttpException("EMAIL_ALREADY_EXISTS", 401);
+        }
+
         let user = await this.usersRepository.createUser(userData);
         delete user.password;
 
