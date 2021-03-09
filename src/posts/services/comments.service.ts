@@ -16,8 +16,8 @@ export class CommentsService {
       return this.commentsRepository.getCommentsFromPostId(postId, page);
     }
 
-    async deleteComment(postId, commentId) {
-      await this.commentsRepository.deleteComment(postId, commentId);
+    async deleteComment(userId, postId, commentId) {
+      await this.commentsRepository.deleteComment(userId, postId, commentId);
     }
 
 }

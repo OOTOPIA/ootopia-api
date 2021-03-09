@@ -81,9 +81,9 @@ export class CommentsRepository extends Repository<PostsComments>{
 
     }
 
-    async deleteComment(postId, commentId) {
+    async deleteComment(userId, postId, commentId) {
         let comment = await this.findOne({
-            where: { postId : postId, id : commentId }
+            where: { userId : userId, postId : postId, id : commentId }
         });
 
         comment.deleted = true;
