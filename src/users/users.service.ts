@@ -34,4 +34,18 @@ export class UsersService {
         return await this.usersRepository.getUserByEmail(email);
     }
 
+    async getUserById(id : string) {
+        return await this.usersRepository.getUserById(id);
+    }
+
+    async getUserProfile(id : string) {
+        let user = await this.usersRepository.getUserById(id);
+        delete user.email;
+        delete user.dailyLearningGoalInMinutes;
+        delete user.enableSustainableAds;
+        delete user.createdAt;
+        delete user.updatedAt;
+        return user;
+    }
+
 }

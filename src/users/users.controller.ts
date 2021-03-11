@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiRespons
 import { AuthService } from 'src/auth/auth.service';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, UserLoginDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, UserLoginDto, UserProfileDto } from './users.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -46,6 +46,21 @@ export class UsersController {
 
             return this.authService.validateUser(loginData.email, loginData.password);
 
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @ApiOperation({ summary: 'Get public details for a specific user' })
+    @ApiParam({name : "id", type: "string", description: "User ID" })
+    @ApiResponse({ status: 200, type: UserProfileDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Get('/:id/profile')
+    async getUserProfile(@Param('id') id) {
+        try {
+            return await this.usersService.getUserProfile(id);
         } catch (error) {
             new ErrorHandling(error);
         }

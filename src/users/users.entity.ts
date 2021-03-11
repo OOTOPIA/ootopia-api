@@ -28,6 +28,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: true, name: 'photo_url', type: 'varchar' })
     photoUrl : string;
 
+    @Column({ nullable: true, type: 'varchar' })
+    bio : string;
+
     @Column({ nullable: true, name: 'daily_learning_goal_in_minutes', type: 'numeric', default: () => "0" })
     dailyLearningGoalInMinutes : number;
 
