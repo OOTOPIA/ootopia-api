@@ -39,6 +39,9 @@ export class CreatedUserDto {
     photoUrl : string;
 
     @ApiProperty()
+    bio : string;
+
+    @ApiProperty()
     acceptedTerms : boolean;
 
     @ApiProperty()
@@ -85,6 +88,9 @@ export class LoggedUserDto {
     photoUrl : string;
 
     @ApiProperty()
+    bio : string;
+
+    @ApiProperty()
     dailyLearningGoalInMinutes : number;
 
     @ApiProperty()
@@ -98,5 +104,24 @@ export class LoggedUserDto {
 
     @ApiProperty()
     updatedAt : Date;
+
+}
+
+export class UserProfileDto {
+
+    @ApiProperty()
+    id : string;
+
+    @ApiProperty()
+    fullname : string;
+
+    @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
+    birthdate : string;
+
+    @ApiProperty()
+    bio : string;
+
+    @ApiProperty()
+    photoUrl : string;
 
 }

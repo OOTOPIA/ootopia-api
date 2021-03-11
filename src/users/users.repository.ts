@@ -24,4 +24,12 @@ export class UsersRepository extends Repository<Users>{
         return (user && user.length ? user[0] : null);
     }
 
+    async getUserById(id: string) {
+        let user = await this.findOne({
+          where: { id },
+        });
+        delete user.password;
+        return user;
+    }
+
 }
