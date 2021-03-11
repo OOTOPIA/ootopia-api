@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -11,6 +11,7 @@ import { CommentsFilterDto, CommentsListDto, CreateCommentsDto, CreatedCommentDt
 import { CommentsService } from './services/comments.service';
 import { HttpResponseDto } from 'src/config/http-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -69,15 +70,12 @@ export class PostsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
     @Get()
-    async getPosts(@Request() req: Request, @Query() filters : PostsTimelineFilterDto) {
+    async getPosts(@Req() req, @Query() filters : PostsTimelineFilterDto) {
         try {
-            
-            /*console.log("file!", file);
-            console.log("post!", post.metadata.type);
-            console.log("file.buffer", file.buffer);*/
 
-            return await this.postsService.getPostsTimeline(filters, '00851c9d-fb60-40b5-8ab2-91bb59bd8163');
+            return await this.postsService.getPostsTimeline(filters, req.user ? req.user.id : null);
             
         } catch (error) {
             new ErrorHandling(error);
