@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
@@ -14,6 +14,7 @@ export class UsersController {
         private readonly authService : AuthService
         ) {}
 
+    @ApiTags('users')
     @ApiOperation({ summary: 'Create a new user account' })
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({ status: 200, description: 'Successfully registered', type: CreatedUserDto })
@@ -29,6 +30,7 @@ export class UsersController {
         }
     }
 
+    @ApiTags('users')
     @ApiOperation({ summary: 'Login' })
     @ApiBody({ type: UserLoginDto })
     @ApiResponse({ status: 200, description: 'Successfully logged in ', type: LoggedUserDto })

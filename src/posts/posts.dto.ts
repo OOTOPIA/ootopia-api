@@ -166,3 +166,10 @@ export class PostVideoWebhookUrl {
     webhookUrl : string;
 
 }
+
+export class DeleteCommentsDto {
+
+    @ApiProperty()
+    commentsIds : string[];
+
+}

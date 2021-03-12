@@ -22,6 +22,10 @@ export class PostsService {
      
     }
 
+    getPostById(id) {
+      return this.postsRepository.getPostById(id);
+    }
+
     likePost(postId, userId) {
       return this.postsRepository.likePost(postId, userId);
     }
