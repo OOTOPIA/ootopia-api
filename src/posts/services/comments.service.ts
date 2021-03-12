@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { PostsService } from '../posts.service';
 import { CommentsRepository } from '../repositories/comments.repository';
 
 @Injectable()
 export class CommentsService {
 
-    constructor(private readonly commentsRepository : CommentsRepository) {
+    constructor(private readonly commentsRepository : CommentsRepository, private readonly postsService : PostsService) {
 
     }
 
@@ -16,8 +17,12 @@ export class CommentsService {
       return this.commentsRepository.getCommentsFromPostId(postId, page);
     }
 
-    async deleteComment(userId, postId, commentId) {
-      await this.commentsRepository.deleteComment(userId, postId, commentId);
+    async deleteComments(userId, postId, commentsIds) {
+      let post = await this.postsService.getPostById(postId);
+      if (!post) {
+        throw new HttpException('Post no found', 400);
+      }
+      await this.commentsRepository.deleteComments(userId, post, commentsIds);
     }
 
 }

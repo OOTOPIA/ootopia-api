@@ -1,8 +1,8 @@
 import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -21,6 +21,7 @@ export class PostsController {
         private readonly videoService : VideoService,
         private readonly commentsService : CommentsService) {}
 
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Upload a video or image post' })
     @ApiBearerAuth()
     @ApiBody({ type: CreatePostsDto })
@@ -43,6 +44,7 @@ export class PostsController {
         }
     }
     
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Like/dislike a post' })
     @ApiBearerAuth()
     @ApiParam({name : "id", type: "string", description: "Post ID" })
@@ -63,6 +65,7 @@ export class PostsController {
         }
     }
 
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Returns a list of posts for the timeline' })
     @ApiBearerAuth()
     @ApiQuery({ name : "page", type: "number", description: "Current Page" })
@@ -82,6 +85,7 @@ export class PostsController {
         }
     }
 
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Get details for a specific post' })
     @ApiBearerAuth()
     @ApiParam({name : "id", type: "string", description: "Post ID" })
@@ -134,6 +138,7 @@ export class PostsController {
     }
 
     //TODO: ADICIONAR AUTENTICAÇÃO
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Update webhook address called by Cloudflare' })
     @Put('/video/webhook')
     async setWebhookAddress(@Body() data : PostVideoWebhookUrl) {
@@ -144,6 +149,7 @@ export class PostsController {
         }
     }
 
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Comment on a post' })
     @ApiBearerAuth()
     @ApiParam({ name : "postId", type: "string", description: "Post ID" })
@@ -167,6 +173,7 @@ export class PostsController {
         }
     }
 
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Returns a list of comments for the post' })
     @ApiBearerAuth()
     @ApiParam({ name : "postId", type: "string", description: "Post ID" })
@@ -186,20 +193,21 @@ export class PostsController {
         }
     }
 
-    @ApiOperation({ summary: 'Remove a comment' })
-    @ApiBearerAuth()
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Remove one or more comments' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: DeleteCommentsDto })
     @ApiParam({ name : "postId", type: "string", description: "Post ID" })
-    @ApiParam({ name : "commentId", type: "string", description: "Comment ID" })
     @ApiResponse({ status: 200, description: 'Successfully removed' })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
-    @Delete('/:postId/comments/:commentId')
-    async deleteComment(@Req() { user }, @Param('postId') postId, @Param('commentId') commentId) {
+    @Delete('/:postId/comments')
+    async deleteComment(@Req() { user }, @Param('postId') postId, @Body() body : DeleteCommentsDto) {
         try {
 
-            return await this.commentsService.deleteComment(user.id, postId, commentId);
+            return await this.commentsService.deleteComments(user.id, postId, body.commentsIds);
             
         } catch (error) {
             new ErrorHandling(error);

@@ -85,10 +85,15 @@ export class PostsRepository extends Repository<Posts>{
         return this.save(post);
     }
 
-    getPostById(id) {
-        return this.findOne({
-            where: { id }
-        });
+    async getPostById(id) {
+        let results = camelcaseKeys(await getConnection().query(`
+            SELECT 
+                p.*
+            FROM posts p
+            WHERE p.id = $1
+        `, [id]), { deep : true });
+
+        return results.length ? results[0] : null;
     }
 
     getPostByStreamMediaId(streamMediaId) {

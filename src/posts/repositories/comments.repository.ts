@@ -2,6 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { PostsComments } from "../entities/comments.entity";
+import { Posts } from "../posts.entity";
 
 @Injectable()
 @EntityRepository(PostsComments)
@@ -81,16 +82,43 @@ export class CommentsRepository extends Repository<PostsComments>{
 
     }
 
-    async deleteComment(userId, postId, commentId) {
-        let comment = await this.findOne({
-            where: { userId : userId, postId : postId, id : commentId }
-        });
+    async deleteComments(userId : String, post, commentsIds : String[]) {
 
-        comment.deleted = true;
+        let queryRunner = getConnection().createQueryRunner();
+    
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
-        let result = await this.save(comment);
-        await this.recalculateCommentCount(postId);
-        return result;
+        try {
+
+            for (let i = 0; i < commentsIds.length; i++) {
+                let id = commentsIds[i];
+
+                let whereConditions : any = {
+                    id : id,
+                    postId : post.id
+                };
+
+                if (userId != post.userId) {
+                    whereConditions.userId = userId;
+                }
+
+                await queryRunner.manager.update(PostsComments, whereConditions, {
+                    deleted : true
+                });
+
+            }
+
+            await queryRunner.commitTransaction();
+
+            return {
+                status: 200,
+            };
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
 
     }
 
