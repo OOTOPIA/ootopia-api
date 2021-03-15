@@ -109,7 +109,8 @@ export class PostsRepository extends Repository<Posts>{
         let columns = [
             'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status',
             'users.photo_url', 'users.fullname as username', 
-            'COALESCE(pl.likes_count, 0)::integer as likes_count'
+            'COALESCE(pl.likes_count, 0)::integer as likes_count',
+            'COALESCE(pc.comments_count, 0)::integer as comments_count'
         ];
 
         if (filters.page) {
@@ -131,6 +132,7 @@ export class PostsRepository extends Repository<Posts>{
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
+            LEFT JOIN posts_comments_count pc ON pc.post_id = p.id
             WHERE ${where}
             ORDER BY p.created_at DESC
             ${limit}
