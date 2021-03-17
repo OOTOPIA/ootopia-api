@@ -24,6 +24,9 @@ export class CreatePostsDto {
 
 export class PostsTimelineFilterDto {
 
+    @ApiProperty()
+    userId : string;
+
     @ApiProperty({ type: "number" })
     page : number;
 

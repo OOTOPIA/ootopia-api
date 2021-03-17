@@ -23,21 +23,22 @@ export class PostsController {
 
     @ApiTags('posts')
     @ApiOperation({ summary: 'Upload a video or image post' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiBody({ type: CreatePostsDto })
     @ApiResponse({ status: 201, description: 'The post was created successfully', type : CreatedPostDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @ApiConsumes('multipart/form-data')
+    @UseGuards(JwtAuthGuard)
     @Post()
     @UseInterceptors(FileInterceptor('file', {
         storage: memoryStorage(),
     }))
-    async createPost(@UploadedFile() file, @Request() req: Request, @Body() post : CreatePostsDto) {
+    async createPost(@UploadedFile() file, @Req() { user }, @Body() post : CreatePostsDto) {
         try {
-            
-            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), '00851c9d-fb60-40b5-8ab2-91bb59bd8163');
+
+            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), user.id);
             
         } catch (error) {
             new ErrorHandling(error);
@@ -46,7 +47,7 @@ export class PostsController {
     
     @ApiTags('posts')
     @ApiOperation({ summary: 'Like/dislike a post' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiParam({name : "id", type: "string", description: "Post ID" })
     @ApiResponse({ status: 200, description: 'Successfully registered', type: PostLikeDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
@@ -67,7 +68,7 @@ export class PostsController {
 
     @ApiTags('posts')
     @ApiOperation({ summary: 'Returns a list of posts for the timeline' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiQuery({ name : "page", type: "number", description: "Current Page" })
     @ApiResponse({ status: 200, type: PostTimelineDto, isArray: true })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
@@ -87,7 +88,7 @@ export class PostsController {
 
     @ApiTags('posts')
     @ApiOperation({ summary: 'Get details for a specific post' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiParam({name : "id", type: "string", description: "Post ID" })
     @ApiResponse({ status: 200, type: PostTimelineDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
@@ -110,7 +111,7 @@ export class PostsController {
 
     @ApiExcludeEndpoint()
     @ApiOperation({ summary: 'Receive video status update on Cloudflare' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiBody({ type: WebhookDto })
     @ApiResponse({ status: 200, description: 'The video was processed', type : CreatedPostDto })
     @ApiResponse({ status: 401, description: 'Unauthorized', type: HttpResponseDto })
@@ -151,7 +152,7 @@ export class PostsController {
 
     @ApiTags('posts')
     @ApiOperation({ summary: 'Comment on a post' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiParam({ name : "postId", type: "string", description: "Post ID" })
     @ApiBody({ type: CreateCommentsDto })
     @ApiResponse({ status: 201, description: 'Successfully registered', type: CreatedCommentDto })
@@ -175,7 +176,7 @@ export class PostsController {
 
     @ApiTags('posts')
     @ApiOperation({ summary: 'Returns a list of comments for the post' })
-    @ApiBearerAuth()
+    @ApiBearerAuth('Bearer')
     @ApiParam({ name : "postId", type: "string", description: "Post ID" })
     @ApiQuery({ name : "page", type: "number", description: "Current Page" })
     @ApiResponse({ status: 200, type: CommentsListDto, isArray: true })
