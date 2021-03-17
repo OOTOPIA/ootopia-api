@@ -53,6 +53,7 @@ export class UsersController {
         }
     }
 
+    @ApiTags('users')
     @ApiOperation({ summary: 'Get public details for a specific user' })
     @ApiParam({name : "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, type: UserProfileDto })

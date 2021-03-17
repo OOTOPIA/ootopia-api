@@ -113,6 +113,11 @@ export class PostsRepository extends Repository<Posts>{
             'COALESCE(pc.comments_count, 0)::integer as comments_count'
         ];
 
+        if (filters.userId) {
+            params.push(filters.userId);
+            where = where + `p.user_id = $${params.length} AND `;
+        }
+
         if (filters.page) {
             limit = 'LIMIT ' + perPage + ' OFFSET ' + ((filters.page > 1 ? filters.page - 1 : 0) * perPage);
         }
