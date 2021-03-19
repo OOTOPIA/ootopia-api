@@ -11,7 +11,7 @@ export class UsersRepository extends Repository<Users>{
         super();
     }
 
-    createUser(userData) {
+    createOrUpdateUser(userData) {
         const user = this.create();
         Object.assign(user, userData);
         return this.save(user);

@@ -31,10 +31,10 @@ export class PostsController {
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @ApiConsumes('multipart/form-data')
     @UseGuards(JwtAuthGuard)
-    @Post()
     @UseInterceptors(FileInterceptor('file', {
         storage: memoryStorage(),
     }))
+    @Post()
     async createPost(@UploadedFile() file, @Req() { user }, @Body() post : CreatePostsDto) {
         try {
 
