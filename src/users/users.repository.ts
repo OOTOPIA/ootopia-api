@@ -11,10 +11,10 @@ export class UsersRepository extends Repository<Users>{
         super();
     }
 
-    createOrUpdateUser(userData) {
+    async createOrUpdateUser(userData) {
         const user = this.create();
         Object.assign(user, userData);
-        return this.save(user);
+        return await this.save(user);
     }
 
     async getUserByEmail(email: string) {

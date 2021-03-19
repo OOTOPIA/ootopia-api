@@ -7,6 +7,8 @@ import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { VideoModule } from './video/video.module';
 import { AuthModule } from './auth/auth.module';
+import { FilesUploadModule } from './files-upload/files-upload.module';
+import { InterestsTagsModule } from './interests-tags/interests-tags.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { AuthModule } from './auth/auth.module';
     PostsModule,
     UsersModule,
     VideoModule,
-    AuthModule
+    AuthModule,
+    FilesUploadModule,
+    InterestsTagsModule
   ],
   controllers: [AppController],
   providers: [AppService],

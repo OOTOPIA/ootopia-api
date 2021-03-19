@@ -2,11 +2,12 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import * as bcryptjs from 'bcryptjs';
 import { Users } from './users.entity';
+import { FilesUploadService } from 'src/files-upload/files-upload.service';
 
 @Injectable()
 export class UsersService {
 
-    constructor(private readonly usersRepository : UsersRepository) {
+    constructor(private readonly usersRepository : UsersRepository, private readonly filesUploadService : FilesUploadService) {
 
     }
 
@@ -47,17 +48,24 @@ export class UsersService {
             addressLongitude : userData.addressLongitude,
         };
 
+        if (photoFile != null) {
+            let fileUrl = await this.filesUploadService.uploadFileToS3(photoFile.buffer, photoFile.originalname, currentUser.id);
+            _userData.photoUrl = fileUrl;
+        }
+
         if (currentUser.registerPhase == 1) {
             _userData.registerPhase = 2;
+        }
+
+        if (userData.tagsIds && userData.tagsIds.length > 0) {
+            let tagsIds = userData.tagsIds.split(",");
         }
 
         //TODO: Save tags id's
         //TODO: Save address data in other table
 
-        let user = await this.usersRepository.createOrUpdateUser(userData);
-        delete user.password;
-
-        return user;
+        await this.usersRepository.createOrUpdateUser(_userData);
+        return Object.assign(currentUser, _userData);
 
     }
 
