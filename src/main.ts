@@ -37,6 +37,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('users')
     .addTag('posts')
+    .addTag('interests-tags')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', in: 'header' },
       'Bearer',

@@ -3,7 +3,9 @@ import { Pool } from 'pg';
 import { PostsCommentsCount } from 'src/posts/entities/comments-count.entity';
 import { PostsComments } from 'src/posts/entities/comments.entity';
 import { Posts, PostsLikes, PostsLikesCount } from 'src/posts/posts.entity';
+import { InterestsTags } from 'src/interests-tags/interests-tags.entity';
 import { Users } from 'src/users/users.entity';
+import { InterestsTagsUsers } from 'src/interests-tags/interests-tags-users.entity';
 
 require('dotenv').config();
 
@@ -49,7 +51,9 @@ class ConfigService {
           PostsLikes,
           PostsLikesCount,
           PostsComments,
-          PostsCommentsCount
+          PostsCommentsCount,
+          InterestsTags,
+          InterestsTagsUsers
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],

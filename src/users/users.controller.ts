@@ -75,9 +75,9 @@ export class UsersController {
             if (user.id != id) {
                 throw new HttpException('User Not Authorized', 403);
             }
-            console.log("TESTE", body, file);
             var userData : any = body;
             userData.id = user.id;
+            
             return await this.usersService.updateUser(userData, file);
         } catch (error) {
             new ErrorHandling(error);

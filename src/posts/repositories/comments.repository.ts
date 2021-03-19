@@ -82,7 +82,7 @@ export class CommentsRepository extends Repository<PostsComments>{
 
     }
 
-    async deleteComments(userId : String, post, commentsIds : String[]) {
+    async deleteComments(userId : string, post, commentsIds : string[]) {
 
         let queryRunner = getConnection().createQueryRunner();
     
@@ -106,10 +106,10 @@ export class CommentsRepository extends Repository<PostsComments>{
                 await queryRunner.manager.update(PostsComments, whereConditions, {
                     deleted : true
                 });
-
             }
 
             await queryRunner.commitTransaction();
+            await this.recalculateCommentCount(post.id);
 
             return {
                 status: 200,

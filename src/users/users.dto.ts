@@ -153,7 +153,7 @@ export class UserProfileUpdateDto {
     @ApiProperty()
     addressLongitude : number;
 
-    @ApiProperty()
-    tagsIds : number[];
+    @ApiProperty({description: "IDs of selected tags separated by commas"})
+    tagsIds : string;
 
 }
