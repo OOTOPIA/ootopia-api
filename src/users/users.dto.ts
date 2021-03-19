@@ -1,6 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { Double } from 'typeorm';
 
 export class CreateUserDto {
 
@@ -123,5 +124,36 @@ export class UserProfileDto {
 
     @ApiProperty()
     photoUrl : string;
+
+}
+
+export class UserProfileUpdateDto {
+
+    @ApiProperty({ required: true, type: "file", description: "User photo" })
+    file : object;
+
+    @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
+    birthdate : string;
+
+    @ApiProperty({type: "number", minimum: 10, maximum: 60})
+    dailyLearningGoalInMinutes : number;
+
+    @ApiProperty()
+    addressCountryCode : string;
+
+    @ApiProperty()
+    addressState : string;
+    
+    @ApiProperty()
+    addressCity : string;
+
+    @ApiProperty()
+    addressLatitude : number;
+
+    @ApiProperty()
+    addressLongitude : number;
+
+    @ApiProperty()
+    tagsIds : number[];
 
 }

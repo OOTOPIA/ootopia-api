@@ -37,6 +37,24 @@ export class Users extends BaseEntity {
     @Column({ nullable : true, name : 'enable_sustainable_ads', type: 'boolean', default: () => "true" })
     enableSustainableAds : boolean;
 
+    @Column({ nullable: false, type: 'numeric', name : 'register_phase', default: () => "1" })
+    registerPhase : number;
+
+    @Column({ nullable: true, name: 'address_country_code', type: 'varchar' })
+    addressCountryCode : string;
+
+    @Column({ nullable: true, name: 'address_state', type: 'varchar' })
+    addressState : string;
+
+    @Column({ nullable: true, name: 'address_city', type: 'varchar' })
+    addressCity : string;
+
+    @Column({ nullable: true, name: 'address_latitude', type: 'numeric' })
+    addressLatitude : number;
+
+    @Column({ nullable: true, name: 'address_longitude', type: 'numeric' })
+    addressLongitude : number;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
