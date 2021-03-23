@@ -26,6 +26,7 @@ export class FilesUploadService {
       .upload({
         Key: `users/${userId}/photo-${new Date().getTime()}${extension}`,
         Body: fileStreamOrBuffer,
+        Bucket: process.env.BUCKET,
         ACL: 'public-read'
       })
       .promise();
