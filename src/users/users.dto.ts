@@ -96,6 +96,9 @@ export class LoggedUserDto {
 
     @ApiProperty()
     enableSustainableAds : boolean;
+    
+    @ApiProperty()
+    registerPhase : number;
 
     @ApiProperty({ description: "Generated JWT to use on HTTP Headers Authorization" })
     token : string;
