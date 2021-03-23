@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { InterestsTagsService } from './interests-tags.service';
+import { InterestsTagsService } from './services/interests-tags.service';
 import { InterestsTagsController } from './interests-tags.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { InterestsTagsRepository } from './interests-tags.repository';
+import { InterestsTagsRepository } from './repositories/interests-tags.repository';
+import { InterestsTagsUsersService } from './services/interests-tags-users.service';
+import { InterestsTagsUsersRepository } from './repositories/interests-tags-users.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InterestsTagsRepository])],
-  providers: [InterestsTagsService],
-  controllers: [InterestsTagsController]
+  imports: [TypeOrmModule.forFeature([InterestsTagsRepository]), TypeOrmModule.forFeature([InterestsTagsUsersRepository])],
+  providers: [InterestsTagsService, InterestsTagsUsersService],
+  controllers: [InterestsTagsController],
+  exports: [InterestsTagsService, InterestsTagsUsersService]
 })
 export class InterestsTagsModule {}

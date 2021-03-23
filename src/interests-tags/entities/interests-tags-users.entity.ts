@@ -7,7 +7,9 @@ import {
     UpdateDateColumn,
     BaseEntity,
     OneToOne,
-    JoinColumn
+    JoinColumn,
+    OneToMany,
+    ManyToOne
 } from 'typeorm';
 import { InterestsTags } from './interests-tags.entity';
   
@@ -17,11 +19,11 @@ export class InterestsTagsUsers extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id : string;
 
-    @OneToOne(type => Users, user => user.id)
+    @ManyToOne(type => Users, user => user.id)
     @JoinColumn({ name: "user_id" })
     userId : Users;
 
-    @OneToOne(type => InterestsTags, tag => tag.id)
+    @ManyToOne(type => InterestsTags, tag => tag.id)
     @JoinColumn({ name: "tag_id" })
     tagId : InterestsTags;
 

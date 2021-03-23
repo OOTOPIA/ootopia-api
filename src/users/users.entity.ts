@@ -4,8 +4,11 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    BaseEntity
+    BaseEntity,
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
+import { UsersAddresses } from './entities/users-addresses.entity';
   
 @Entity()
 export class Users extends BaseEntity {
@@ -40,20 +43,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: false, type: 'numeric', name : 'register_phase', default: () => "1" })
     registerPhase : number;
 
-    @Column({ nullable: true, name: 'address_country_code', type: 'varchar' })
-    addressCountryCode : string;
-
-    @Column({ nullable: true, name: 'address_state', type: 'varchar' })
-    addressState : string;
-
-    @Column({ nullable: true, name: 'address_city', type: 'varchar' })
-    addressCity : string;
-
-    @Column({ nullable: true, name: 'address_latitude', type: 'numeric' })
-    addressLatitude : number;
-
-    @Column({ nullable: true, name: 'address_longitude', type: 'numeric' })
-    addressLongitude : number;
+    @ManyToOne(type => UsersAddresses, address => address.id)
+    @JoinColumn({ name : "address_id" })
+    addressId : UsersAddresses;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

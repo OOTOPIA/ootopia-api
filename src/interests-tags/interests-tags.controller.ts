@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiRespons
 import { ErrorHandling } from './../config/error-handling';
 import { HttpResponseDto } from './../config/http-response.dto';
 import { FilterInterestsTagsDto, InterestsTagsDto } from './interests-tags.dto';
-import { InterestsTagsService } from './interests-tags.service';
+import { InterestsTagsService } from './services/interests-tags.service';
 
 @Controller('interests-tags')
 export class InterestsTagsController {
@@ -12,12 +12,12 @@ export class InterestsTagsController {
         private readonly interestsTagsService : InterestsTagsService) {}
 
     @ApiTags('interests-tags')
-    @ApiQuery({ name: "language", type: "string", example: "pt-BR" } )
+    @ApiQuery({ name: "language", type: "string", example: "pt-BR" })
     @ApiOperation({ summary: 'Returns a list of tags' })
     @ApiResponse({ status: 200, type: InterestsTagsDto, isArray: true })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @Get()
     async getTags(@Query() filters : FilterInterestsTagsDto) {
         try {

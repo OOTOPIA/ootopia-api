@@ -9,6 +9,7 @@ import { VideoModule } from './video/video.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesUploadModule } from './files-upload/files-upload.module';
 import { InterestsTagsModule } from './interests-tags/interests-tags.module';
+import { CitiesModule } from './cities/cities.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { InterestsTagsModule } from './interests-tags/interests-tags.module';
     VideoModule,
     AuthModule,
     FilesUploadModule,
-    InterestsTagsModule
+    InterestsTagsModule,
+    CitiesModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,12 +3,20 @@ import { UsersRepository } from './users.repository';
 import * as bcryptjs from 'bcryptjs';
 import { Users } from './users.entity';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
+import { getConnection } from 'typeorm';
+import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
+import { CitiesService } from 'src/cities/cities.service';
+import { UsersAddressesRepository } from './repositories/users-addresses.repository';
 
 @Injectable()
 export class UsersService {
 
-    constructor(private readonly usersRepository : UsersRepository, private readonly filesUploadService : FilesUploadService) {
-
+    constructor(
+        private readonly usersRepository : UsersRepository, 
+        private readonly filesUploadService : FilesUploadService,
+        private readonly interestsTagsService : InterestsTagsService,
+        private readonly citiesService : CitiesService,
+        private readonly usersAddressesRepository : UsersAddressesRepository) {
     }
 
     async createUser(userData) {
@@ -34,18 +42,17 @@ export class UsersService {
 
     async updateUser(userData, photoFile = null) {
 
+        let queryRunner = getConnection().createQueryRunner();
+
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
         let currentUser = await this.getUserById(userData.id);
 
-        //TODO: Upload photo file
         let _userData : any = {
             id : userData.id,
             birthdate : userData.birthdate,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
-            addressCountryCode : userData.addressCountryCode,
-            addressState : userData.addressState,
-            addressCity : userData.addressCity,
-            addressLatitude : userData.addressLatitude,
-            addressLongitude : userData.addressLongitude,
         };
 
         if (photoFile != null) {
@@ -59,12 +66,40 @@ export class UsersService {
 
         if (userData.tagsIds && userData.tagsIds.length > 0) {
             let tagsIds = userData.tagsIds.split(",");
+            await this.interestsTagsService.updateUserTags(userData.id, tagsIds, queryRunner);
         }
 
-        //TODO: Save tags id's
-        //TODO: Save address data in other table
+        if (userData.addressCountryCode && userData.addressState && userData.addressCity) {
 
-        await this.usersRepository.createOrUpdateUser(_userData);
+            let city = await this.citiesService.getCity(userData.addressCity, userData.addressState, userData.addressCountryCode);
+            if (!city) {
+                city = await this.citiesService.createCity({
+                    city : userData.addressCity,
+                    state : userData.addressState,
+                    country : userData.addressCountryCode,
+                });
+            }
+
+            let addressData : any = {
+                city : city,
+                lat : userData.addressLatitude,
+                lng : userData.addressLongitude,
+            };
+
+            if (currentUser.addressId) {
+                addressData.id = currentUser.addressId;
+            }
+
+            let userAddress = await this.usersAddressesRepository.createOrUpdateUserAddress(addressData);
+            _userData.addressId = userAddress.id;
+            
+            await queryRunner.manager.save(userAddress);
+
+        }
+
+        await queryRunner.manager.save(await this.usersRepository.create(_userData));
+        await queryRunner.commitTransaction();
+        
         return Object.assign(currentUser, _userData);
 
     }
@@ -82,6 +117,8 @@ export class UsersService {
         delete user.email;
         delete user.dailyLearningGoalInMinutes;
         delete user.enableSustainableAds;
+        delete user.addressId;
+        delete user.registerPhase;
         delete user.createdAt;
         delete user.updatedAt;
         return user;
