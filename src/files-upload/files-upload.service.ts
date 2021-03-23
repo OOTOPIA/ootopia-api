@@ -21,9 +21,6 @@ export class FilesUploadService {
   }
 
   async uploadFileToS3(fileStreamOrBuffer, fileName, userId) {
-    console.log("userId >>", userId);
-    console.log("fileName >>", fileName);
-    console.log("process.env >>", process.env);
     const extension = /(?:\.([^.]+))?$/.exec(fileName)[0];
     let { Location } = await this.aws
       .upload({
