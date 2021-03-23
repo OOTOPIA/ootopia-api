@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
-import { InterestsTags } from "./interests-tags.entity";
+import { InterestsTags } from "../entities/interests-tags.entity";
+import { InterestsTagsUsers } from '../entities/interests-tags-users.entity';
 
 @Injectable()
 @EntityRepository(InterestsTags)

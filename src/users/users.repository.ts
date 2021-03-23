@@ -24,10 +24,18 @@ export class UsersRepository extends Repository<Users>{
         return (user && user.length ? user[0] : null);
     }
 
+    //I use the manual query because the typeOrm does not return related tables without the join, in this case, it would not return the address_id column
     async getUserById(id: string) {
-        let user = await this.findOne({
-          where: { id },
-        });
+        let results = camelcaseKeys(await getConnection().query(`
+            SELECT 
+                u.*
+            FROM users u
+            WHERE u.id = $1
+        `, [id]), { deep : true });
+
+        let user = results.length ? results[0] : null;
+
+        if (!user) return user;
         delete user.password;
         return user;
     }
