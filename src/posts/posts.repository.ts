@@ -118,8 +118,12 @@ export class PostsRepository extends Repository<Posts>{
             where = where + `p.user_id = $${params.length} AND `;
         }
 
-        if (filters.page) {
-            limit = 'LIMIT ' + perPage + ' OFFSET ' + ((filters.page > 1 ? filters.page - 1 : 0) * perPage);
+        if (filters.limit && filters.offset) {
+            if (filters.limit > 50) {
+                filters.limit = 50;
+            }
+            //limit = 'LIMIT ' + perPage + ' OFFSET ' + ((filters.page > 1 ? filters.page - 1 : 0) * perPage);
+            limit = 'LIMIT ' + filters.limit + ' OFFSET ' + filters.offset;
         }
 
         if (userId) {

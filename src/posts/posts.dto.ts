@@ -24,11 +24,14 @@ export class CreatePostsDto {
 
 export class PostsTimelineFilterDto {
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     userId : string;
 
-    @ApiProperty({ type: "number" })
-    page : number;
+    @ApiProperty({ type: "number", required: false })
+    limit : number;
+
+    @ApiProperty({ type: "number", required: false })
+    offset : number;
 
 }
 
