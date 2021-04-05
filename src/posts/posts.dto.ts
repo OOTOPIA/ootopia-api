@@ -10,6 +10,27 @@ export class PostMetadataDto {
     @ApiProperty({ required: true, example : "My first awesome post!"})
     description : string;
 
+    @ApiProperty()
+    tagsIds : string;
+
+    @ApiProperty()
+    addressCountryCode : string;
+
+    @ApiProperty()
+    addressState : string;
+    
+    @ApiProperty()
+    addressCity : string;
+
+    @ApiProperty()
+    addressLatitude : number;
+
+    @ApiProperty()
+    addressLongitude : number;
+
+    @ApiProperty()
+    addressNumber : number;
+
 }
 
 export class CreatePostsDto {
@@ -116,6 +137,18 @@ export class PostTimelineDto {
 
     @ApiProperty({ description: "Total number of comments" })
     commentsCount : number;
+
+    @ApiProperty({ description: "Interests tags", isArray: true })
+    tags : string;
+
+    @ApiProperty()
+    city : string;
+
+    @ApiProperty()
+    state : string;
+
+    @ApiProperty()
+    country : string;
 
     @ApiProperty()
     createdAt : Date;

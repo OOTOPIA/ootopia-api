@@ -1,3 +1,4 @@
+import { Addresses } from 'src/addresses/addresses.entity';
 import { Users } from 'src/users/users.entity';
 import {
   Entity,
@@ -48,6 +49,10 @@ export class Posts extends BaseEntity {
 
   @Column({ nullable: true, name: "stream_media_id", type: 'varchar' })
   streamMediaId : string;
+
+  @ManyToOne(type => Addresses, address => address.id)
+  @JoinColumn({ name : "address_id" })
+  addressId : Addresses;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

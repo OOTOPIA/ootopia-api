@@ -8,7 +8,7 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm';
-import { UsersAddresses } from './entities/users-addresses.entity';
+import { Addresses } from '../addresses/addresses.entity';
   
 @Entity()
 export class Users extends BaseEntity {
@@ -43,9 +43,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: false, type: 'numeric', name : 'register_phase', default: () => "1" })
     registerPhase : number;
 
-    @ManyToOne(type => UsersAddresses, address => address.id)
+    @ManyToOne(type => Addresses, address => address.id)
     @JoinColumn({ name : "address_id" })
-    addressId : UsersAddresses;
+    addressId : Addresses;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

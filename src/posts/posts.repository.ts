@@ -17,6 +17,13 @@ export class PostsRepository extends Repository<Posts>{
         return this.save(post);
     }
 
+    deletePost(id) {
+        if (!id) {
+            return null;
+        }
+        return this.delete(id);
+    }
+
     //TODO: Melhorar insert utilizando ON CONFLICT com dois campos
 
     async likePost(postId : string, userId : string) {
@@ -110,7 +117,8 @@ export class PostsRepository extends Repository<Posts>{
             'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status',
             'users.photo_url', 'users.fullname as username', 
             'COALESCE(pl.likes_count, 0)::integer as likes_count',
-            'COALESCE(pc.comments_count, 0)::integer as comments_count'
+            'COALESCE(pc.comments_count, 0)::integer as comments_count',
+            'c.city', 'c.state', 'c.country'
         ];
 
         if (filters.userId) {
@@ -137,11 +145,18 @@ export class PostsRepository extends Repository<Posts>{
 
         return camelcaseKeys(await getConnection().query(`
             SELECT 
-                ${columns}
+                ${columns}, array(
+                    select t.name
+                    from interests_tags_posts tp
+                    inner join interests_tags t on t.id = tp.tag_id
+                    where tp.post_id = p.id
+                    ) as tags
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
             LEFT JOIN posts_comments_count pc ON pc.post_id = p.id
+            LEFT JOIN addresses addr ON addr.id = p.address_id
+            LEFT JOIN cities c ON c.id = addr.city_id
             WHERE ${where}
             ORDER BY p.created_at DESC
             ${limit}

@@ -6,7 +6,7 @@ import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import { getConnection } from 'typeorm';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
 import { CitiesService } from 'src/cities/cities.service';
-import { UsersAddressesRepository } from './repositories/users-addresses.repository';
+import { AddressesRepository } from '../addresses/addresses.repository';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +16,7 @@ export class UsersService {
         private readonly filesUploadService : FilesUploadService,
         private readonly interestsTagsService : InterestsTagsService,
         private readonly citiesService : CitiesService,
-        private readonly usersAddressesRepository : UsersAddressesRepository) {
+        private readonly addressesRepository : AddressesRepository) {
     }
 
     async createUser(userData) {
@@ -90,7 +90,7 @@ export class UsersService {
                 addressData.id = currentUser.addressId;
             }
 
-            let userAddress = await this.usersAddressesRepository.createOrUpdateUserAddress(addressData);
+            let userAddress = await this.addressesRepository.createOrUpdateAddress(addressData);
             _userData.addressId = userAddress.id;
             
             await queryRunner.manager.save(userAddress);

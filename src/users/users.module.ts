@@ -4,7 +4,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { CitiesModule } from 'src/cities/cities.module';
 import { FilesUploadModule } from 'src/files-upload/files-upload.module';
 import { InterestsTagsModule } from 'src/interests-tags/interests-tags.module';
-import { UsersAddressesRepository } from './repositories/users-addresses.repository';
+import { AddressesRepository } from '../addresses/addresses.repository';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
@@ -12,7 +12,7 @@ import { UsersService } from './users.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UsersRepository]),
-    TypeOrmModule.forFeature([UsersAddressesRepository]),
+    TypeOrmModule.forFeature([AddressesRepository]),
     forwardRef(() => AuthModule),
     FilesUploadModule,
     InterestsTagsModule,
