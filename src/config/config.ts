@@ -6,8 +6,9 @@ import { Posts, PostsLikes, PostsLikesCount } from 'src/posts/posts.entity';
 import { InterestsTags } from 'src/interests-tags/entities/interests-tags.entity';
 import { Users } from 'src/users/users.entity';
 import { InterestsTagsUsers } from 'src/interests-tags/entities/interests-tags-users.entity';
-import { UsersAddresses } from 'src/users/entities/users-addresses.entity';
+import { Addresses } from 'src/addresses/addresses.entity';
 import { Cities } from 'src/cities/cities.entity';
+import { InterestsTagsPosts } from 'src/interests-tags/entities/interests-tags-posts.entity';
 
 require('dotenv').config();
 
@@ -56,8 +57,9 @@ class ConfigService {
           PostsCommentsCount,
           InterestsTags,
           InterestsTagsUsers,
+          InterestsTagsPosts,
           Cities,
-          UsersAddresses
+          Addresses
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
