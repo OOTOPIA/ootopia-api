@@ -7,8 +7,7 @@ import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import { urlencoded, json } from 'express';
 import { AllExceptionsFilter } from './config/all-exception-filter';
-import { HttpExceptionFilter } from './config/http-exception-filter';
-import * as bodyParser from 'body-parser';
+import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
   const expressApp = express();
@@ -16,6 +15,10 @@ async function bootstrap() {
     AppModule,
     new ExpressAdapter(expressApp),
   );
+
+  Sentry.init({
+    dsn: 'https://85374b7ba3a94b00bd99bb44f014acd0@o566687.ingest.sentry.io/5709807',
+  });
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useStaticAssets(join(__dirname, '..', 'public'));

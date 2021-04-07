@@ -12,6 +12,7 @@ import { CommentsService } from './services/comments.service';
 import { HttpResponseDto } from 'src/config/http-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
+import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 
 @Controller('posts')
 export class PostsController {
@@ -21,6 +22,7 @@ export class PostsController {
         private readonly videoService : VideoService,
         private readonly commentsService : CommentsService) {}
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Upload a video or image post' })
     @ApiBearerAuth('Bearer')
@@ -45,6 +47,7 @@ export class PostsController {
         }
     }
     
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Like/dislike a post' })
     @ApiBearerAuth('Bearer')
@@ -66,6 +69,7 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Returns a list of posts for the timeline' })
     @ApiBearerAuth('Bearer')
@@ -87,6 +91,7 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Get details for a specific post' })
     @ApiBearerAuth('Bearer')
@@ -110,6 +115,7 @@ export class PostsController {
 
     //TODO: VALIDATE WEBHOOK SIGNATURE
 
+    @UseInterceptors(SentryInterceptor)
     @ApiExcludeEndpoint()
     @ApiOperation({ summary: 'Receive video status update on Cloudflare' })
     @ApiBearerAuth('Bearer')
@@ -140,6 +146,7 @@ export class PostsController {
     }
 
     //TODO: ADICIONAR AUTENTICAÇÃO
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Update webhook address called by Cloudflare' })
     @Put('/video/webhook')
@@ -151,6 +158,7 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Comment on a post' })
     @ApiBearerAuth('Bearer')
@@ -175,6 +183,7 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Returns a list of comments for the post' })
     @ApiBearerAuth('Bearer')
@@ -195,6 +204,7 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Remove one or more comments' })
     @ApiBearerAuth('Bearer')
