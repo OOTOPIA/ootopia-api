@@ -22,8 +22,8 @@ export class Addresses extends BaseEntity {
     @Column({ nullable: false, type: 'numeric' })
     lng : number;
 
-    @Column({ nullable: true, type: 'numeric' })
-    number : number;
+    @Column({ nullable: true, type: 'varchar' })
+    number : string;
 
     @Column({ nullable: true, type: 'varchar' })
     complement : string;
