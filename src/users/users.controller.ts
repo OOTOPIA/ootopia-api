@@ -7,7 +7,8 @@ import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
 import { CreatedUserDto, CreateUserDto, LoggedUserDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
 import { UsersService } from './users.service';
-import { memoryStorage } from 'multer'
+import { memoryStorage } from 'multer';
+import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +18,7 @@ export class UsersController {
         private readonly authService : AuthService
         ) {}
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Create a new user account' })
     @ApiBody({ type: CreateUserDto })
@@ -33,6 +35,7 @@ export class UsersController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Login' })
     @ApiBody({ type: UserLoginDto })
@@ -56,6 +59,7 @@ export class UsersController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Update user account' })
     @ApiBearerAuth('Bearer')
@@ -84,6 +88,7 @@ export class UsersController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Get public details for a specific user' })
     @ApiParam({name : "id", type: "string", description: "User ID" })
