@@ -97,4 +97,8 @@ export class PostsService {
       return this.postsRepository.getPostsTimeline(filters, userId);
     }
 
+    async deletePost(postId, userId) {
+      await this.postsRepository.deletePostByUser(postId, userId);
+    }
+
 }
