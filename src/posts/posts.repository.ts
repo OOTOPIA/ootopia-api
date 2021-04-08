@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { Posts } from "./posts.entity";
 import * as camelcaseKeys from 'camelcase-keys';
@@ -17,6 +17,21 @@ export class PostsRepository extends Repository<Posts>{
         return this.save(post);
     }
 
+    async deletePostByUser(postId, userId) {
+        const post = await this.findOne({
+            where : {
+                id : postId, 
+                userId : userId
+            }
+        });
+        if (!post) {
+            throw new HttpException("Permission denied", 403);
+        }
+        post.videoStatus = "deleted";
+        return await this.save(post);
+    }
+
+    //Método usado somente para caso haja uma exceção na transaction do método createPost
     deletePost(id) {
         if (!id) {
             return null;

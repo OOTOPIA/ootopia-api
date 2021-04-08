@@ -113,6 +113,27 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Remove post' })
+    @ApiBearerAuth('Bearer')
+    @ApiParam({ name : "postId", type: "string", description: "Post ID" })
+    @ApiResponse({ status: 200, description: 'Successfully removed' })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Delete('/:postId')
+    async deletePost(@Req() { user }, @Param('postId') postId) {
+        try {
+
+            return await this.postsService.deletePost(postId, user.id);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
     //TODO: VALIDATE WEBHOOK SIGNATURE
 
     @UseInterceptors(SentryInterceptor)
