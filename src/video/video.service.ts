@@ -114,6 +114,11 @@ export class VideoService {
 
     }
 
-
+    async deleteVideo(streamMediaId) {
+      let result = await axios.delete(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${streamMediaId}`, {
+        headers : this.headers
+      });
+      return result.data;
+    }
 
 }

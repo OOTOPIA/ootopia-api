@@ -98,7 +98,8 @@ export class PostsService {
     }
 
     async deletePost(postId, userId) {
-      await this.postsRepository.deletePostByUser(postId, userId);
+      let result = await this.postsRepository.deletePostByUser(postId, userId);
+      await this.videoService.deleteVideo(result.streamMediaId);
     }
 
 }
