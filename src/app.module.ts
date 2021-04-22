@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { FilesUploadModule } from './files-upload/files-upload.module';
 import { InterestsTagsModule } from './interests-tags/interests-tags.module';
 import { CitiesModule } from './cities/cities.module';
+import { WalletsModule } from './wallets/wallets.module';
+import { WalletTransfersModule } from './wallet-transfers/wallet-transfers.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { CitiesModule } from './cities/cities.module';
     AuthModule,
     FilesUploadModule,
     InterestsTagsModule,
-    CitiesModule
+    CitiesModule,
+    WalletsModule,
+    WalletTransfersModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,6 +9,8 @@ import { InterestsTagsUsers } from 'src/interests-tags/entities/interests-tags-u
 import { Addresses } from 'src/addresses/addresses.entity';
 import { Cities } from 'src/cities/cities.entity';
 import { InterestsTagsPosts } from 'src/interests-tags/entities/interests-tags-posts.entity';
+import { Wallets } from 'src/wallets/wallets.entity';
+import { WalletTransfers } from 'src/wallet-transfers/wallet-transfers.entity';
 
 require('dotenv').config();
 
@@ -59,7 +61,9 @@ class ConfigService {
           InterestsTagsUsers,
           InterestsTagsPosts,
           Cities,
-          Addresses
+          Addresses,
+          Wallets,
+          WalletTransfers
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
