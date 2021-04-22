@@ -7,6 +7,7 @@ import { getConnection } from 'typeorm';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
 import { CitiesService } from 'src/cities/cities.service';
 import { AddressesRepository } from '../addresses/addresses.repository';
+import { WalletsService } from 'src/wallets/wallets.service';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +17,8 @@ export class UsersService {
         private readonly filesUploadService : FilesUploadService,
         private readonly interestsTagsService : InterestsTagsService,
         private readonly citiesService : CitiesService,
-        private readonly addressesRepository : AddressesRepository) {
+        private readonly addressesRepository : AddressesRepository,
+        private readonly walletsService : WalletsService) {
     }
 
     async createUser(userData) {
@@ -34,6 +36,9 @@ export class UsersService {
         }
 
         let user = await this.usersRepository.createOrUpdateUser(userData);
+        await this.walletsService.createOrUpdateWallet({
+            userId : user.id,
+        });
         delete user.password;
 
         return user;
