@@ -22,9 +22,12 @@ export class WalletsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-    @UseGuards(JwtAuthGuard)
+    //@UseGuards(JwtAuthGuard)
     @Get('/:userId')
-    async getWallet(@Param('userId') userId, @Req() { user }) {
+    async getWallet(
+        @Param('userId') userId, 
+        //@Req() { user },
+        ) {
         try {
 
             /*if (user.id != userId) {
