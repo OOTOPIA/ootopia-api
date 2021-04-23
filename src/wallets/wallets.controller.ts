@@ -27,11 +27,9 @@ export class WalletsController {
     async getWallet(@Param('userId') userId, @Req() { user }) {
         try {
 
-            //throw new HttpException('User Not Authorized', 403);
-
-            if (user.id != userId) {
+            /*if (user.id != userId) {
                 throw new HttpException('User Not Authorized', 403);
-            }
+            }*/
 
             return await this.walletsService.getWalletByUserId(userId);
             
