@@ -1,0 +1,20 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  devmagic_staging_deploy:
+    name: Beta deploy on DevMagic's server
+    runs-on: ubuntu-latest
+    steps:      
+      - run: > ssh ubuntu@1.1.1.1 << EOSSH
+            . ~/.nvm/nvm.sh #https://stackoverflow.com/questions/57901543/the-problem-with-running-version-managed-node-as-a-remote-ssh-script
+            cd /home/ubuntu/ootopia-api
+            git pull origin staging
+            npm ci
+            npm run build
+            pm2 delete ootopia-api-staging
+            pm2 start dist/main.js --name "ootopia-api-staging"
+            EOSSH
