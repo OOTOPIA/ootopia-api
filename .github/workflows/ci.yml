@@ -3,7 +3,10 @@ on:
   pull_request:
     branches:
       - staging
-
+  push:
+    branches:
+      - staging
+      
 jobs:
   devmagic_staging_deploy:
     name: Beta deploy on DevMagic's server
