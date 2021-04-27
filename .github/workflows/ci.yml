@@ -11,19 +11,19 @@ jobs:
   devmagic_staging_deploy:
     name: Beta deploy on DevMagic's server
     runs-on: ubuntu-latest
-    env:
-      CI: true
-      SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
-      SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
     steps:      
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${SSH_HOST}
           >> ~/.ssh/known_hosts
+        env:
+          SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${SSH_PRIVATE_KEY}
-      - run:> ssh ubuntu@${SSH_HOST} << EOSSH
+      - run: | 
+            ssh ubuntu@${SSH_HOST} << EOSSH
             . ~/.nvm/nvm.sh
             cd /home/ubuntu/ootopia-api
             git pull origin staging
@@ -32,3 +32,6 @@ jobs:
             pm2 delete ootopia-api-staging
             pm2 start dist/main.js --name "ootopia-api-staging"
             EOSSH
+        env:
+          SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
