@@ -9,8 +9,8 @@ jobs:
     name: Beta deploy on DevMagic's server
     runs-on: ubuntu-latest
     steps:      
-      - run: > ssh ubuntu@1.1.1.1 << EOSSH
-            . ~/.nvm/nvm.sh #https://stackoverflow.com/questions/57901543/the-problem-with-running-version-managed-node-as-a-remote-ssh-script
+      - run:> ssh ubuntu@1.1.1.1 << EOSSH
+            . ~/.nvm/nvm.sh
             cd /home/ubuntu/ootopia-api
             git pull origin staging
             npm ci
