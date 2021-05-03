@@ -22,14 +22,14 @@ async function bootstrap() {
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+//  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   //app.useGlobalFilters(new HttpExceptionFilter());
 
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
 
-  app.use(json({ limit: '100mb' }));
-  app.use(urlencoded({limit: '100mb', extended: true}));
+  app.use(json({ limit: '500mb' }));
+  app.use(urlencoded({limit: '500mb', extended: true}));
 
   //TEMP: Check if is necessary to validate video webhook signature
   //app.use('/posts/video/webhook', bodyParser.raw({type: 'application/json'}));
