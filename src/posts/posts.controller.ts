@@ -40,6 +40,10 @@ export class PostsController {
     async createPost(@UploadedFile() file, @Req() { user }, @Body() post : CreatePostsDto) {
         try {
 
+            if (!file) {
+                throw new HttpException("Video file is not sent", 400);
+            }
+
             return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), user.id);
             
         } catch (error) {
