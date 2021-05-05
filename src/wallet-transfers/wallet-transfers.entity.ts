@@ -11,10 +11,20 @@ import {
     ManyToMany,
     OneToOne,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
 } from 'typeorm';
 
 import { Users } from '../users/users.entity';
+
+export enum Origin {
+  VIDEO_VIEW = "video_view",
+  VIDEO_LIKE = "video_like",
+};
+
+export enum Action {
+  SENT = "sent",
+  RECEIVED = "received",
+};
 
 @Entity()
 export class WalletTransfers extends BaseEntity {
@@ -29,6 +39,24 @@ export class WalletTransfers extends BaseEntity {
   @ManyToOne(type => Wallets, wallet => wallet.id)
   @JoinColumn({ name: "wallet_id" })
   walletId : Wallets;
+
+  @ManyToOne(type => Users, user => user.id, { nullable : true })
+  @JoinColumn({ name: "origin_user_id" })
+  originUserId : string;
+
+  @Column({ 
+    nullable: true, 
+    type: "enum",
+    enum: Origin,
+  })
+  origin : Origin;
+
+  @Column({ 
+    nullable: true, 
+    type: "enum",
+    enum: Action,
+  })
+  action : Action;
 
   @Column({ nullable : false, type: 'numeric', default: () => "0"})
   balance : number;
