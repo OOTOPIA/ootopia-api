@@ -50,6 +50,9 @@ export class Posts extends BaseEntity {
   @Column({ nullable: true, name: "stream_media_id", type: 'varchar' })
   streamMediaId : string;
 
+  @Column({ nullable : false, name: "ooz_total_collected", type: 'numeric', default: () => "0"})
+  oozTotalCollected : number;
+
   @ManyToOne(type => Addresses, address => address.id)
   @JoinColumn({ name : "address_id" })
   addressId : Addresses;

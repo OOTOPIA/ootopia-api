@@ -102,4 +102,8 @@ export class PostsService {
       await this.videoService.deleteVideo(result.streamMediaId);
     }
 
+    incrementOOZTotalCollected(balance : number, postId : string) {
+      return this.postsRepository.incrementOOZTotalCollected(balance, postId);
+    }
+
 }

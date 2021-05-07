@@ -33,13 +33,13 @@ export class WalletTransfersHistoryDto {
     @ApiProperty()
     walletId : string;
 
-    @ApiProperty({ description: "ID of the user who originated the transfer, applicable to display the user's name on incoming transfers" })
-    originUserId : string;
+    @ApiProperty({ description: "ID of the other user related to the transaction, if any. Applicable to display the user's name on incoming transfers" })
+    otherUserId : string;
 
-    @ApiProperty({ description: "Name of the user who originated the transfer, applicable to display the user's name on incoming transfers" })
-    originUserName : string;
+    @ApiProperty({ description: "Name of the other user related to the transaction, if any. Applicable to display the user's name on incoming transfers" })
+    otherUsername : string;
 
-    @ApiProperty({ enum: ['video_view', 'video_like'], description: "Identifier of the origin of the transfer. In cases of transfer received through a like, video viewing etc." })
+    @ApiProperty({ enum: ['video_view', 'video_like', 'transfer'], description: "Identifier of the origin of the transfer. In cases of transfer received through a like, video viewing etc." })
     origin : string;
 
     @ApiProperty({ enum: ['sent', 'received'] })
@@ -53,5 +53,12 @@ export class WalletTransfersHistoryDto {
 
     @ApiProperty()
     updatedAt : Date;
+
+}
+
+export class WalletTransferToPostDto {
+
+    @ApiProperty()
+    balance : number;
 
 }
