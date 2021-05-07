@@ -13,16 +13,8 @@ export class WalletsService {
         return await this.walletsRepository.getWalletByUserId(userId);
     }
 
-    /*async recalculateTotalBalance(walletId, userId) {
+    async recalculateTotalBalance(walletId, userId) {
         return await this.walletsRepository.recalculateTotalBalance(walletId, userId);
-    }*/
-
-    async increaseTotalBalance(walletId, userId, balance) {
-        return await this.walletsRepository.increaseTotalBalance(walletId, userId, balance);
-    }
-
-    async decreaseTotalBalance(walletId, userId, balance) {
-        return await this.walletsRepository.decreaseTotalBalance(walletId, userId, balance);
     }
 
 }

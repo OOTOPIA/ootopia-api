@@ -20,7 +20,6 @@ import { CitiesModule } from 'src/cities/cities.module';
     CitiesModule
   ],
   providers: [PostsService, CommentsService],
-  controllers: [PostsController],
-  exports: [PostsService]
+  controllers: [PostsController]
 })
 export class PostsModule {}

@@ -1,5 +1,4 @@
 
-import { Posts } from 'src/posts/posts.entity';
 import { Wallets } from 'src/wallets/wallets.entity';
 import {
     Entity,
@@ -20,10 +19,9 @@ import { Users } from '../users/users.entity';
 export enum Origin {
   VIDEO_VIEW = "video_view",
   VIDEO_LIKE = "video_like",
-  TRANSFER = "transfer"
 };
 
-export enum WalletTransferAction {
+export enum Action {
   SENT = "sent",
   RECEIVED = "received",
 };
@@ -36,19 +34,15 @@ export class WalletTransfers extends BaseEntity {
 
   @ManyToOne(type => Users, user => user.id)
   @JoinColumn({ name: "user_id" })
-  userId : string;
+  userId : Users;
 
   @ManyToOne(type => Wallets, wallet => wallet.id)
   @JoinColumn({ name: "wallet_id" })
-  walletId : string;
+  walletId : Wallets;
 
   @ManyToOne(type => Users, user => user.id, { nullable : true })
-  @JoinColumn({ name: "other_user_id" })
-  otherUserId? : string;
-
-  @ManyToOne(type => Posts, post => post.id, { nullable : true })
-  @JoinColumn({ name: "post_id" })
-  postId? : string;
+  @JoinColumn({ name: "origin_user_id" })
+  originUserId : string;
 
   @Column({ 
     nullable: true, 
@@ -60,9 +54,9 @@ export class WalletTransfers extends BaseEntity {
   @Column({ 
     nullable: true, 
     type: "enum",
-    enum: WalletTransferAction,
+    enum: Action,
   })
-  action : WalletTransferAction;
+  action : Action;
 
   @Column({ nullable : false, type: 'numeric', default: () => "0"})
   balance : number;

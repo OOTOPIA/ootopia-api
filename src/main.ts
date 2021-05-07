@@ -38,12 +38,9 @@ async function bootstrap() {
     .setTitle('Ootopia API')
     .setDescription('Ootopia API Doc')
     .setVersion('1.0')
-    .addTag('general-config')
     .addTag('users')
     .addTag('posts')
     .addTag('interests-tags')
-    .addTag('wallets')
-    .addTag('wallet-transfers')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', in: 'header' },
       'Bearer',
