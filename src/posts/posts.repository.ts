@@ -113,7 +113,10 @@ export class PostsRepository extends Repository<Posts>{
                 id : postId
             },
         });
-        post.oozTotalCollected = +(+post.oozTotalCollected + balance).toFixed(2);
+        if (!post.oozTotalCollected) {
+            post.oozTotalCollected = 0;
+        }
+        post.oozTotalCollected = +(+post.oozTotalCollected + +balance).toFixed(2);
         return post;
     }
 
