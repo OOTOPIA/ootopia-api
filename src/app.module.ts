@@ -12,6 +12,7 @@ import { InterestsTagsModule } from './interests-tags/interests-tags.module';
 import { CitiesModule } from './cities/cities.module';
 import { WalletsModule } from './wallets/wallets.module';
 import { WalletTransfersModule } from './wallet-transfers/wallet-transfers.module';
+import { GeneralConfigModule } from './general-config/general-config.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { WalletTransfersModule } from './wallet-transfers/wallet-transfers.modul
     InterestsTagsModule,
     CitiesModule,
     WalletsModule,
-    WalletTransfersModule
+    WalletTransfersModule,
+    GeneralConfigModule
   ],
   controllers: [AppController],
   providers: [AppService],

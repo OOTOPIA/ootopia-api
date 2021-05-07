@@ -107,12 +107,22 @@ export class PostsRepository extends Repository<Posts>{
         return this.save(post);
     }
 
+    async incrementOOZTotalCollected(balance : number, postId : string) {
+        const post = await this.findOne({
+            where: {
+                id : postId
+            },
+        });
+        post.oozTotalCollected = +(+post.oozTotalCollected + balance).toFixed(2);
+        return post;
+    }
+
     async getPostById(id) {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
                 p.*
             FROM posts p
-            WHERE p.id = $1
+            WHERE p.id = $1 and video_status <> 'deleted'
         `, [id]), { deep : true });
 
         return results.length ? results[0] : null;

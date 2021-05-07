@@ -1,0 +1,1 @@
+INSERT INTO general_config (name, value) VALUES ('transfer_ooz_to_post_limit', '20');

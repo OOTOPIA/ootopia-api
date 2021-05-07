@@ -11,10 +11,13 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         super();
     }
 
-    createTransfer(walletTransferData) {
+    createTransfer(walletTransferData, isTransaction? : boolean) {
         const walletTransfer = this.create();
         Object.assign(walletTransfer, walletTransferData);
-        return this.save(walletTransfer);
+        if (!isTransaction) {
+            return this.save(walletTransfer);
+        }
+        return walletTransfer;
     }
 
 }
