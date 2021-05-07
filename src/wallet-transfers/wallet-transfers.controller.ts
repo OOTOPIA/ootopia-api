@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpException, Param, Query, Req, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, Param, Query, Req, UseInterceptors, UseGuards, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { ErrorHandling } from './../config/error-handling';
@@ -44,6 +44,7 @@ export class WalletTransfersController {
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
     @Post('/post/:postId/transfer')
+    @HttpCode(200)
     async transferOOZFromPost(@Req() { user }, @Param('postId') postId, @Body() data : WalletTransferToPostDto) {
         try {
 
