@@ -18,13 +18,11 @@ export class GeneralConfigController {
     @ApiTags('general-config')
     @ApiParam({ name : "name", type: "string", description: "Name of the configuration you want to get the value" })
     @ApiOperation({ summary: 'Get a configuration value' })
-    @ApiBearerAuth('Bearer')
     @ApiResponse({ status: 200, type: GeneralConfig })
     @ApiResponse({ status: 404, description: 'Configuration not found', type: HttpResponseDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-    @UseGuards(JwtAuthGuard)
     @Get('/:name')
     async getTags(@Param('name') name) {
         try {
