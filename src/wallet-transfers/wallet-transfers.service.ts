@@ -89,8 +89,8 @@ export class WalletTransfersService {
 
         let userWallet = await this.walletsService.getWalletByUserId(userId);
 
-        if ((userWallet.balance - balance) < 0) {
-            throw new HttpException("INSUFFICIENT_BALANCE", 401);
+        if ((+userWallet.totalBalance - +balance) < 0) {
+            throw new HttpException("INSUFFICIENT_BALANCE", 400);
         }
 
         let postAuthorId = (await this.postsService.getPostById(postId)).userId;

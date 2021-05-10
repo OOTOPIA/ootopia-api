@@ -142,7 +142,7 @@ export class PostsRepository extends Repository<Posts>{
         let where = "video_status = 'ready' AND ", params = [];
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
-            'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status',
+            'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status', 'p.ooz_total_collected',
             'users.photo_url', 'users.fullname as username', 
             'COALESCE(pl.likes_count, 0)::integer as likes_count',
             'COALESCE(pc.comments_count, 0)::integer as comments_count',
