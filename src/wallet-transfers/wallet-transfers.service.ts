@@ -74,8 +74,12 @@ export class WalletTransfersService {
                 await queryRunner.manager.save(await this.postsService.incrementOOZTotalCollected(balance, postId));
             }
 
-            await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(senderUserWalletId, senderUserId, balance));
-            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, receiverUserId, balance));
+            if (senderUserId != receiverUserId) {
+
+                await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(senderUserWalletId, senderUserId, balance));
+                await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, receiverUserId, balance));
+
+            }
 
             await queryRunner.commitTransaction();
 
