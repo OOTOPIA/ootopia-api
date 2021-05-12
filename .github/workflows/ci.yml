@@ -11,15 +11,7 @@ jobs:
   devmagic_staging_deploy:
     name: Beta deploy on DevMagic's server
     runs-on: ubuntu-latest
-    steps:      
-      - name: Adding Known Hosts
-        uses: kielabokkie/ssh-key-and-known-hosts-action@v1
-        with:
-          ssh-private-key: ${SSH_PRIVATE_KEY}
-          ssh-host: ${SSH_HOST}
-        env:
-          SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
-          SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
+    steps:
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
