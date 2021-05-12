@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:      
       - name: Adding Known Hosts
-        run: ssh-keyscan -H ${SSH_HOST}
-          >> ~/.ssh/known_hosts
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+        with:
+          ssh-private-key: ${SSH_PRIVATE_KEY}
+          ssh-host: ${SSH_HOST}
         env:
           SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
           SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
