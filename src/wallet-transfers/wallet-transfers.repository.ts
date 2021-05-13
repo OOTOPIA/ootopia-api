@@ -52,7 +52,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
 
         return camelcaseKeys(await getConnection().query(`
             SELECT ${columns} FROM wallet_transfers w
-            INNER JOIN users ON users.id = w.user_id
+            LEFT JOIN users ON users.id = w.other_user_id
             WHERE ${where}
             ORDER BY w.created_at DESC
             ${limit}
