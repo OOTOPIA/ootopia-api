@@ -62,3 +62,16 @@ export class WalletTransferToPostDto {
     balance : number;
 
 }
+
+export class WalletTransfersFilterDto {
+
+    @ApiProperty({ enum: ['sent', 'received'] })
+    action : string;
+
+    @ApiProperty({ type: "number", required: false })
+    limit : number;
+
+    @ApiProperty({ type: "number", required: false })
+    offset : number;
+
+}
