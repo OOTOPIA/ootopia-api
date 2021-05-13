@@ -102,4 +102,8 @@ export class WalletTransfersService {
 
     }
 
+    getTransfers(filters) {
+        return this.walletTransfersRepository.getTransfers(filters);
+    }
+
 }
