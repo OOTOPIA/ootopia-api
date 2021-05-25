@@ -105,4 +105,22 @@ export class UsersController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: "Get data from the logged-in user, endpoint used to update local data on the user's device" })
+    @ApiResponse({ status: 200, type: UserProfileDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Get()
+    async getUser(@Req() { user }) {
+        try {
+            return await this.usersService.getUserById(user.id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
 }

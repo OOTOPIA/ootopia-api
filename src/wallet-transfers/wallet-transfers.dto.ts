@@ -61,6 +61,9 @@ export class WalletTransferToPostDto {
     @ApiProperty()
     balance : number;
 
+    @ApiProperty()
+    dontAskAgainToConfirmGratitudeReward : boolean;
+
 }
 
 export class WalletTransfersFilterDto {

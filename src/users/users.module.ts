@@ -20,7 +20,7 @@ import { UsersService } from './users.service';
     InterestsTagsModule,
     CitiesModule,
     WalletsModule,
-    WalletTransfersModule
+    forwardRef(() => WalletTransfersModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],
