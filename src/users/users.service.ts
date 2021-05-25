@@ -129,4 +129,8 @@ export class UsersService {
         return user;
     }
 
+    async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
+        return await this.usersRepository.updateDontAskToConfirmGratitudeReward(id, value);
+    }
+
 }

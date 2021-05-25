@@ -7,12 +7,15 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { WalletTransfersService } from './wallet-transfers.service';
 import { WalletTransfersDto, WalletTransfersFilterDto, WalletTransfersHistoryDto, WalletTransferToPostDto } from './wallet-transfers.dto';
 import { Origin, WalletTransferAction } from './wallet-transfers.entity';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('wallet-transfers')
 export class WalletTransfersController {
 
     constructor(
-        private readonly walletTransfersService : WalletTransfersService) {}
+        private readonly walletTransfersService : WalletTransfersService,
+        private readonly usersService : UsersService,
+        ) {}
 
     //TODO: Remover este endpoint, serve apenas para testes
     @UseInterceptors(SentryInterceptor)
@@ -47,6 +50,10 @@ export class WalletTransfersController {
     @HttpCode(200)
     async transferOOZFromPost(@Req() { user }, @Param('postId') postId, @Body() data : WalletTransferToPostDto) {
         try {
+
+            if (data.dontAskAgainToConfirmGratitudeReward) {
+                this.usersService.updateDontAskToConfirmGratitudeReward(user.id, data.dontAskAgainToConfirmGratitudeReward);
+            }
 
             await this.walletTransfersService.transferToPostAuthor(user.id, postId, data.balance);
 

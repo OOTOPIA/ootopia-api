@@ -40,4 +40,13 @@ export class UsersRepository extends Repository<Users>{
         return user;
     }
 
+    async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
+        return getConnection()
+            .createQueryBuilder()
+            .update(Users)
+            .set({ dontAskAgainToConfirmGratitudeReward : true })
+            .where("id = :id", { id })
+            .execute();
+    }
+
 }

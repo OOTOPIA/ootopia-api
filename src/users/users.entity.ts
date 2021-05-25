@@ -43,6 +43,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: false, type: 'numeric', name : 'register_phase', default: () => "1" })
     registerPhase : number;
 
+    @Column({ nullable : true, name : 'dont_ask_again_to_confirm_gratitude_reward', type: 'boolean', default: () => "false" })
+    dontAskAgainToConfirmGratitudeReward : boolean;
+
     @ManyToOne(type => Addresses, address => address.id)
     @JoinColumn({ name : "address_id" })
     addressId : Addresses;
