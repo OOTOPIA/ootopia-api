@@ -5,6 +5,7 @@ import * as bcryptjs from 'bcryptjs';
 import { Users } from '../users/users.entity';
 import { jwtConstants } from './constants';
 import { EmailsService } from '../emails/emails.service';
+import * as util from 'util'
 
 @Injectable()
 export class AuthService {
