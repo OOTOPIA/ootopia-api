@@ -4,6 +4,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { Users } from '../users/users.entity';
 import { jwtConstants } from './constants';
+import { EmailsService } from '../emails/emails.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private jwtService: JwtService,
+    private emailsService: EmailsService
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -55,6 +57,32 @@ export class AuthService {
     return this.jwtService.sign(payload, {
         secret: jwtConstants.secret,
     });
+  }
+
+  async recoverPassword(email: string) {
+    const user = await this.usersService.getUserByEmail(email);
+
+    if(!user) {
+      throw new HttpException(
+        {
+          status: 404,
+          error: "User not found",
+        },
+        400
+      );
+    }
+
+    const token = await this.generateRecoverPasswordToken(user);
+
+    await this.emailsService.sendRecoverPasswordEmail(
+      user.email,
+      {
+        url_recover_password: util.format(process.env.SITE_URL + '/auth/login?resetPasswordToken=%s', token)
+      }
+    );
+      // Delete unused data
+
+
   }
 
   async generateRecoverPasswordToken(user) {
