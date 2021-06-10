@@ -4,6 +4,9 @@ import { UsersService } from 'src/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { Users } from '../users/users.entity';
 import { jwtConstants } from './constants';
+import { AuthService } from 'src/auth/auth.service';
+import { util } from 'prettier';
+import { userInfo } from 'os';
 
 @Injectable()
 export class AuthService {
@@ -12,10 +15,10 @@ export class AuthService {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(email: string, password: string) {
-    
+
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
@@ -29,7 +32,7 @@ export class AuthService {
     }
 
     return await this.authenticatedUser(user);
-    
+
   }
 
   async authenticatedUser(user: any) {
@@ -39,7 +42,7 @@ export class AuthService {
     delete user.password;
 
     return Object.assign(user, {
-      token : token
+      token: token
     });
 
   }
@@ -48,21 +51,21 @@ export class AuthService {
 
     const payload: any = {
       id: user.id,
-      fullname : user.fullname,
-      email : user.email,
+      fullname: user.fullname,
+      email: user.email,
     };
 
     return this.jwtService.sign(payload, {
-        secret: jwtConstants.secret,
+      secret: jwtConstants.secret,
     });
   }
 
   async generateRecoverPasswordToken(user) {
 
     const payload: any = {
-      id : user.id,
-      email : user.email,
-      fullname : user.fullname
+      id: user.id,
+      email: user.email,
+      fullname: user.fullname
     };
 
     return this.jwtService.sign(payload, {
@@ -70,6 +73,29 @@ export class AuthService {
       expiresIn: '1h'
     });
 
+  }
+
+  async recoverPassword(email: string) {
+    let user = await this.validateUser({ email: email, getAllData: true });
+
+    if (!user) {
+      throw new HttpException(
+        {
+        status: 404,
+        error: "User not found",
+      },
+      400,
+      );
+    }
+    let token = await this.generateRecoverPasswordToken(user);
+
+    await this.emailsService.sendRecoverPasswordEmail(
+    user.email,
+    {
+      url_recover_password: util.format(process.env.SITE_URL + '/auth/login?resetPasswordToken=%s', token)
+    }
+  );
+    return userInfo;
   }
 
 }
