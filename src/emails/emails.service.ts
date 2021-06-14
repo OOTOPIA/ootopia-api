@@ -17,7 +17,7 @@ export class EmailsService {
       apiVersion: '2012-11-05'
     });
   }
-
+  
   async sendRecoverPasswordEmail(email : string, payload : { url_recover_password : string }) {
 
     const body = this.loadTemplate("recover-password");

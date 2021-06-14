@@ -50,7 +50,7 @@ class ConfigService {
         username: this.getValue('POSTGRES_USER'),
         password: this.getValue('POSTGRES_PASSWORD'),
         database: this.getValue('POSTGRES_DATABASE'),
-        synchronize: true,
+        synchronize: false,
         entities: [
           Users,
           Posts,

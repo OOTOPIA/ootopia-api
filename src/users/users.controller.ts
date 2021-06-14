@@ -5,7 +5,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -53,6 +53,30 @@ export class UsersController {
             }
 
             return this.authService.validateUser(loginData.email, loginData.password);
+
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'Recover Password' })
+    @ApiBody({ type: RecoverPasswordDto })
+    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Post('/recover-password')
+    @HttpCode(200)
+    async recoverPassword(@Body() recoverPasswordData : RecoverPasswordDto) {
+        try {
+
+            if (!recoverPasswordData) {
+                throw new HttpException({ status: 400, error: "Invalid Body" }, 400);
+            }
+
+            return this.authService.recoverPassword(recoverPasswordData.email);
 
         } catch (error) {
             new ErrorHandling(error);
