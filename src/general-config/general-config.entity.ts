@@ -10,6 +10,7 @@ import {
 
 export enum ConfigName {
     TRANSFER_OOZ_TO_POST_LIMIT = "transfer_ooz_to_post_limit",
+    CREATOR_REWARD_PER_MINUTE__OF_POSTED_VIDEO = "creator_reward_per_minute_of_posted_video",
 };
   
 @Entity()

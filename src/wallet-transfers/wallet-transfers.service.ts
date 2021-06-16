@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { WalletsService } from '../wallets/wallets.service';
 import { WalletTransferAction, Origin, WalletTransfers } from './wallet-transfers.entity';
 import { WalletTransfersRepository } from './wallet-transfers.repository';
@@ -11,12 +11,13 @@ export class WalletTransfersService {
     constructor(
         private readonly walletTransfersRepository : WalletTransfersRepository, 
         private readonly walletsService : WalletsService,
+        @Inject(forwardRef(() => PostsService))
         private readonly postsService : PostsService
     ) {}
 
     //Esse método deveria ser privado, porém está exposto porque temos um endpoint para dar aumentar o valor da carteira do usuário manualmente
 
-    async createTransfer(userId : String, data, isTransaction? : boolean) {
+    async createTransfer(userId, data, isTransaction? : boolean) {
 
         let walletId = data.walletId ? data.walletId : (await this.walletsService.getWalletByUserId(userId)).id;
 
@@ -26,7 +27,8 @@ export class WalletTransfersService {
             otherUserId : data.otherUserId,
             balance : data.balance,
             origin : data.origin,
-            action : data.action
+            action : data.action,
+            fromPlatform : data.fromPlatform || false
         }, isTransaction);
 
         if (!isTransaction) {
@@ -97,13 +99,31 @@ export class WalletTransfersService {
             throw new HttpException("INSUFFICIENT_BALANCE", 400);
         }
 
-        let postAuthorId = (await this.postsService.getPostById(postId)).userId;
+        let postAuthorId : any = (await this.postsService.getPostById(postId)).userId;
         return await this.transferOOZBetweenUsers(userId, postAuthorId, balance, Origin.VIDEO_LIKE, postId);
 
     }
 
     getTransfers(filters) {
         return this.walletTransfersRepository.getTransfers(filters);
+    }
+
+    async createTransferTest(userId : string) {
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+                let transfer = await this.createTransfer(userId, { balance : 50, origin : Origin.TRANSFER, action: WalletTransferAction.RECEIVED }, true);
+                await queryRunner.manager.save(transfer);
+                let walletId = (await this.walletsService.getWalletByUserId(userId)).id;
+                await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(walletId, userId, 50));
+                await queryRunner.commitTransaction();
+                return transfer;
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
     }
 
 }

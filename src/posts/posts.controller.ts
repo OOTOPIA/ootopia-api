@@ -163,7 +163,7 @@ export class PostsController {
 
             //await this.videoService.validateWebhookSignature(webhookSignature, req.body);
 
-            return await this.postsService.updatePostVideoStatus(data.uid, data.status.state);
+            return await this.postsService.updatePostVideoStatus(data.uid, data.status.state, true);
             
         } catch (error) {
             new ErrorHandling(error);

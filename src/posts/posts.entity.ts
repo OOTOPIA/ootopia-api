@@ -57,6 +57,9 @@ export class Posts extends BaseEntity {
   @JoinColumn({ name : "address_id" })
   addressId : Addresses;
 
+  @Column({ nullable : false, name: "duration_in_secs", type: 'numeric', default: () => "0"})
+  durationInSecs : number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

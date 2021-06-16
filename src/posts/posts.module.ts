@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,15 +9,24 @@ import { CommentsRepository } from './repositories/comments.repository';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { InterestsTagsModule } from 'src/interests-tags/interests-tags.module';
 import { CitiesModule } from 'src/cities/cities.module';
+import { GeneralConfigModule } from 'src/general-config/general-config.module';
+import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
+import { WalletsModule } from 'src/wallets/wallets.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PostsRepository]), 
-    TypeOrmModule.forFeature([CommentsRepository]), 
-    TypeOrmModule.forFeature([AddressesRepository]),
+    TypeOrmModule.forFeature([
+      PostsRepository,
+      CommentsRepository,
+      AddressesRepository,
+    ]),
+    WalletsModule,
+    forwardRef(() => WalletsModule),
+    forwardRef(() => WalletTransfersModule),
     VideoModule,
     InterestsTagsModule,
-    CitiesModule
+    CitiesModule,
+    GeneralConfigModule,
   ],
   providers: [PostsService, CommentsService],
   controllers: [PostsController],
