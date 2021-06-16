@@ -9,7 +9,6 @@ export class CreateCommentsDto {
 
 }
 
-
 export class CreatedCommentDto {
 
     @ApiProperty({ example: "33e3b1f9-b211-49df-b70b-8fdc1037b8d3" })

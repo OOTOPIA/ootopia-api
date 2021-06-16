@@ -29,7 +29,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         let where = "", params = [];
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
-            'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.created_at', 'w.updated_at',
+            'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.from_platform', 'w.created_at', 'w.updated_at',
             'users.photo_url', 'users.fullname as other_username',
         ];
 

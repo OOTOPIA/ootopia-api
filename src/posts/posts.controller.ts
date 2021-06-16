@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile,
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -13,6 +13,7 @@ import { HttpResponseDto } from 'src/config/http-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
+import { PostsWatchedVideotimeService } from './services/posts-watched-videotime.service';
 
 @Controller('posts')
 export class PostsController {
@@ -20,7 +21,9 @@ export class PostsController {
     constructor(
         private readonly postsService : PostsService, 
         private readonly videoService : VideoService,
-        private readonly commentsService : CommentsService) {}
+        private readonly commentsService : CommentsService,
+        private readonly postsWatchedVideotimeService : PostsWatchedVideotimeService,
+        ) {}
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
@@ -163,7 +166,7 @@ export class PostsController {
 
             //await this.videoService.validateWebhookSignature(webhookSignature, req.body);
 
-            return await this.postsService.updatePostVideoStatus(data.uid, data.status.state);
+            return await this.postsService.updatePostVideoStatus(data.uid, data.status.state, true);
             
         } catch (error) {
             new ErrorHandling(error);
@@ -245,6 +248,31 @@ export class PostsController {
         try {
 
             return await this.commentsService.deleteComments(user.id, postId, body.commentsIds);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Record watched video time' })
+    @ApiBearerAuth('Bearer')
+    @ApiParam({ name : "postId", type: "string", description: "Post ID" })
+    @ApiBody({ type: PostWatchedVideoTimeDto })
+    @ApiResponse({ status: 201, description: 'Successfully registered' })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Post('/:postId/watched')
+    async recordWatchedVideoTime(@Req() { user }, @Param('postId') postId, @Body() data) {
+        try {
+
+            data.postId = postId;
+            data.userId = user.id;
+
+            return await this.postsWatchedVideotimeService.recordWatchedVideotime(postId, data);
             
         } catch (error) {
             new ErrorHandling(error);
