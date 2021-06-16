@@ -212,3 +212,11 @@ export class DeleteCommentsDto {
     commentsIds : string[];
 
 }
+
+export class PostWatchedVideoTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
+
+}

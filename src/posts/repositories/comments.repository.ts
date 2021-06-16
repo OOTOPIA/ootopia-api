@@ -2,7 +2,6 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { PostsComments } from "../entities/comments.entity";
-import { Posts } from "../posts.entity";
 
 @Injectable()
 @EntityRepository(PostsComments)

@@ -12,6 +12,7 @@ import { InterestsTagsPosts } from 'src/interests-tags/entities/interests-tags-p
 import { Wallets } from 'src/wallets/wallets.entity';
 import { WalletTransfers } from 'src/wallet-transfers/wallet-transfers.entity';
 import { GeneralConfig } from 'src/general-config/general-config.entity';
+import { PostsWatchedVideotime } from 'src/posts/entities/posts-watched-videotime.entity';
 
 require('dotenv').config();
 
@@ -58,6 +59,7 @@ class ConfigService {
           PostsLikesCount,
           PostsComments,
           PostsCommentsCount,
+          PostsWatchedVideotime,
           InterestsTags,
           InterestsTagsUsers,
           InterestsTagsPosts,

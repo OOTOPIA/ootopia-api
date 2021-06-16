@@ -12,6 +12,8 @@ import { CitiesModule } from 'src/cities/cities.module';
 import { GeneralConfigModule } from 'src/general-config/general-config.module';
 import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
 import { WalletsModule } from 'src/wallets/wallets.module';
+import { PostsWatchedVideotimeService } from './services/posts-watched-videotime.service';
+import { PostsWatchedVideotimeRepository } from './repositories/posts-watched-videotime.repository';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { WalletsModule } from 'src/wallets/wallets.module';
       PostsRepository,
       CommentsRepository,
       AddressesRepository,
+      PostsWatchedVideotimeRepository,
     ]),
     WalletsModule,
     forwardRef(() => WalletsModule),
@@ -28,7 +31,7 @@ import { WalletsModule } from 'src/wallets/wallets.module';
     CitiesModule,
     GeneralConfigModule,
   ],
-  providers: [PostsService, CommentsService],
+  providers: [PostsService, CommentsService, PostsWatchedVideotimeService],
   controllers: [PostsController],
   exports: [PostsService]
 })
