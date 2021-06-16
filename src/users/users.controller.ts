@@ -5,10 +5,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
+import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
 
 @Controller('users')
 export class UsersController {
@@ -61,7 +62,7 @@ export class UsersController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
-    @ApiOperation({ summary: 'Recover Password' })
+    @ApiOperation({ summary: 'Send reset password email' })
     @ApiBody({ type: RecoverPasswordDto })
     @ApiResponse({ status: 200, description: 'Successfully logged in '})
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
@@ -107,6 +108,29 @@ export class UsersController {
             userData.id = user.id;
             
             return await this.usersService.updateUser(userData, file);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'Update user´s password' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: ResetPasswordDto })
+    @ApiResponse({ status: 200, description: 'Successfully updated', type: ResetPasswordDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    
+    @UseGuards(JwtResetPasswordStrategy)   
+    @Post('/auth/reset-password')
+    async updateUserPassword(@Req() { user }, @Body() resetPassword : ResetPasswordDto) {
+       try{
+        if(!resetPassword) {
+            throw { status: '400', message: 'Invalid body'};
+        }
+          return this.usersService.resetPassword(user.id, resetPassword.newPassword);        
         } catch (error) {
             new ErrorHandling(error);
         }

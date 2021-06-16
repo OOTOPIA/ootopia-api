@@ -17,6 +17,20 @@ export class UsersRepository extends Repository<Users>{
         return await this.save(user);
     }
 
+    async resetPassword(id: string, password: string) {
+        let result = await getConnection()
+        .createQueryBuilder()
+        .update(Users)
+        .set({ password })
+        .where("id = : id", { id })
+        .execute();
+        if (result && result.affected){
+            return { status: "ok" }
+        }else{
+            return null;
+        }
+    }
+
     async getUserByEmail(email: string) {
         const user = await this.find({
           where: { email },

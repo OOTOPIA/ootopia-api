@@ -109,6 +109,11 @@ export class UsersService {
 
     }
 
+    async resetPassword(userId: string, password: string) {        
+        password = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
+        return this.usersRepository.resetPassword(userId, password);    
+    }
+
     async getUserByEmail(email : string) {
         return await this.usersRepository.getUserByEmail(email);
     }
