@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile,
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -14,6 +14,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { PostsWatchedVideotimeService } from './services/posts-watched-videotime.service';
+import { PostsTimelineViewTimeService } from './services/posts-timeline-view-time.service';
 
 @Controller('posts')
 export class PostsController {
@@ -23,6 +24,7 @@ export class PostsController {
         private readonly videoService : VideoService,
         private readonly commentsService : CommentsService,
         private readonly postsWatchedVideotimeService : PostsWatchedVideotimeService,
+        private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
         ) {}
 
     @UseInterceptors(SentryInterceptor)
@@ -273,6 +275,29 @@ export class PostsController {
             data.userId = user.id;
 
             return await this.postsWatchedVideotimeService.recordWatchedVideotime(postId, data);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Record posts timeline view time' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: PostTimelineViewTimeDto })
+    @ApiResponse({ status: 201, description: 'Successfully registered' })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Post('/timeline-watched')
+    async recordPostsTimelineViewTime(@Req() { user }, @Body() data) {
+        try {
+
+            data.userId = user.id;
+
+            return await this.postsTimelineViewTimeService.recordTimelineViewTime(data);
             
         } catch (error) {
             new ErrorHandling(error);
