@@ -59,7 +59,7 @@ export class PostsWatchedVideotimeService {
 
             //Reward to creator of post
 
-            let oozToCreatorReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE__OF_POSTED_VIDEO)).value);
+            let oozToCreatorReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO)).value);
             let totalCreatorOOZ = oozToCreatorReward * (duration / 60);
 
             let receiverCreatorWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
