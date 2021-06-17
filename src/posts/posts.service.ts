@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { CitiesService } from 'src/cities/cities.service';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
@@ -102,9 +102,49 @@ export class PostsService {
       return this.postsRepository.getPostById(id);
     }
 
-    likePost(postId, userId) {
-      return this.postsRepository.likePost(postId, userId);
+    async likePost(postId, userId) {
+      let likeResult = await this.postsRepository.likePost(postId, userId);
+      if (likeResult.liked) {
+        await this.sendRewardToCreatorForWoowReceived(postId);
+      }
+      return likeResult;
     }
+
+    private async sendRewardToCreatorForWoowReceived(postId) {
+
+      if (!postId) {
+          throw new HttpException('Post ID not found', 400);
+      }
+
+      let queryRunner = getConnection().createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+
+          let oozToReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_FOR_WOOW_RECEIVED)).value);
+          let post = await this.getPostById(postId);
+          let receiverUserWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
+
+          await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
+              userId : post.userId,
+              walletId : receiverUserWalletId,
+              balance : oozToReward,
+              origin : Origin.TRANSFER,
+              action : WalletTransferAction.RECEIVED,
+              fromPlatform : true
+          }, true));
+
+          await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, post.userId, oozToReward));
+
+          await queryRunner.commitTransaction();
+
+      }catch(err) {
+          await queryRunner.rollbackTransaction();
+          throw err;
+      }
+      
+  }
 
     //Se rewardToCreator for true, uma recompensa em OOZ será transferida ao criador a cada 60 segundos do vídeo postado se o novo status do video for "ready"
 
@@ -132,7 +172,7 @@ export class PostsService {
 
       try {
 
-        let oozToReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE__OF_POSTED_VIDEO)).value);
+        let oozToReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO)).value);
         let post = await this.getPostById(postId);
         let duration = +((+post.durationInSecs).toFixed(0));
         let totalOOZ = oozToReward * (duration / 60);
