@@ -5,15 +5,14 @@ import { Origin, WalletTransferAction } from 'src/wallet-transfers/wallet-transf
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { getConnection } from 'typeorm';
-import { PostWatchedVideoTimeDto } from '../posts.dto';
 import { PostsService } from '../posts.service';
-import { PostsWatchedVideotimeRepository } from '../repositories/posts-watched-videotime.repository';
+import { PostsTimelineViewTimeRepository } from '../repositories/posts-timeline-view-time.repository';
 
 @Injectable()
-export class PostsWatchedVideotimeService {
+export class PostsTimelineViewTimeService {
 
     constructor(
-        private readonly postsWatchedVideotimeRepository : PostsWatchedVideotimeRepository,
+        private readonly postsTimelineViewTimeRepository : PostsTimelineViewTimeRepository,
         private readonly generalConfigService : GeneralConfigService,
         private readonly walletsService : WalletsService,
         private readonly walletTransfersService : WalletTransfersService,
@@ -22,10 +21,10 @@ export class PostsWatchedVideotimeService {
 
     }
 
-    async recordWatchedVideotime(postId : string, data) {
+    async recordTimelineViewTime(data) {
 
-        if (!postId || !data) {
-            throw new HttpException('Post ID is mandatory', 400);
+        if (!data || !data.timeInMilliseconds || !data.userId) {
+            throw new HttpException('Mandatory data not found', 400);
         }
 
         let queryRunner = getConnection().createQueryRunner();
@@ -34,13 +33,11 @@ export class PostsWatchedVideotimeService {
 
         try {
 
-            let post = await this.postsService.getPostById(postId);
-
-            await queryRunner.manager.save(await this.postsWatchedVideotimeRepository.recordWatchedVideotime(data));
+            await queryRunner.manager.save(await this.postsTimelineViewTimeRepository.recordTimelineViewTime(data));
 
             //Reward to user 
 
-            let oozToUserReward = +((await this.generalConfigService.getConfig(ConfigName.USER_REWARD_PER_MINUTE_OF_WATCHED_VIDEO)).value);
+            let oozToUserReward = +((await this.generalConfigService.getConfig(ConfigName.USER_REWARD_PER_MINUTE_OF_TIMELINE_VIEW_TIME)).value);
             let duration = +((+data.timeInMilliseconds / 1000).toFixed(0));
             let totalUserOOZ = oozToUserReward * (duration / 60);
 
@@ -56,24 +53,6 @@ export class PostsWatchedVideotimeService {
             }, true));
 
             await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, data.userId, totalUserOOZ));
-
-            //Reward to creator of post
-
-            let oozToCreatorReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE__OF_POSTED_VIDEO)).value);
-            let totalCreatorOOZ = oozToCreatorReward * (duration / 60);
-
-            let receiverCreatorWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
-
-            await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
-                userId : post.userId,
-                walletId : receiverCreatorWalletId,
-                balance : totalCreatorOOZ,
-                origin : Origin.TRANSFER,
-                action : WalletTransferAction.RECEIVED,
-                fromPlatform : true
-            }, true));
-
-            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
 
             await queryRunner.commitTransaction();
 

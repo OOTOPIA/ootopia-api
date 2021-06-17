@@ -1,7 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
-import * as camelcaseKeys from 'camelcase-keys';
-import { PostsComments } from "../entities/comments.entity";
 import { PostsWatchedVideotime } from "../entities/posts-watched-videotime.entity";
 
 @Injectable()
@@ -15,7 +13,7 @@ export class PostsWatchedVideotimeRepository extends Repository<PostsWatchedVide
     async recordWatchedVideotime(data) {
         const postWatchedVideotime = this.create();
         Object.assign(postWatchedVideotime, data);
-        return await this.save(postWatchedVideotime);
+        return postWatchedVideotime;
     }
 
     async getPostWatchedVideotimeById(postId : string) {

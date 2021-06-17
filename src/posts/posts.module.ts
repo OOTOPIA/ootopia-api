@@ -14,6 +14,8 @@ import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.mod
 import { WalletsModule } from 'src/wallets/wallets.module';
 import { PostsWatchedVideotimeService } from './services/posts-watched-videotime.service';
 import { PostsWatchedVideotimeRepository } from './repositories/posts-watched-videotime.repository';
+import { PostsTimelineViewTimeRepository } from './repositories/posts-timeline-view-time.repository';
+import { PostsTimelineViewTimeService } from './services/posts-timeline-view-time.service';
 
 @Module({
   imports: [
@@ -22,8 +24,8 @@ import { PostsWatchedVideotimeRepository } from './repositories/posts-watched-vi
       CommentsRepository,
       AddressesRepository,
       PostsWatchedVideotimeRepository,
+      PostsTimelineViewTimeRepository,
     ]),
-    WalletsModule,
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
     VideoModule,
@@ -31,7 +33,12 @@ import { PostsWatchedVideotimeRepository } from './repositories/posts-watched-vi
     CitiesModule,
     GeneralConfigModule,
   ],
-  providers: [PostsService, CommentsService, PostsWatchedVideotimeService],
+  providers: [
+    PostsService, 
+    CommentsService, 
+    PostsWatchedVideotimeService, 
+    PostsTimelineViewTimeService,
+  ],
   controllers: [PostsController],
   exports: [PostsService]
 })

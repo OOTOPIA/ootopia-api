@@ -220,3 +220,11 @@ export class PostWatchedVideoTimeDto {
     timeInMilliseconds : number;
 
 }
+
+export class PostTimelineViewTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
+
+}
