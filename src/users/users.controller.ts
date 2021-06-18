@@ -11,6 +11,7 @@ import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
 
+
 @Controller('users')
 export class UsersController {
 
@@ -117,6 +118,7 @@ export class UsersController {
     @ApiTags('users')
     @ApiOperation({ summary: 'Update user´s password' })
     @ApiBearerAuth('Bearer')
+    @ApiParam({name : "id", type: "string", description: "User ID" })
     @ApiBody({ type: ResetPasswordDto })
     @ApiResponse({ status: 200, description: 'Successfully updated', type: ResetPasswordDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
@@ -124,13 +126,13 @@ export class UsersController {
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     
     @UseGuards(JwtResetPasswordStrategy)   
-    @Post('/auth/reset-password')
-    async updateUserPassword(@Req() { user }, @Body() resetPassword : ResetPasswordDto) {
+    @Put('/:id/reset-password')
+    async updateUserPassword(@Req() { userId }, @Body() password : ResetPasswordDto) {
        try{
-        if(!resetPassword) {
+        if(!password) {
             throw { status: '400', message: 'Invalid body'};
         }
-          return this.usersService.resetPassword(user.id, resetPassword.password);        
+          return this.usersService.resetPassword(userId, password.password);        
         } catch (error) {
             new ErrorHandling(error);
         }
