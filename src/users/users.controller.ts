@@ -130,7 +130,7 @@ export class UsersController {
         if(!resetPassword) {
             throw { status: '400', message: 'Invalid body'};
         }
-          return this.usersService.resetPassword(user.id, resetPassword.newPassword);        
+          return this.usersService.resetPassword(user.id, resetPassword.password);        
         } catch (error) {
             new ErrorHandling(error);
         }
