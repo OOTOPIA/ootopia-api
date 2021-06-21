@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Header
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
+import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
@@ -9,7 +10,7 @@ import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, Reset
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
-import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
+//import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
 
 
 @Controller('users')
@@ -118,21 +119,20 @@ export class UsersController {
     @ApiTags('users')
     @ApiOperation({ summary: 'Update user´s password' })
     @ApiBearerAuth('Bearer')
-    @ApiParam({name : "id", type: "string", description: "User ID" })
     @ApiBody({ type: ResetPasswordDto })
     @ApiResponse({ status: 200, description: 'Successfully updated', type: ResetPasswordDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    
-    @UseGuards(JwtResetPasswordStrategy)   
-    @Put('/:id/reset-password')
-    async updateUserPassword(@Req() { userId }, @Body() password : ResetPasswordDto) {
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })    
+    @UseGuards(AuthGuard('jwt-reset-password'))   
+    @Post('/reset-password')
+    async updateUserPassword(@Req() { user }, @Body() password : ResetPasswordDto) {
+        console.log(user);
        try{
         if(!password) {
             throw { status: '400', message: 'Invalid body'};
         }
-          return this.usersService.resetPassword(userId, password.password);        
+          return this.usersService.resetPassword(user.id , password.password);        
         } catch (error) {
             new ErrorHandling(error);
         }

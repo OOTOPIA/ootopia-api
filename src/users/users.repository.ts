@@ -22,8 +22,11 @@ export class UsersRepository extends Repository<Users>{
         .createQueryBuilder()
         .update(Users)
         .set({ password })
-        .where("id = : id", { id })
+        .where("id = :id", { id })
         .execute();
+        console.log("result:", result);
+        console.log("id:", id);
+        console.log("password:", password);
         if (result && result.affected){
             return { status: "ok" }
         }else{
