@@ -25,7 +25,7 @@ export class WalletTransfersService {
             userId : userId,
             walletId : walletId,
             otherUserId : data.otherUserId,
-            balance : +(data.balance.toFixed(2)),
+            balance : +((+data.balance).toFixed(2)),
             origin : data.origin,
             action : data.action,
             fromPlatform : data.fromPlatform || false
@@ -106,7 +106,7 @@ export class WalletTransfersService {
 
     async getTransfers(filters) {
         return (await this.walletTransfersRepository.getTransfers(filters)).map((transfer) => {
-            transfer.balance = +(transfer.balance.toFixed(2));
+            transfer.balance = +((+transfer.balance).toFixed(2));
             return transfer;
         });
     }
