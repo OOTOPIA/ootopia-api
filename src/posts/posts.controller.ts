@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile,
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -258,23 +258,20 @@ export class PostsController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
-    @ApiOperation({ summary: 'Record watched video time' })
+    @ApiOperation({ summary: 'Record watched video time for a lot of posts' })
     @ApiBearerAuth('Bearer')
-    @ApiParam({ name : "postId", type: "string", description: "Post ID" })
-    @ApiBody({ type: PostWatchedVideoTimeDto })
+    @ApiBody({ type: PostsWatchedVideosTimeDto })
     @ApiResponse({ status: 201, description: 'Successfully registered' })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
-    @Post('/:postId/watched')
-    async recordWatchedVideoTime(@Req() { user }, @Param('postId') postId, @Body() data) {
+    @Post('/watched')
+    async recordWatchedVideoTime(@Req() { user }, @Body() body) {
         try {
 
-            data.postId = postId;
-            data.userId = user.id;
-
-            return await this.postsWatchedVideotimeService.recordWatchedVideotime(postId, data);
+            this.postsWatchedVideotimeService.recordWatchedVideotime(user.id, JSON.parse(body.data));
+            return;
             
         } catch (error) {
             new ErrorHandling(error);
