@@ -12,6 +12,8 @@ import { InterestsTagsPosts } from 'src/interests-tags/entities/interests-tags-p
 import { Wallets } from 'src/wallets/wallets.entity';
 import { WalletTransfers } from 'src/wallet-transfers/wallet-transfers.entity';
 import { GeneralConfig } from 'src/general-config/general-config.entity';
+import { PostsWatchedVideotime } from 'src/posts/entities/posts-watched-videotime.entity';
+import { PostsTimelineViewTime } from 'src/posts/entities/posts-timeline-view-time.entity';
 
 require('dotenv').config();
 
@@ -44,12 +46,16 @@ class ConfigService {
     public getTypeOrmConfig(): TypeOrmModuleOptions {
       return {
         type: 'postgres',
-  
         host: this.getValue('POSTGRES_HOST'),
         port: parseInt(this.getValue('POSTGRES_PORT')),
         username: this.getValue('POSTGRES_USER'),
         password: this.getValue('POSTGRES_PASSWORD'),
         database: this.getValue('POSTGRES_DATABASE'),
+        extra: {
+          max: 100, // set pool max size to 20
+          idleTimeoutMillis: 1000 * 60, // close idle clients after 1 second
+          connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
+        },
         synchronize: false,
         entities: [
           Users,
@@ -58,6 +64,8 @@ class ConfigService {
           PostsLikesCount,
           PostsComments,
           PostsCommentsCount,
+          PostsWatchedVideotime,
+          PostsTimelineViewTime,
           InterestsTags,
           InterestsTagsUsers,
           InterestsTagsPosts,
@@ -74,16 +82,6 @@ class ConfigService {
         },
         ssl: this.isProduction(),
       };
-    }
-  
-    public getPoolPg() {
-      return new Pool({
-        user: process.env.POSTGRES_USER,
-        host: process.env.POSTGRES_HOST,
-        database: process.env.POSTGRES_DATABASE,
-        password: process.env.POSTGRES_PASSWORD,
-        port: 5432,
-      });
     }
   }
   

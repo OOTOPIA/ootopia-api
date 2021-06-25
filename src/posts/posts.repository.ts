@@ -120,7 +120,7 @@ export class PostsRepository extends Repository<Posts>{
         return post;
     }
 
-    async getPostById(id) {
+    async getPostById(id) : Promise<Posts> {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
                 p.*

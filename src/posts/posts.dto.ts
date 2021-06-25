@@ -212,3 +212,31 @@ export class DeleteCommentsDto {
     commentsIds : string[];
 
 }
+
+export class PostWatchedVideoTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    postId : string;
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
+
+}
+
+export class PostsWatchedVideosTimeDto {
+
+    @ApiProperty({ required: true, type: PostWatchedVideoTimeDto, isArray: true, description: "The 'data' field must be a string in json array of objects format"})
+    @IsNotEmpty()
+    data : PostWatchedVideoTimeDto[];
+
+}
+
+export class PostTimelineViewTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
+
+}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { CitiesService } from 'src/cities/cities.service';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
@@ -6,6 +6,11 @@ import { VideoService } from 'src/video/video.service';
 import { getConnection } from 'typeorm';
 import { PostsRepository } from './posts.repository';
 import { v4 as uuidv4 } from 'uuid';
+import { GeneralConfigService } from 'src/general-config/general-config.service';
+import { ConfigName } from 'src/general-config/general-config.entity';
+import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import { WalletsService } from 'src/wallets/wallets.service';
+import { Origin, WalletTransferAction } from 'src/wallet-transfers/wallet-transfers.entity';
 
 @Injectable()
 export class PostsService {
@@ -15,7 +20,12 @@ export class PostsService {
       private readonly videoService : VideoService,
       private readonly interestsTagsService : InterestsTagsService,
       private readonly citiesService : CitiesService,
-      private readonly addressesRepository : AddressesRepository) {
+      private readonly addressesRepository : AddressesRepository,
+      private readonly generalConfigService : GeneralConfigService,
+      private readonly walletsService : WalletsService,
+      @Inject(forwardRef(() => WalletTransfersService))
+      private readonly walletTransfersService : WalletTransfersService,
+      ) {
 
     }
 
@@ -92,15 +102,104 @@ export class PostsService {
       return this.postsRepository.getPostById(id);
     }
 
-    likePost(postId, userId) {
-      return this.postsRepository.likePost(postId, userId);
+    async likePost(postId, userId) {
+      let likeResult = await this.postsRepository.likePost(postId, userId);
+      if (likeResult.liked) {
+        await this.sendRewardToCreatorForWoowReceived(postId);
+      }
+      return likeResult;
     }
 
-    updatePostVideoStatus(streamMediaId : string, status : string) {
-      return this.postsRepository.updatePostVideoStatus(streamMediaId, status)
+    private async sendRewardToCreatorForWoowReceived(postId) {
+
+      if (!postId) {
+          throw new HttpException('Post ID not found', 400);
+      }
+
+      let queryRunner = getConnection().createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+
+          let oozToReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_FOR_WOOW_RECEIVED)).value);
+          let post = await this.getPostById(postId);
+          let receiverUserWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
+
+          await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
+              userId : post.userId,
+              walletId : receiverUserWalletId,
+              balance : oozToReward,
+              origin : Origin.TRANSFER,
+              action : WalletTransferAction.RECEIVED,
+              fromPlatform : true
+          }, true));
+
+          await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, post.userId, oozToReward));
+
+          await queryRunner.commitTransaction();
+
+      }catch(err) {
+          await queryRunner.rollbackTransaction();
+          throw err;
+      }
+      
+  }
+
+    //Se rewardToCreator for true, uma recompensa em OOZ será transferida ao criador a cada 60 segundos do vídeo postado se o novo status do video for "ready"
+
+    async updatePostVideoStatus(streamMediaId : string, status : string, rewardToCreator? : boolean) {
+      let videoDetails = (await this.videoService.getVideoDetails(streamMediaId)).result;
+      let post = (await this.postsRepository.getPostByStreamMediaId(streamMediaId));
+      post.videoStatus = status;
+      post.durationInSecs = +videoDetails.duration;
+      let result = await this.postsRepository.createOrUpdatePost(post);
+      if (rewardToCreator && status == "ready") {
+        try {
+          await this.sendRewardToCreatorForPost(post.id);
+        }catch(err) {
+          //do nothing
+        }
+      }
+      return result;
     }
 
-    getPostsTimeline(filters, userId? : string) {
+    async sendRewardToCreatorForPost(postId : string) {
+
+      let queryRunner = getConnection().createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+
+        let oozToReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO)).value);
+        let post = await this.getPostById(postId);
+        let duration = +((+post.durationInSecs).toFixed(0));
+        let totalOOZ = oozToReward * (duration / 60);
+
+        let receiverUserWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
+
+        await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
+          userId : post.userId,
+          walletId : receiverUserWalletId,
+          balance : totalOOZ,
+          origin : Origin.TRANSFER,
+          action : WalletTransferAction.RECEIVED,
+          fromPlatform : true
+        }, true));
+
+        await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, post.userId, totalOOZ));
+
+        await queryRunner.commitTransaction();
+
+      }catch(err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      }
+      
+    }
+
+    async getPostsTimeline(filters, userId? : string) {
       return this.postsRepository.getPostsTimeline(filters, userId);
     }
 
