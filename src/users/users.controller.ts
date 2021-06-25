@@ -2,13 +2,16 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Header
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
+import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
+//import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
+
 
 @Controller('users')
 export class UsersController {
@@ -61,6 +64,30 @@ export class UsersController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
+    @ApiOperation({ summary: 'Send reset password email' })
+    @ApiBody({ type: RecoverPasswordDto })
+    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Post('/recover-password')
+    @HttpCode(200)
+    async recoverPassword(@Body() recoverPasswordData : RecoverPasswordDto) {
+        try {
+
+            if (!recoverPasswordData) {
+                throw new HttpException({ status: 400, error: "Invalid Body" }, 400);
+            }
+
+            return this.authService.recoverPassword(recoverPasswordData.email);
+
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
     @ApiOperation({ summary: 'Update user account' })
     @ApiBearerAuth('Bearer')
     @ApiBody({ type: UserProfileUpdateDto })
@@ -83,6 +110,29 @@ export class UsersController {
             userData.id = user.id;
             
             return await this.usersService.updateUser(userData, file);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'Update user´s password' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: ResetPasswordDto })
+    @ApiResponse({ status: 200, description: 'Successfully updated', type: ResetPasswordDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })    
+    @UseGuards(AuthGuard('jwt-reset-password'))   
+    @Post('/reset-password')
+    async updateUserPassword(@Req() { user }, @Body() password : ResetPasswordDto) {
+        console.log(user);
+       try{
+        if(!password) {
+            throw { status: '400', message: 'Invalid body'};
+        }
+          return this.usersService.resetPassword(user.id , password.password);        
         } catch (error) {
             new ErrorHandling(error);
         }

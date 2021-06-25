@@ -13,6 +13,7 @@ import { CitiesModule } from './cities/cities.module';
 import { WalletsModule } from './wallets/wallets.module';
 import { WalletTransfersModule } from './wallet-transfers/wallet-transfers.module';
 import { GeneralConfigModule } from './general-config/general-config.module';
+import { EmailsModule } from './emails/emails.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { GeneralConfigModule } from './general-config/general-config.module';
     CitiesModule,
     WalletsModule,
     WalletTransfersModule,
-    GeneralConfigModule
+    GeneralConfigModule,
+    EmailsModule
   ],
   controllers: [AppController],
   providers: [AppService],

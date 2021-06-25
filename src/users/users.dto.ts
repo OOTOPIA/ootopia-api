@@ -71,6 +71,22 @@ export class UserLoginDto {
   
 }
 
+export class RecoverPasswordDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    email : string;    
+  
+}
+
+export class ResetPasswordDto {
+           
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    password : string;   
+  
+}
+
 export class LoggedUserDto {
 
     @ApiProperty()
