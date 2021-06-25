@@ -106,7 +106,7 @@ export class WalletTransfersService {
 
     async getTransfers(filters) {
         return (await this.walletTransfersRepository.getTransfers(filters)).map((transfer) => {
-            transfer.balance = +((+transfer.balance).toFixed(2));
+            transfer.balance = ((+transfer.balance).toFixed(2));
             return transfer;
         });
     }
