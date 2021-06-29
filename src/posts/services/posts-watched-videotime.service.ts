@@ -52,9 +52,9 @@ export class PostsWatchedVideotimeService {
             let oozToUserReward = +((await this.generalConfigService.getConfig(ConfigName.USER_REWARD_PER_MINUTE_OF_WATCHED_VIDEO)).value);
             let oozToCreatorReward = +((await this.generalConfigService.getConfig(ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO)).value);
 
-            for (let i = 0; i < Object(groupedPostsIds).keys; i++) {
+            for (let i = 0; i < Object.keys(groupedPostsIds).length; i++) {
 
-                let record = Object(groupedPostsIds).keys[i];
+                let record = groupedPostsIds[Object.keys(groupedPostsIds)[i]];
                 let post = await this.postsService.getPostById(record.postId);
 
                 await queryRunner.manager.save(await this.postsWatchedVideotimeRepository.recordWatchedVideotime({
