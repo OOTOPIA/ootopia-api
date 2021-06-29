@@ -87,6 +87,13 @@ export class ResetPasswordDto {
   
 }
 
+export class ResetPasswordResponseDto {
+           
+    @ApiProperty()
+    status : string;   
+  
+}
+
 export class LoggedUserDto {
 
     @ApiProperty()
