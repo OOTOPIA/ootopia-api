@@ -68,31 +68,39 @@ export class PostsWatchedVideotimeService {
                 let totalUserOOZ = oozToUserReward * (duration / 60);
                 let receiverUserWalletId = (await this.walletsService.getWalletByUserId(userId)).id;
 
-                await queryRunner.manager.save(await this.walletTransfersService.createTransfer(userId, {
-                    userId : userId,
-                    walletId : receiverUserWalletId,
-                    balance : totalUserOOZ,
-                    origin : Origin.TRANSFER,
-                    action : WalletTransferAction.RECEIVED,
-                    fromPlatform : true
-                }, true));
+                if (totalUserOOZ > 0) {
 
-                await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
+                    await queryRunner.manager.save(await this.walletTransfersService.createTransfer(userId, {
+                        userId : userId,
+                        walletId : receiverUserWalletId,
+                        balance : totalUserOOZ,
+                        origin : Origin.TRANSFER,
+                        action : WalletTransferAction.RECEIVED,
+                        fromPlatform : true
+                    }, true));
+
+                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
+
+                }
 
                 //Reward to creator of post
                 let totalCreatorOOZ = oozToCreatorReward * (duration / 60);
                 let receiverCreatorWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
 
-                await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
-                    userId : post.userId,
-                    walletId : receiverCreatorWalletId,
-                    balance : totalCreatorOOZ,
-                    origin : Origin.TRANSFER,
-                    action : WalletTransferAction.RECEIVED,
-                    fromPlatform : true
-                }, true));
+                if (totalCreatorOOZ > 0) {
 
-                await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
+                    await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
+                        userId : post.userId,
+                        walletId : receiverCreatorWalletId,
+                        balance : totalCreatorOOZ,
+                        origin : Origin.TRANSFER,
+                        action : WalletTransferAction.RECEIVED,
+                        fromPlatform : true
+                    }, true));
+
+                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
+
+                }
 
             }
 
