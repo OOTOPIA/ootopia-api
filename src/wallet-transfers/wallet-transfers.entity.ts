@@ -70,6 +70,9 @@ export class WalletTransfers extends BaseEntity {
   @Column({ nullable : false, type: 'boolean', name: 'from_platform', default: () => "false" })
   fromPlatform : boolean;
 
+  @Column({ nullable : false, type: 'boolean', default: () => "false"})
+  processed : boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

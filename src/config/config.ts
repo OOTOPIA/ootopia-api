@@ -56,7 +56,7 @@ class ConfigService {
           idleTimeoutMillis: 1000 * 60, // close idle clients after 1 second
           connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
         },
-        synchronize: false,
+        synchronize: true,
         entities: [
           Users,
           Posts,
