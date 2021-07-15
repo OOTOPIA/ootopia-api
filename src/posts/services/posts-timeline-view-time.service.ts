@@ -52,7 +52,7 @@ export class PostsTimelineViewTimeService {
                 fromPlatform : true
             }, true));
 
-            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, data.userId, totalUserOOZ));
+            //await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, data.userId, totalUserOOZ));
 
             await queryRunner.commitTransaction();
 

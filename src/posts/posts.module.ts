@@ -40,6 +40,6 @@ import { PostsTimelineViewTimeService } from './services/posts-timeline-view-tim
     PostsTimelineViewTimeService,
   ],
   controllers: [PostsController],
-  exports: [PostsService]
+  exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService]
 })
 export class PostsModule {}

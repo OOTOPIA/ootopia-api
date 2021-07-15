@@ -7,6 +7,7 @@ import { GeneralConfigService } from './general-config.service';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { GeneralConfig } from './general-config.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { GeneralConfigDto } from './general-config.dto';
 
 @Controller('general-config')
 export class GeneralConfigController {
@@ -18,13 +19,13 @@ export class GeneralConfigController {
     @ApiTags('general-config')
     @ApiParam({ name : "name", type: "string", description: "Name of the configuration you want to get the value" })
     @ApiOperation({ summary: 'Get a configuration value' })
-    @ApiResponse({ status: 200, type: GeneralConfig })
+    @ApiResponse({ status: 200, type: GeneralConfigDto })
     @ApiResponse({ status: 404, description: 'Configuration not found', type: HttpResponseDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @Get('/:name')
-    async getTags(@Param('name') name) {
+    async getConfig(@Param('name') name) {
         try {
 
             let config = await this.generalConfigService.getConfig(name);
@@ -34,6 +35,25 @@ export class GeneralConfigController {
             }
 
             return config;
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('general-config')
+    @ApiOperation({ summary: 'Get all configurations' })
+    @ApiResponse({ status: 200, type: GeneralConfig })
+    @ApiResponse({ status: 404, description: 'Configuration not found', type: HttpResponseDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+    @Get()
+    async getAllConfigs(@Param('name') name) {
+        try {
+
+            return await this.generalConfigService.getAllConfigs();
             
         } catch (error) {
             new ErrorHandling(error);

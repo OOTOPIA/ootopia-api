@@ -79,7 +79,7 @@ export class PostsWatchedVideotimeService {
                         fromPlatform : true
                     }, true));
 
-                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
+                    //await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
 
                 }
 
@@ -98,7 +98,7 @@ export class PostsWatchedVideotimeService {
                         fromPlatform : true
                     }, true));
 
-                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
+                    //await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
 
                 }
 
@@ -111,6 +111,10 @@ export class PostsWatchedVideotimeService {
             throw err;
         }
         
+    }
+
+    async getUsersIdsWhoWatchedVideosInThisPeriod(startDateTime : Date, page : number) {
+        return await this.postsWatchedVideotimeRepository.getUsersIdsWhoWatchedVideosInThisPeriod(startDateTime, page);
     }
 
 }

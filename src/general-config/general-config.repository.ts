@@ -18,4 +18,8 @@ export class GeneralConfigRepository extends Repository<GeneralConfig>{
         });
     }
 
+    getAllConfigs() {
+        return this.find();
+    }
+
 }
