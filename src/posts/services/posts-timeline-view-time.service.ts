@@ -63,4 +63,13 @@ export class PostsTimelineViewTimeService {
         
     }
 
+    async getUsersIdsWhoViewedTimelineInThisPeriod(startDateTime : Date, page : number) {
+        return await this.postsTimelineViewTimeRepository.getUsersIdsWhoViewedTimelineInThisPeriod(startDateTime, page);
+    }
+
+    async getTimeSumOfUserViewedTimelineInThisPeriod(userId : string, startDateTime : Date) : Promise<number> {
+        let result = await this.postsTimelineViewTimeRepository.getTimeSumOfUserViewedTimelineInThisPeriod(userId, startDateTime)
+        return result.length ? +result[0].sum : 0;
+    }
+
 }

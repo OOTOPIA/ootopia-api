@@ -76,10 +76,12 @@ export class PostsWatchedVideotimeService {
                         balance : totalUserOOZ,
                         origin : Origin.TRANSFER,
                         action : WalletTransferAction.RECEIVED,
-                        fromPlatform : true
+                        fromPlatform : true,
+                        processed : true
                     }, true));
 
-                    //await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
+                    //TODO: REMOVER LINHA ABAIXO
+                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
 
                 }
 
@@ -95,10 +97,12 @@ export class PostsWatchedVideotimeService {
                         balance : totalCreatorOOZ,
                         origin : Origin.TRANSFER,
                         action : WalletTransferAction.RECEIVED,
-                        fromPlatform : true
+                        fromPlatform : true,
+                        processed : true
                     }, true));
 
-                    //await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
+                    //TODO: REMOVER LINHA ABAIXO
+                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
 
                 }
 
@@ -115,6 +119,11 @@ export class PostsWatchedVideotimeService {
 
     async getUsersIdsWhoWatchedVideosInThisPeriod(startDateTime : Date, page : number) {
         return await this.postsWatchedVideotimeRepository.getUsersIdsWhoWatchedVideosInThisPeriod(startDateTime, page);
+    }
+
+    async getTimeSumOfUserWatchedVideosInThisPeriod(userId : string, startDateTime : Date) : Promise<number> {
+        let result = await this.postsWatchedVideotimeRepository.getTimeSumOfUserWatchedVideosInThisPeriod(userId, startDateTime)
+        return result.length ? +result[0].sum : 0;
     }
 
 }

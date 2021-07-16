@@ -132,7 +132,8 @@ export class PostsService {
               balance : oozToReward,
               origin : Origin.TRANSFER,
               action : WalletTransferAction.RECEIVED,
-              fromPlatform : true
+              fromPlatform : true,
+              processed : true
           }, true));
 
           await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, post.userId, oozToReward));

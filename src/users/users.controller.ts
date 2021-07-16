@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -117,6 +117,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Update user account' })
     @ApiBearerAuth('Bearer')
     @ApiBody({ type: UserProfileUpdateDto })
+    @ApiParam({ name : "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, description: 'Successfully updated', type: CreatedUserDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
@@ -171,6 +172,28 @@ export class UsersController {
     async getUser(@Req() { user }) {
         try {
             return await this.usersService.getUserById(user.id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: "Get user daily goal stats" })
+    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiResponse({ status: 200, type: UserDailyGoalStatsDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Get('/:id/daily-goal-stats')
+    async getUserDailyGoalStats(@Param('id') id, @Req() { user }) {
+        try {
+            if (user.id != id) {
+                throw new HttpException('User Not Authorized', 403);
+            }
+            return await this.usersService.getUserDailyGoalStats(user.id);
         } catch (error) {
             new ErrorHandling(error);
         }

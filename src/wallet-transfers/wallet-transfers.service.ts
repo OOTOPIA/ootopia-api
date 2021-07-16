@@ -28,7 +28,8 @@ export class WalletTransfersService {
             balance : +((+data.balance).toFixed(2)),
             origin : data.origin,
             action : data.action,
-            fromPlatform : data.fromPlatform || false
+            fromPlatform : data.fromPlatform || false,
+            processed : data.processed || false,
         }, isTransaction);
 
         if (!isTransaction) {
@@ -60,6 +61,7 @@ export class WalletTransfersService {
                 action: WalletTransferAction.SENT,
                 balance : balance,
                 postId : postId,
+                processed : true,
             }, true));
 
             await queryRunner.manager.save(await this.createTransfer(receiverUserId, {
@@ -70,6 +72,7 @@ export class WalletTransfersService {
                 action: WalletTransferAction.RECEIVED,
                 balance : balance,
                 postId : postId,
+                processed : true,
             }, true));
 
             if (postId) {
@@ -127,6 +130,15 @@ export class WalletTransfersService {
             await queryRunner.rollbackTransaction();
             throw err;
         }
+    }
+
+    async getUserOOZAccumulatedInThisPeriod(userId : string, processed : boolean, startDateTime : Date) {
+        let result = await this.walletTransfersRepository.getUserOOZAccumulatedInThisPeriod(userId, processed, startDateTime);
+        return (result.length ? +result[0].sum : 0);
+    }
+
+    async getTransfersNotProcessedInThisPeriod(userId : string, startDateTime : Date) {
+        return await this.walletTransfersRepository.getTransfersNotProcessedInThisPeriod(userId, startDateTime);
     }
 
 }
