@@ -36,4 +36,11 @@ export class PostsWatchedVideotimeRepository extends Repository<PostsWatchedVide
         `, [startDateTime]), { deep : true });
     }
 
+    async getTimeSumOfUserWatchedVideosInThisPeriod(userId : string, startDateTime : Date) {
+        return camelcaseKeys(await getConnection().query(`
+            SELECT sum(time_in_milliseconds) FROM posts_watched_videotime 
+            WHERE user_id = $1 AND created_at BETWEEN $2 and now() at time zone 'UTC';
+        `, [userId, startDateTime]), { deep : true });
+    }
+
 }

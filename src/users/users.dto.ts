@@ -153,6 +153,28 @@ export class UserProfileDto {
 
 }
 
+export class UserDailyGoalStatsDto {
+
+    @ApiProperty({ description: "User id" })
+    id : string;
+
+    @ApiProperty({ description: "User-configured daily goal" })
+    dailyGoalInMinutes : number;
+
+    @ApiProperty({ description: "End time to meet daily goal" })
+    dailyGoalEndsAt : Date;
+
+    @ApiProperty({ description: "Indicates whether the daily goal was achieved or not" })
+    dailyGoalAchieved : boolean;
+
+    @ApiProperty({ description: "Daily goal time achieved so far (Format: 00h 00m 00s)" })
+    dailyGoalAchievedSoFar : string;
+
+    @ApiProperty({ description: "Daily goal time achieved so far in milliseconds" })
+    dailyGoalAchievedSoFarMs : string;
+
+}
+
 export class UserProfileUpdateDto {
 
     @ApiProperty({ required: true, type: "file", description: "User photo" })

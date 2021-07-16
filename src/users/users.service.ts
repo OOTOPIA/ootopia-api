@@ -8,6 +8,12 @@ import { InterestsTagsService } from 'src/interests-tags/services/interests-tags
 import { CitiesService } from 'src/cities/cities.service';
 import { AddressesRepository } from '../addresses/addresses.repository';
 import { WalletsService } from 'src/wallets/wallets.service';
+import { GeneralConfigService } from 'src/general-config/general-config.service';
+import { PostsWatchedVideotimeService } from 'src/posts/services/posts-watched-videotime.service';
+import { PostsTimelineViewTimeService } from 'src/posts/services/posts-timeline-view-time.service';
+import { ConfigName } from 'src/general-config/general-config.entity';
+import * as moment from 'moment-timezone';
+import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +24,12 @@ export class UsersService {
         private readonly interestsTagsService : InterestsTagsService,
         private readonly citiesService : CitiesService,
         private readonly addressesRepository : AddressesRepository,
-        private readonly walletsService : WalletsService) {
+        private readonly walletsService : WalletsService,
+        private readonly walletTransfersService : WalletTransfersService,
+        private readonly generalConfigService : GeneralConfigService,
+        private readonly postsWatchedVideoTimeService : PostsWatchedVideotimeService,
+        private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
+        ) {
     }
 
     async createUser(userData) {
@@ -136,6 +147,60 @@ export class UsersService {
 
     async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
         return await this.usersRepository.updateDontAskToConfirmGratitudeReward(id, value);
+    }
+
+    async getUserDailyGoalStats(id : string, dailyGoalStartTime? : Date, dailyGoalEndTime? : Date) {
+        let user = await this.getUserById(id), globalGoalLimitTimeConfig;
+
+        if (!dailyGoalStartTime || !dailyGoalEndTime) {
+            globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
+        }
+
+        if (!dailyGoalStartTime) dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
+        if (!dailyGoalEndTime) dailyGoalEndTime = this.generalConfigService.getDailyGoalEndTime(globalGoalLimitTimeConfig.value);
+
+        if (!+user.dailyLearningGoalInMinutes) {
+            return {
+                id,
+                dailyGoalInMinutes : 0,
+                dailyGoalEndsAt : null,
+                dailyGoalAchieved : false,
+                dailyGoalAchievedSoFar : 0,
+                dailyGoalAchievedSoFarMs : 0
+            };
+        }
+
+        let totalWatchedMilliseconds = await this.postsWatchedVideoTimeService.getTimeSumOfUserWatchedVideosInThisPeriod(id, dailyGoalStartTime);
+        let totalViewedTimelineMilliseconds = await this.postsTimelineViewTimeService.getTimeSumOfUserViewedTimelineInThisPeriod(id, dailyGoalStartTime);
+        let totalTimeInMinutes = Math.floor((totalWatchedMilliseconds + totalViewedTimelineMilliseconds)/ 60000);
+        let dailyGoalAchieved = (+totalTimeInMinutes > +user.dailyLearningGoalInMinutes);
+        let dailyGoalAchievedSoFarMs = totalWatchedMilliseconds + totalViewedTimelineMilliseconds;
+        let dailyGoalAchievedSoFar = this.msToTime(dailyGoalAchievedSoFarMs);
+        let accumulatedOOZ = await this.walletTransfersService.getUserOOZAccumulatedInThisPeriod(id, false, dailyGoalStartTime);
+
+        return {
+            id,
+            dailyGoalInMinutes : +user.dailyLearningGoalInMinutes,
+            dailyGoalEndsAt : dailyGoalEndTime,
+            dailyGoalAchieved : dailyGoalAchieved,
+            dailyGoalAchievedSoFar : dailyGoalAchievedSoFar,
+            dailyGoalAchievedSoFarMs : dailyGoalAchievedSoFarMs,
+            accumulatedOOZ : accumulatedOOZ
+        };
+
+    }
+
+    msToTime(duration) {
+
+        var seconds : any = Math.floor((duration / 1000) % 60),
+          minutes : any = Math.floor((duration / (1000 * 60)) % 60),
+          hours : any = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+      
+        return (+hours ? hours + "h " : "") + minutes + "m " + seconds + "s";
     }
 
 }
