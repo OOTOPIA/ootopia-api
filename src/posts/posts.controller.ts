@@ -4,9 +4,10 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiRespons
 import { ErrorHandling } from 'src/config/error-handling';
 import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto } from './posts.dto';
 import { memoryStorage } from 'multer'
-import { extname } from 'path'
+import path, { extname } from 'path'
 import { PostsService } from './posts.service';
 import { VideoService } from 'src/video/video.service';
+import { FilesUploadService } from 'src/files-upload/files-upload.service'
 import { CommentsFilterDto, CommentsListDto, CreateCommentsDto, CreatedCommentDto } from './comments.dto';
 import { CommentsService } from './services/comments.service';
 import { HttpResponseDto } from 'src/config/http-response.dto';
@@ -23,6 +24,7 @@ export class PostsController {
         private readonly postsService : PostsService, 
         private readonly videoService : VideoService,
         private readonly commentsService : CommentsService,
+        private readonly filesUploadService: FilesUploadService,
         private readonly postsWatchedVideotimeService : PostsWatchedVideotimeService,
         private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
         ) {}
@@ -50,6 +52,47 @@ export class PostsController {
             }
 
             return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), user.id);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @ApiTags('test')
+    @ApiOperation({ summary: 'test post' })
+    @ApiResponse({ status: 201, description: 'The post was created successfully', type : CreatedPostDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+        type: 'object',
+        properties: {
+            file: {
+            type: 'string',
+            format: 'binary',
+            },
+        },
+        },
+    })
+    @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage(),
+    }))
+    @Post('/test')
+    async createPostTest(@UploadedFile() file) {
+        try {
+
+            if (!file) {
+                throw new HttpException("Video file is not sent", 400);
+            }
+
+            // console.log(path.extname(file.originalname).toLowerCase());
+            console.log(file.mimetype);
+
+            const teste = await this.filesUploadService.uploadFileToS3Minio(file.buffer, file.originalname, 1)
+
+            console.log(teste)
             
         } catch (error) {
             new ErrorHandling(error);
@@ -160,7 +203,7 @@ export class PostsController {
         try {
             console.log("headers", headers);
             //console.log("body", typeof raw, raw);
-            let webhookSignature = headers['webhook-signature'];
+            const webhookSignature = headers['webhook-signature'];
 
             if (!webhookSignature) {
                 throw new HttpException("UNAUTHORIZED", 401);
