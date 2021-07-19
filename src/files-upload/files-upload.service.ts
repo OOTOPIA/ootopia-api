@@ -1,37 +1,57 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
+import * as Minio from 'minio';
 
 @Injectable()
 export class FilesUploadService {
-
   private aws;
+  private awsMinio;
 
   constructor() {
     this.aws = new AWS.S3({
       accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey:
-        process.env.SECRET_ACCESS_KEY,
+      secretAccessKey: process.env.SECRET_ACCESS_KEY,
       region: process.env.REGION,
       params: {
         Bucket: process.env.BUCKET,
         ACL: 'public-read',
       },
     });
+    this.awsMinio = new Minio.Client({
+      endPoint: 's3.amazonaws.com',
+      accessKey: process.env.S3_ACCESS_KEY_ID,
+      secretKey: process.env.S3_SECRET_ACCESS_KEY,
+    });
   }
 
   async uploadFileToS3(fileStreamOrBuffer, fileName, userId) {
     const extension = /(?:\.([^.]+))?$/.exec(fileName)[0];
-    let { Location } = await this.aws
+    const { Location } = await this.aws
       .upload({
         Key: `users/${userId}/photo-${new Date().getTime()}${extension}`,
         Body: fileStreamOrBuffer,
         Bucket: process.env.BUCKET,
-        ACL: 'public-read'
+        ACL: 'public-read',
       })
       .promise();
 
-      return Location;
+    return Location;
   }
-
+  
+  async uploadFileToS3Minio(fileStreamOrBuffer, fileName, userId) {
+    const extension = /(?:\.([^.]+))?$/.exec(fileName)[0];
+    const name = `users/${userId}/photo-${new Date().getTime()}${extension}`;
+    const test = await this.awsMinio.putObject(
+      process.env.S3_BUCKET,
+      name,
+      fileStreamOrBuffer,
+      function(err, objInfo) {
+        if (err) {
+          return console.log(err); // err should be null
+        }
+        console.log('Success', objInfo);
+      },
+    );
+    return test;
+  }
 }
