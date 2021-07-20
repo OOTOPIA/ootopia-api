@@ -3,6 +3,7 @@ import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { CitiesService } from 'src/cities/cities.service';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
 import { VideoService } from 'src/video/video.service';
+import { FilesUploadService } from 'src/files-upload/files-upload.service'
 import { getConnection } from 'typeorm';
 import { PostsRepository } from './posts.repository';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,6 +21,7 @@ export class PostsService {
   constructor(
     private readonly postsRepository: PostsRepository,
     private readonly videoService: VideoService,
+    private readonly filesUploadService: FilesUploadService,
     private readonly interestsTagsService: InterestsTagsService,
     private readonly citiesService: CitiesService,
     private readonly addressesRepository: AddressesRepository,
@@ -50,6 +52,102 @@ export class PostsService {
       postData.thumbnailUrl = video.thumbnail;
       postData.streamMediaId = video.uid;
 
+      const postResult: any = await this.postsRepository.createOrUpdatePost(
+        postData,
+      );
+
+      if (
+        postData.addressCountryCode &&
+        postData.addressState &&
+        postData.addressCity
+      ) {
+        console.log('>>> post has address');
+
+        let city = await this.citiesService.getCity(
+          postData.addressCity,
+          postData.addressState,
+          postData.addressCountryCode,
+        );
+        if (!city) {
+          console.log('>>> created new city entry');
+          city = await this.citiesService.createCity({
+            city: postData.addressCity,
+            state: postData.addressState,
+            country: postData.addressCountryCode,
+          });
+        }
+
+        const addressData: any = {
+          city: city,
+          lat: postData.addressLatitude,
+          lng: postData.addressLongitude,
+          number: postData.addressNumber,
+        };
+
+        const address = await this.addressesRepository.createOrUpdateAddress(
+          addressData,
+        );
+
+        console.log('>>> saved address info', address);
+        postResult.addressId = address.id;
+
+        await queryRunner.manager.save(address);
+      }
+
+      if (postData.tagsIds && postData.tagsIds.length > 0) {
+        const tagsIds = postData.tagsIds.split(',');
+        await this.interestsTagsService.updatePostTags(
+          postResult.id,
+          tagsIds,
+          queryRunner,
+        );
+      }
+
+      await queryRunner.manager.save(postResult);
+      await queryRunner.commitTransaction();
+      return postResult;
+    } catch (err) {
+      await this.postsRepository.deletePost(postData.id);
+      await queryRunner.rollbackTransaction();
+      throw err;
+    }
+  }
+  async createPostMinio(file, postData, userId) {
+    postData.id = uuidv4();
+
+    const queryRunner = getConnection().createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    console.log('new post data', postData);
+
+    console.log(file.mimetype)
+
+    try {
+      if (postData.type === 'image') {
+        const imagesAcceptTypes = ['image/png', 'image/jpeg'];
+        if (file.mimetype === 'image/png') {
+          console.log('entrou');
+          console.log(userId);
+          console.log(file.originalname);
+          postData.imageUrl = await this.filesUploadService.uploadFileToS3Minio(
+            file.buffer,
+            file.originalname,
+            userId,
+          );
+        }
+      } else {
+        const video: any = await this.videoService.uploadVideo(
+          file.buffer,
+          postData.description,
+        );
+        postData.videoUrl = video.playback.hls;
+        postData.thumbnailUrl = video.thumbnail;
+        postData.streamMediaId = video.uid;
+      }
+      postData.userId = userId;
+      
       const postResult: any = await this.postsRepository.createOrUpdatePost(
         postData,
       );

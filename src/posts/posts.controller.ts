@@ -58,29 +58,22 @@ export class PostsController {
         }
     }
 
+    @UseInterceptors(SentryInterceptor)
     @ApiTags('test')
     @ApiOperation({ summary: 'test post' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: CreatePostsDto })
     @ApiResponse({ status: 201, description: 'The post was created successfully', type : CreatedPostDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        schema: {
-        type: 'object',
-        properties: {
-            file: {
-            type: 'string',
-            format: 'binary',
-            },
-        },
-        },
-    })
+    @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileInterceptor('file', {
         storage: memoryStorage(),
     }))
     @Post('/test')
-    async createPostTest(@UploadedFile() file) {
+    async createPostTest(@UploadedFile() file, @Req() { user }, @Body() post : CreatePostsDto) {
         try {
 
             if (!file) {
@@ -90,10 +83,11 @@ export class PostsController {
             // console.log(path.extname(file.originalname).toLowerCase());
             console.log(file.mimetype);
 
-            const teste = await this.filesUploadService.uploadFileToS3Minio(file.buffer, file.originalname, 1)
-
-            console.log(teste)
+            // const teste = await this.filesUploadService.uploadFileToS3Minio(file.buffer, file.originalname, 1)
             
+            return await this.postsService.createPostMinio(file, JSON.parse(post.metadata), user.id);
+            
+
         } catch (error) {
             new ErrorHandling(error);
         }
