@@ -30,8 +30,8 @@ export class PostsService {
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
   ) {}
-
-  async createPost(fileBuffer, postData, userId) {
+ 
+  async createPost(file, postData, userId) {
     postData.id = uuidv4();
 
     const queryRunner = getConnection().createQueryRunner();
@@ -40,98 +40,12 @@ export class PostsService {
     await queryRunner.startTransaction();
 
     console.log('new post data', postData);
-
-    try {
-      const video: any = await this.videoService.uploadVideo(
-        fileBuffer,
-        postData.description,
-      );
-
-      postData.userId = userId;
-      postData.videoUrl = video.playback.hls;
-      postData.thumbnailUrl = video.thumbnail;
-      postData.streamMediaId = video.uid;
-
-      const postResult: any = await this.postsRepository.createOrUpdatePost(
-        postData,
-      );
-
-      if (
-        postData.addressCountryCode &&
-        postData.addressState &&
-        postData.addressCity
-      ) {
-        console.log('>>> post has address');
-
-        let city = await this.citiesService.getCity(
-          postData.addressCity,
-          postData.addressState,
-          postData.addressCountryCode,
-        );
-        if (!city) {
-          console.log('>>> created new city entry');
-          city = await this.citiesService.createCity({
-            city: postData.addressCity,
-            state: postData.addressState,
-            country: postData.addressCountryCode,
-          });
-        }
-
-        const addressData: any = {
-          city: city,
-          lat: postData.addressLatitude,
-          lng: postData.addressLongitude,
-          number: postData.addressNumber,
-        };
-
-        const address = await this.addressesRepository.createOrUpdateAddress(
-          addressData,
-        );
-
-        console.log('>>> saved address info', address);
-        postResult.addressId = address.id;
-
-        await queryRunner.manager.save(address);
-      }
-
-      if (postData.tagsIds && postData.tagsIds.length > 0) {
-        const tagsIds = postData.tagsIds.split(',');
-        await this.interestsTagsService.updatePostTags(
-          postResult.id,
-          tagsIds,
-          queryRunner,
-        );
-      }
-
-      await queryRunner.manager.save(postResult);
-      await queryRunner.commitTransaction();
-      return postResult;
-    } catch (err) {
-      await this.postsRepository.deletePost(postData.id);
-      await queryRunner.rollbackTransaction();
-      throw err;
-    }
-  }
-  async createPostMinio(file, postData, userId) {
-    postData.id = uuidv4();
-
-    const queryRunner = getConnection().createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    console.log('new post data', postData);
-
-    console.log(file.mimetype)
 
     try {
       if (postData.type === 'image') {
         const imagesAcceptTypes = ['image/png', 'image/jpeg'];
-        if (file.mimetype === 'image/png') {
-          console.log('entrou');
-          console.log(userId);
-          console.log(file.originalname);
-          postData.imageUrl = await this.filesUploadService.uploadFileToS3Minio(
+        if (imagesAcceptTypes.includes(file.mimetype)) {
+          postData.thumbnailUrl = postData.imageUrl = await this.filesUploadService.uploadFileToS3Minio(
             file.buffer,
             file.originalname,
             userId,

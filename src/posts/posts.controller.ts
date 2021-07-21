@@ -51,48 +51,13 @@ export class PostsController {
                 throw new HttpException("Video file is not sent", 400);
             }
 
-            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), user.id);
+            return await this.postsService.createPost(file, JSON.parse(post.metadata), user.id);
             
         } catch (error) {
             new ErrorHandling(error);
         }
     }
 
-    @UseInterceptors(SentryInterceptor)
-    @ApiTags('test')
-    @ApiOperation({ summary: 'test post' })
-    @ApiBearerAuth('Bearer')
-    @ApiBody({ type: CreatePostsDto })
-    @ApiResponse({ status: 201, description: 'The post was created successfully', type : CreatedPostDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
-    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @ApiConsumes('multipart/form-data')
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor('file', {
-        storage: memoryStorage(),
-    }))
-    @Post('/test')
-    async createPostTest(@UploadedFile() file, @Req() { user }, @Body() post : CreatePostsDto) {
-        try {
-
-            if (!file) {
-                throw new HttpException("Video file is not sent", 400);
-            }
-
-            // console.log(path.extname(file.originalname).toLowerCase());
-            console.log(file.mimetype);
-
-            // const teste = await this.filesUploadService.uploadFileToS3Minio(file.buffer, file.originalname, 1)
-            
-            return await this.postsService.createPostMinio(file, JSON.parse(post.metadata), user.id);
-            
-
-        } catch (error) {
-            new ErrorHandling(error);
-        }
-    }
-    
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Like/dislike a post' })
