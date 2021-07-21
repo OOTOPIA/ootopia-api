@@ -50,7 +50,7 @@ export class PostsService {
           );
         }
         else {
-          throw new HttpException("Only .png or .jpeg extension image is accept", 400); 
+          throw new HttpException("When image type is set only .png or .jpeg extensions is accept", 400); 
         }
       } else {
         const video: any = await this.videoService.uploadVideo(
