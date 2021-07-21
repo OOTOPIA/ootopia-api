@@ -49,6 +49,9 @@ export class PostsService {
             userId,
           );
         }
+        else {
+          throw new HttpException("Only .png or .jpeg extension image is accept", 400); 
+        }
       } else {
         const video: any = await this.videoService.uploadVideo(
           file.buffer,
