@@ -39,8 +39,6 @@ export class PostsService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    console.log('new post data', postData);
-
     try {
       if (postData.type === 'image') {
         const imagesAcceptTypes = ['image/png', 'image/jpeg'];
@@ -71,7 +69,6 @@ export class PostsService {
         postData.addressState &&
         postData.addressCity
       ) {
-        console.log('>>> post has address');
 
         let city = await this.citiesService.getCity(
           postData.addressCity,
@@ -79,7 +76,6 @@ export class PostsService {
           postData.addressCountryCode,
         );
         if (!city) {
-          console.log('>>> created new city entry');
           city = await this.citiesService.createCity({
             city: postData.addressCity,
             state: postData.addressState,
@@ -98,7 +94,6 @@ export class PostsService {
           addressData,
         );
 
-        console.log('>>> saved address info', address);
         postResult.addressId = address.id;
 
         await queryRunner.manager.save(address);
