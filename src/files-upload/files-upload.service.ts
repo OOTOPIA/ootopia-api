@@ -43,18 +43,12 @@ export class FilesUploadService {
     const name = `users/${userId}/photo-${new Date().getTime()}${extension}`;
     try {
       await this.awsMinio.putObject(
-      process.env.S3_BUCKET,
-      name,
-      fileStreamOrBuffer,
-      function(err, objInfo) {
-        if (err) {
-          return console.log(err); // err should be null
-        }
-        console.log('Success', objInfo);
-      },
-    );
+        process.env.S3_BUCKET,
+        name,
+        fileStreamOrBuffer,
+      );
     } catch (error) {
-      throw error
+      throw error;
     }
     
     return `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${name}`;
