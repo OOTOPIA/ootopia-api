@@ -4,9 +4,10 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiRespons
 import { ErrorHandling } from 'src/config/error-handling';
 import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto } from './posts.dto';
 import { memoryStorage } from 'multer'
-import { extname } from 'path'
+import path, { extname } from 'path'
 import { PostsService } from './posts.service';
 import { VideoService } from 'src/video/video.service';
+import { FilesUploadService } from 'src/files-upload/files-upload.service'
 import { CommentsFilterDto, CommentsListDto, CreateCommentsDto, CreatedCommentDto } from './comments.dto';
 import { CommentsService } from './services/comments.service';
 import { HttpResponseDto } from 'src/config/http-response.dto';
@@ -23,6 +24,7 @@ export class PostsController {
         private readonly postsService : PostsService, 
         private readonly videoService : VideoService,
         private readonly commentsService : CommentsService,
+        private readonly filesUploadService: FilesUploadService,
         private readonly postsWatchedVideotimeService : PostsWatchedVideotimeService,
         private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
         ) {}
@@ -49,13 +51,13 @@ export class PostsController {
                 throw new HttpException("Video file is not sent", 400);
             }
 
-            return await this.postsService.createPost(file.buffer, JSON.parse(post.metadata), user.id);
+            return await this.postsService.createPost(file, JSON.parse(post.metadata), user.id);
             
         } catch (error) {
             new ErrorHandling(error);
         }
     }
-    
+
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
     @ApiOperation({ summary: 'Like/dislike a post' })
@@ -160,7 +162,7 @@ export class PostsController {
         try {
             console.log("headers", headers);
             //console.log("body", typeof raw, raw);
-            let webhookSignature = headers['webhook-signature'];
+            const webhookSignature = headers['webhook-signature'];
 
             if (!webhookSignature) {
                 throw new HttpException("UNAUTHORIZED", 401);
