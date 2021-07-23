@@ -74,14 +74,11 @@ export class PostsWatchedVideotimeService {
                         userId : userId,
                         walletId : receiverUserWalletId,
                         balance : totalUserOOZ,
-                        origin : Origin.TRANSFER,
+                        origin : Origin.WATCHED_VIDEOS,
                         action : WalletTransferAction.RECEIVED,
                         fromPlatform : true,
-                        processed : true
+                        processed : false
                     }, true));
-
-                    //TODO: REMOVER LINHA ABAIXO
-                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, totalUserOOZ));
 
                 }
 
@@ -98,11 +95,8 @@ export class PostsWatchedVideotimeService {
                         origin : Origin.TRANSFER,
                         action : WalletTransferAction.RECEIVED,
                         fromPlatform : true,
-                        processed : true
+                        processed : false
                     }, true));
-
-                    //TODO: REMOVER LINHA ABAIXO
-                    await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverCreatorWalletId, post.userId, totalCreatorOOZ));
 
                 }
 

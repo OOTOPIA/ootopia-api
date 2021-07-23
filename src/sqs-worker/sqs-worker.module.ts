@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SqsWorkerService } from './sqs-worker.service';
 import { DailyGoalDistributionHandlerService } from './daily-goal-distribution-handler/daily-goal-distribution-handler.service';
 import { UsersModule } from 'src/users/users.module';
@@ -9,12 +9,12 @@ import { WalletsModule } from 'src/wallets/wallets.module';
 
 @Module({
   imports: [
-    UsersModule,
-    WalletTransfersModule,
+    forwardRef(() => WalletTransfersModule),
     WalletsModule,
     GeneralConfigModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [SqsWorkerService, DailyGoalDistributionHandlerService],
-  exports: [SqsWorkerService]
+  exports: [SqsWorkerService, DailyGoalDistributionHandlerService]
 })
 export class SqsWorkerModule {}

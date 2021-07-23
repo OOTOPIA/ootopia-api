@@ -9,11 +9,9 @@ import { CitiesService } from 'src/cities/cities.service';
 import { AddressesRepository } from '../addresses/addresses.repository';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
-import { PostsWatchedVideotimeService } from 'src/posts/services/posts-watched-videotime.service';
-import { PostsTimelineViewTimeService } from 'src/posts/services/posts-timeline-view-time.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
-import * as moment from 'moment-timezone';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
 
 @Injectable()
 export class UsersService {
@@ -27,8 +25,7 @@ export class UsersService {
         private readonly walletsService : WalletsService,
         private readonly walletTransfersService : WalletTransfersService,
         private readonly generalConfigService : GeneralConfigService,
-        private readonly postsWatchedVideoTimeService : PostsWatchedVideotimeService,
-        private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
+        private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
         ) {
     }
 
@@ -165,17 +162,16 @@ export class UsersService {
                 dailyGoalInMinutes : 0,
                 dailyGoalEndsAt : null,
                 dailyGoalAchieved : false,
-                dailyGoalAchievedSoFar : 0,
-                dailyGoalAchievedSoFarMs : 0
+                totalAppUsageTimeSoFar : 0,
+                totalAppUsageTimeSoFarInMs : 0,
+                accumulatedOOZ : 0
             };
         }
 
-        let totalWatchedMilliseconds = await this.postsWatchedVideoTimeService.getTimeSumOfUserWatchedVideosInThisPeriod(id, dailyGoalStartTime);
-        let totalViewedTimelineMilliseconds = await this.postsTimelineViewTimeService.getTimeSumOfUserViewedTimelineInThisPeriod(id, dailyGoalStartTime);
-        let totalTimeInMinutes = Math.floor((totalWatchedMilliseconds + totalViewedTimelineMilliseconds)/ 60000);
+        let totalAppUserUsageTimeInMs = await this.usersAppUsageTimeService.getTimeSumOfUserUsedAppInThisPeriod(id, dailyGoalStartTime);
+        let totalTimeInMinutes = Math.floor(totalAppUserUsageTimeInMs / 60000);
         let dailyGoalAchieved = (+totalTimeInMinutes > +user.dailyLearningGoalInMinutes);
-        let dailyGoalAchievedSoFarMs = totalWatchedMilliseconds + totalViewedTimelineMilliseconds;
-        let dailyGoalAchievedSoFar = this.msToTime(dailyGoalAchievedSoFarMs);
+        let dailyGoalAchievedSoFar = this.msToTime(totalAppUserUsageTimeInMs);
         let accumulatedOOZ = await this.walletTransfersService.getUserOOZAccumulatedInThisPeriod(id, false, dailyGoalStartTime);
 
         return {
@@ -183,8 +179,8 @@ export class UsersService {
             dailyGoalInMinutes : +user.dailyLearningGoalInMinutes,
             dailyGoalEndsAt : dailyGoalEndTime,
             dailyGoalAchieved : dailyGoalAchieved,
-            dailyGoalAchievedSoFar : dailyGoalAchievedSoFar,
-            dailyGoalAchievedSoFarMs : dailyGoalAchievedSoFarMs,
+            totalAppUsageTimeSoFar : dailyGoalAchievedSoFar,
+            totalAppUsageTimeSoFarInMs : totalAppUserUsageTimeInMs,
             accumulatedOOZ : accumulatedOOZ
         };
 
