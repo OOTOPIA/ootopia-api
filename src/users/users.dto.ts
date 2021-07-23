@@ -205,3 +205,11 @@ export class UserProfileUpdateDto {
     tagsIds : string;
 
 }
+
+export class UsersAppUsageTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
+
+}

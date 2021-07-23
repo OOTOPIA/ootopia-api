@@ -47,12 +47,10 @@ export class PostsTimelineViewTimeService {
                 userId : data.userId,
                 walletId : receiverUserWalletId,
                 balance : totalUserOOZ,
-                origin : Origin.TRANSFER,
+                origin : Origin.TIMELINE_VIEW,
                 action : WalletTransferAction.RECEIVED,
                 fromPlatform : true
             }, true));
-
-            //await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, data.userId, totalUserOOZ));
 
             await queryRunner.commitTransaction();
 
