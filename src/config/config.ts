@@ -15,6 +15,7 @@ import { GeneralConfig } from 'src/general-config/general-config.entity';
 import { PostsWatchedVideotime } from 'src/posts/entities/posts-watched-videotime.entity';
 import { PostsTimelineViewTime } from 'src/posts/entities/posts-timeline-view-time.entity';
 import { UsersAppUsageTime } from 'src/users/entities/users-app-usage-time.entity';
+import { Badges } from 'src/badges/entities/badges.entity';
 
 require('dotenv').config();
 
@@ -76,6 +77,7 @@ class ConfigService {
           WalletTransfers,
           GeneralConfig,
           UsersAppUsageTime,
+          Badges
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],

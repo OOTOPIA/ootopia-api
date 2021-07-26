@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Badges } from './entities/badge.entity';
+import { Badges } from './entities/badges.entity';
 
 @Injectable()
 export class BadgesService {
