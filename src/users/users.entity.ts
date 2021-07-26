@@ -1,3 +1,4 @@
+import { Badges } from 'src/badges/entities/badges.entity';
 import {
     Entity,
     Column,
@@ -6,7 +7,9 @@ import {
     UpdateDateColumn,
     BaseEntity,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    ManyToMany,
+    JoinTable
 } from 'typeorm';
 import { Addresses } from '../addresses/addresses.entity';
   
@@ -49,6 +52,20 @@ export class Users extends BaseEntity {
     @ManyToOne(type => Addresses, address => address.id)
     @JoinColumn({ name : "address_id" })
     addressId : Addresses;
+    
+    @ManyToMany(() => Badges)
+    @JoinTable({
+        name: 'user_badges',
+        joinColumn: {
+          name: 'user_id',
+          referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+          name: 'badges_id',
+          referencedColumnName: 'id',
+        },
+    })
+    badges : Badges[];
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
