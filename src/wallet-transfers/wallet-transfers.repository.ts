@@ -26,7 +26,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
             throw new HttpException("Mandatory field 'userId' is not found", 400);
         }
 
-        let where = "w.processed = true AND ", params = [];
+        let where = "w.processed = true AND w.removed = false AND ", params = [];
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
             'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.from_platform', 'w.created_at', 'w.updated_at',
@@ -63,14 +63,14 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
     async getUserOOZAccumulatedInThisPeriod(userId : string, processed : boolean, startDateTime : Date) {
         return camelcaseKeys(await getConnection().query(`
             SELECT sum(balance) FROM wallet_transfers w 
-            WHERE user_id = $1 AND processed = $2 AND created_at BETWEEN $3 and now() at time zone 'UTC';
+            WHERE user_id = $1 AND processed = $2 AND created_at BETWEEN $3 and now() at time zone 'UTC' AND removed = false;
         `, [userId, processed, startDateTime]), { deep : true });
     }
 
     async getTransfersNotProcessedInThisPeriod(userId : string, startDateTime : Date) {
         return camelcaseKeys(await getConnection().query(`
             SELECT * FROM wallet_transfers w 
-            WHERE user_id = $1 AND processed = false AND created_at BETWEEN $2 and now() at time zone 'UTC';
+            WHERE user_id = $1 AND processed = false AND created_at BETWEEN $2 and now() at time zone 'UTC' AND removed = false;
         `, [userId, startDateTime]), { deep : true });
     }
 

@@ -14,6 +14,7 @@ import { WalletTransfers } from 'src/wallet-transfers/wallet-transfers.entity';
 import { GeneralConfig } from 'src/general-config/general-config.entity';
 import { PostsWatchedVideotime } from 'src/posts/entities/posts-watched-videotime.entity';
 import { PostsTimelineViewTime } from 'src/posts/entities/posts-timeline-view-time.entity';
+import { UsersAppUsageTime } from 'src/users/entities/users-app-usage-time.entity';
 
 require('dotenv').config();
 
@@ -54,7 +55,7 @@ class ConfigService {
         extra: {
           max: 100, // set pool max size to 20
           idleTimeoutMillis: 1000 * 60, // close idle clients after 1 second
-          connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
+          connectionTimeoutMillis: 15000, // return an error after 1 second if connection could not be established
         },
         synchronize: true,
         entities: [
@@ -73,7 +74,8 @@ class ConfigService {
           Addresses,
           Wallets,
           WalletTransfers,
-          GeneralConfig
+          GeneralConfig,
+          UsersAppUsageTime,
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
@@ -6,10 +6,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
+import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
+import { DailyGoalDistributionHandlerService } from 'src/sqs-worker/daily-goal-distribution-handler/daily-goal-distribution-handler.service';
 //import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
 
 
@@ -18,7 +20,9 @@ export class UsersController {
 
     constructor(
         private readonly usersService : UsersService,
-        private readonly authService : AuthService
+        private readonly authService : AuthService,
+        private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
+        @Inject(forwardRef(() => DailyGoalDistributionHandlerService)) private readonly dailyGoalDistributionHandlerService : DailyGoalDistributionHandlerService,
         ) {}
 
     @UseInterceptors(SentryInterceptor)
@@ -194,6 +198,49 @@ export class UsersController {
                 throw new HttpException('User Not Authorized', 403);
             }
             return await this.usersService.getUserDailyGoalStats(user.id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: "Record the time the user used the app" })
+    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiBody({ type: UsersAppUsageTimeDto })
+    @ApiResponse({ status: 200 })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Post('/usage-time')
+    async recordTimeUserUsedApp(@Req() { user }, @Body() data) {
+        try {
+            data.userId = user.id;
+            return await this.usersAppUsageTimeService.recordAppUsageTime(data);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiBearerAuth('Bearer')
+    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiOperation({ summary: "Force daily goal checking for a user." })
+    @ApiResponse({ status: 200 })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Get('/:id/force-daily-goal-check')
+    async forceDailyGoalCheck(@Param('id') id, @Req() { user }) {
+        try {
+            if (user.id != id) {
+                throw new HttpException('User Not Authorized', 403);
+            }
+            return await this.dailyGoalDistributionHandlerService.startCheckingUsersDailyGoal([id]);
         } catch (error) {
             new ErrorHandling(error);
         }
