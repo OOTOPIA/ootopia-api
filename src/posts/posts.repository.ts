@@ -139,14 +139,27 @@ export class PostsRepository extends Repository<Posts>{
 
     async getPostsTimeline(filters, userId? : string) {
 
-        let where = "video_status = 'ready' AND ", params = [];
-        let perPage = 10, limit = 'LIMIT ' + perPage;
-        let columns = [
-            'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status', 'p.ooz_total_collected',
-            'users.photo_url', 'users.fullname as username', 
-            'COALESCE(pl.likes_count, 0)::integer as likes_count',
-            'COALESCE(pc.comments_count, 0)::integer as comments_count',
-            'c.city', 'c.state', 'c.country'
+        let where = "video_status = 'ready' AND ";
+        const params = [];
+        const perPage = 10;
+        let limit = 'LIMIT ' + perPage;
+        const columns = [
+          'p.id',
+          'p.user_id',
+          'p.description',
+          'p.type',
+          'p.image_url',
+          'p.video_url',
+          'p.thumbnail_url',
+          'p.video_status',
+          'p.ooz_total_collected',
+          'users.photo_url',
+          'users.fullname as username',
+          'COALESCE(pl.likes_count, 0)::integer as likes_count',
+          'COALESCE(pc.comments_count, 0)::integer as comments_count',
+          'c.city',
+          'c.state',
+          'c.country',
         ];
 
         if (filters.userId) {
@@ -170,6 +183,18 @@ export class PostsRepository extends Repository<Posts>{
         }
 
         where = where.substring(0, where.length - 5);
+
+        //pegar badge.name quando 
+        // coluns = [ badges.icon, badges.name ]
+        // LEFT JOIN users_badges u_b ON u_b.user_id = p.user_id
+        // LEFT JOIN badges ON u_b.badges_id = badges.id
+
+        // array(
+        // select b.icon, b.name
+        // from users_badges
+        // Inner join badges b ON b.id = users_badges.badges_id
+        // where users_badges.user_id = p.user_id
+        // ) as badges
 
         return camelcaseKeys(await getConnection().query(`
             SELECT 
