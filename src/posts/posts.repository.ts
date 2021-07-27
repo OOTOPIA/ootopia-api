@@ -184,18 +184,6 @@ export class PostsRepository extends Repository<Posts>{
 
         where = where.substring(0, where.length - 5);
 
-        //pegar badge.name quando 
-        // coluns = [ badges.icon, badges.name ]
-        // LEFT JOIN users_badges u_b ON u_b.user_id = p.user_id
-        // LEFT JOIN badges ON u_b.badges_id = badges.id
-
-        // array(
-        // select b.icon, b.name
-        // from users_badges
-        // Inner join badges b ON b.id = users_badges.badges_id
-        // where users_badges.user_id = p.user_id
-        // ) as badges
-
         return camelcaseKeys(await getConnection().query(`
             SELECT 
                 ${columns}, array(
@@ -203,7 +191,14 @@ export class PostsRepository extends Repository<Posts>{
                     from interests_tags_posts tp
                     inner join interests_tags t on t.id = tp.tag_id
                     where tp.post_id = p.id
-                    ) as tags
+                    ) as tags,
+                    array (
+                        select 
+                        json_build_object('Icon', b.icon, 'Name', b.name) as bdg
+                        from user_badges
+                        inner join badges b ON b.id = user_badges.badges_id
+                        where user_badges.user_id = p.user_id
+                    ) as badges
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
