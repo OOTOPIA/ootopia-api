@@ -1,0 +1,1 @@
+insert into badges (icon, name) values ('url', 'Semeador')

@@ -42,7 +42,14 @@ export class UsersRepository extends Repository<Users>{
     async getUserById(id: string) {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
-                u.*
+                u.*, 
+                array (
+                    select 
+                    json_build_object('Icon', b.icon, 'Name', b.name) as bdg
+                    from user_badges
+                    inner join badges b ON b.id = user_badges.badges_id
+                    where user_badges.user_id = u.id
+                ) as badges
             FROM users u
             WHERE u.id = $1
         `, [id]), { deep : true });
