@@ -23,6 +23,10 @@ export enum Origin {
   TRANSFER = "transfer",
   TIMELINE_VIEW = "timeline_view",
   WATCHED_VIDEOS = "watched_videos",
+  POSTED_VIDEOS = "posted_videos",
+  POSTED_PHOTOS = "posted_photos",
+  TOTAL_GAME_COMPLETED = "total_game_completed",
+  PERSONAL_GOAL_ACHIEVED = "personal_goal_achieved",
 };
 
 export enum WalletTransferAction {

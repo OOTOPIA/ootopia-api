@@ -12,6 +12,7 @@ import { GeneralConfigService } from 'src/general-config/general-config.service'
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class UsersService {
@@ -156,15 +157,20 @@ export class UsersService {
         if (!dailyGoalStartTime) dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
         if (!dailyGoalEndTime) dailyGoalEndTime = this.generalConfigService.getDailyGoalEndTime(globalGoalLimitTimeConfig.value);
 
+        let remainingTimeUntilEndOfGameInMs = moment(dailyGoalEndTime).diff(moment.utc(), 'milliseconds');
+        let remainingTimeUntilEndOfGame = this.msToTime(remainingTimeUntilEndOfGameInMs);
+
         if (!+user.dailyLearningGoalInMinutes) {
             return {
                 id,
                 dailyGoalInMinutes : 0,
-                dailyGoalEndsAt : null,
+                dailyGoalEndsAt : dailyGoalEndTime,
                 dailyGoalAchieved : false,
                 totalAppUsageTimeSoFar : 0,
                 totalAppUsageTimeSoFarInMs : 0,
-                accumulatedOOZ : 0
+                accumulatedOOZ : 0,
+                remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
+                remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
             };
         }
 
@@ -181,7 +187,9 @@ export class UsersService {
             dailyGoalAchieved : dailyGoalAchieved,
             totalAppUsageTimeSoFar : dailyGoalAchievedSoFar,
             totalAppUsageTimeSoFarInMs : totalAppUserUsageTimeInMs,
-            accumulatedOOZ : accumulatedOOZ
+            accumulatedOOZ : accumulatedOOZ,
+            remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
+            remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs
         };
 
     }
