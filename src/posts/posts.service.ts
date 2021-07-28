@@ -201,21 +201,13 @@ export class PostsService {
     post.durationInSecs = +videoDetails.duration;
     const result = await this.postsRepository.createOrUpdatePost(post);
     if (rewardToCreator && status == 'ready') {
-      try {
-        await this.sendRewardToCreatorForPost(post.id);
-      } catch (err) {
-        //do nothing
-      }
+      await this.sendRewardToCreatorForPost(post.id);
     }
     return result;
   }
 
   async sendRewardToCreatorForPost(postId: string) {
-    const queryRunner = getConnection().createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
 
-    try {
       const oozToReward = +(
         await this.generalConfigService.getConfig(
           ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO,
@@ -229,27 +221,20 @@ export class PostsService {
         await this.walletsService.getWalletByUserId(post.userId)
       ).id;
 
-      await queryRunner.manager.save(
-        await this.walletTransfersService.createTransfer(
-          post.userId,
-          {
-            userId: post.userId,
-            walletId: receiverUserWalletId,
-            balance: totalOOZ,
-            origin: Origin.POSTED_VIDEOS,
-            action: WalletTransferAction.RECEIVED,
-            processed : false,
-            fromPlatform: true,
-          },
-          true,
-        ),
+      await this.walletTransfersService.createTransfer(
+        post.userId,
+        {
+          userId: post.userId,
+          walletId: receiverUserWalletId,
+          balance: totalOOZ,
+          origin: Origin.POSTED_VIDEOS,
+          action: WalletTransferAction.RECEIVED,
+          processed : false,
+          fromPlatform: true,
+        },
+        true,
       );
-
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      throw err;
-    }
+      
   }
 
   async getPostsTimeline(filters, userId?: string) {
