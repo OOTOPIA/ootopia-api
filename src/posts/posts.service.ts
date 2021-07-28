@@ -236,19 +236,12 @@ export class PostsService {
             userId: post.userId,
             walletId: receiverUserWalletId,
             balance: totalOOZ,
-            origin: Origin.TRANSFER,
+            origin: Origin.POSTED_VIDEOS,
             action: WalletTransferAction.RECEIVED,
+            processed : false,
             fromPlatform: true,
           },
           true,
-        ),
-      );
-
-      await queryRunner.manager.save(
-        await this.walletsService.increaseTotalBalance(
-          receiverUserWalletId,
-          post.userId,
-          totalOOZ,
         ),
       );
 

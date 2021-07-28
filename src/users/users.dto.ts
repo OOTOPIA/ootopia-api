@@ -168,10 +168,13 @@ export class UserDailyGoalStatsDto {
     dailyGoalAchieved : boolean;
 
     @ApiProperty({ description: "Daily goal time achieved so far (Format: 00h 00m 00s)" })
-    dailyGoalAchievedSoFar : string;
+    totalAppUsageTimeSoFar : string;
 
     @ApiProperty({ description: "Daily goal time achieved so far in milliseconds" })
-    dailyGoalAchievedSoFarMs : string;
+    totalAppUsageTimeSoFarInMs : number;
+
+    @ApiProperty({ description: "Total OOZ accumulated so far" })
+    accumulatedOOZ : number;
 
 }
 
