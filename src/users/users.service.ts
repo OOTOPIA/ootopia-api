@@ -171,6 +171,7 @@ export class UsersService {
                 accumulatedOOZ : 0,
                 remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
                 remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
+                percentageOfDailyGoalAchieved : 0
             };
         }
 
@@ -179,6 +180,8 @@ export class UsersService {
         let dailyGoalAchieved = (+totalTimeInMinutes > +user.dailyLearningGoalInMinutes);
         let dailyGoalAchievedSoFar = this.msToTime(totalAppUserUsageTimeInMs);
         let accumulatedOOZ = await this.walletTransfersService.getUserOOZAccumulatedInThisPeriod(id, false, dailyGoalStartTime);
+        let dailyLearningGoalInMs = +user.dailyLearningGoalInMinutes * 60000;
+        let percentageOfDailyGoalAchieved = +((totalAppUserUsageTimeInMs/dailyLearningGoalInMs) * 100).toFixed(1);
 
         return {
             id,
@@ -189,7 +192,8 @@ export class UsersService {
             totalAppUsageTimeSoFarInMs : totalAppUserUsageTimeInMs,
             accumulatedOOZ : accumulatedOOZ,
             remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
-            remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs
+            remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
+            percentageOfDailyGoalAchieved : percentageOfDailyGoalAchieved >= 100 ? 100 : percentageOfDailyGoalAchieved
         };
 
     }

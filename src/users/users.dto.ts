@@ -176,6 +176,9 @@ export class UserDailyGoalStatsDto {
     @ApiProperty({ description: "Total OOZ accumulated so far" })
     accumulatedOOZ : number;
 
+    @ApiProperty({ description: "Percentage of daily goal achieved" })
+    percentageOfDailyGoalAchieved : number;
+
 }
 
 export class UserProfileUpdateDto {
