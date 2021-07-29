@@ -3,7 +3,7 @@ import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { CitiesService } from 'src/cities/cities.service';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
 import { VideoService } from 'src/video/video.service';
-import { FilesUploadService } from 'src/files-upload/files-upload.service'
+import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import { getConnection } from 'typeorm';
 import { PostsRepository } from './posts.repository';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,7 +30,7 @@ export class PostsService {
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
   ) {}
- 
+
   async createPost(file, postData, userId) {
     postData.id = uuidv4();
 
@@ -48,9 +48,11 @@ export class PostsService {
             file.originalname,
             userId,
           );
-        }
-        else {
-          throw new HttpException("When image type is set only .png or .jpeg extensions is accept", 400); 
+        } else {
+          throw new HttpException(
+            'When image type is set only .png or .jpeg extensions is accept',
+            400,
+          );
         }
       } else {
         const video: any = await this.videoService.uploadVideo(
@@ -62,7 +64,7 @@ export class PostsService {
         postData.streamMediaId = video.uid;
       }
       postData.userId = userId;
-      
+
       const postResult: any = await this.postsRepository.createOrUpdatePost(
         postData,
       );
@@ -72,7 +74,6 @@ export class PostsService {
         postData.addressState &&
         postData.addressCity
       ) {
-
         let city = await this.citiesService.getCity(
           postData.addressCity,
           postData.addressState,
@@ -121,7 +122,7 @@ export class PostsService {
     }
   }
 
-  getPostById(id) {
+  getPostById(id: string) {
     return this.postsRepository.getPostById(id);
   }
 
@@ -207,34 +208,58 @@ export class PostsService {
   }
 
   async sendRewardToCreatorForPost(postId: string) {
+    const post = await this.getPostById(postId);
+    const oozToReward = +(
+      await this.generalConfigService.getConfig(
+        ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO,
+      )
+    ).value;
+    const duration = +(+post.durationInSecs).toFixed(0);
+    const totalOOZ = oozToReward * (duration / 60);
 
-      const oozToReward = +(
-        await this.generalConfigService.getConfig(
-          ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO,
-        )
-      ).value;
-      const post = await this.getPostById(postId);
-      const duration = +(+post.durationInSecs).toFixed(0);
-      const totalOOZ = oozToReward * (duration / 60);
+    const receiverUserWalletId = (
+      await this.walletsService.getWalletByUserId(post.userId)
+    ).id;
 
-      const receiverUserWalletId = (
-        await this.walletsService.getWalletByUserId(post.userId)
-      ).id;
+    await this.walletTransfersService.createTransfer(
+      post.userId,
+      {
+        userId: post.userId,
+        walletId: receiverUserWalletId,
+        balance: totalOOZ,
+        origin: Origin.POSTED_VIDEOS,
+        action: WalletTransferAction.RECEIVED,
+        processed: false,
+        fromPlatform: true,
+      },
+      true,
+    );
+  }
 
-      await this.walletTransfersService.createTransfer(
-        post.userId,
-        {
-          userId: post.userId,
-          walletId: receiverUserWalletId,
-          balance: totalOOZ,
-          origin: Origin.POSTED_VIDEOS,
-          action: WalletTransferAction.RECEIVED,
-          processed : false,
-          fromPlatform: true,
-        },
-        true,
-      );
-      
+  async sendRewardToCreatorForPostPhoto(postId: string) {
+    const post = await this.getPostById(postId);
+    const oozToReward = +(
+      await this.generalConfigService.getConfig(
+        ConfigName.CREATOR_REWARD_FOR_POSTED_PHOTO,
+      )
+    ).value;
+    const receiverUserWalletId = (
+      await this.walletsService.getWalletByUserId(post.userId)
+    ).id;
+
+    return await this.walletTransfersService.createTransfer(
+      post.userId,
+      {
+        userId: post.userId,
+        walletId: receiverUserWalletId,
+        balance: oozToReward,
+        origin: Origin.POSTED_PHOTOS,
+        action: WalletTransferAction.RECEIVED,
+        processed: false,
+        fromPlatform: true,
+      },
+      false,
+    );
   }
 
   async getPostsTimeline(filters, userId?: string) {
@@ -243,7 +268,9 @@ export class PostsService {
 
   async deletePost(postId, userId) {
     const result = await this.postsRepository.deletePostByUser(postId, userId);
-    await this.videoService.deleteVideo(result.streamMediaId);
+    if(result.type === 'video'){
+      await this.videoService.deleteVideo(result.streamMediaId);
+    }
   }
 
   incrementOOZTotalCollected(balance: number, postId: string) {

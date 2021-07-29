@@ -28,6 +28,7 @@ export class PostsRepository extends Repository<Posts>{
             throw new HttpException("Permission denied", 403);
         }
         post.videoStatus = "deleted";
+        post.deletedAt = new Date();
         return await this.save(post);
     }
 
@@ -125,9 +126,8 @@ export class PostsRepository extends Repository<Posts>{
             SELECT 
                 p.*
             FROM posts p
-            WHERE p.id = $1 and video_status <> 'deleted'
+            WHERE p.id = $1 and deleted_at is null
         `, [id]), { deep : true });
-
         return results.length ? results[0] : null;
     }
 
@@ -139,7 +139,7 @@ export class PostsRepository extends Repository<Posts>{
 
     async getPostsTimeline(filters, userId? : string) {
 
-        let where = "video_status = 'ready' AND ";
+        let where = "video_status = 'ready' AND deleted_at is null AND ";
         const params = [];
         const perPage = 10;
         let limit = 'LIMIT ' + perPage;
