@@ -11,6 +11,7 @@ import {
 export enum ConfigName {
     TRANSFER_OOZ_TO_POST_LIMIT = "transfer_ooz_to_post_limit",
     CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO = "creator_reward_per_minute_of_posted_video",
+    CREATOR_REWARD_FOR_POSTED_PHOTO = "creator_reward_for_posted_photo",
     USER_REWARD_PER_MINUTE_OF_WATCHED_VIDEO = "user_reward_per_minute_of_watched_video",
     USER_REWARD_PER_MINUTE_OF_TIMELINE_VIEW_TIME = "user_reward_per_minute_of_timeline_view_time",
     CREATOR_REWARD_FOR_WOOW_RECEIVED = "creator_reward_for_woow_received",
