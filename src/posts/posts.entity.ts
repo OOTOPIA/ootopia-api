@@ -66,6 +66,9 @@ export class Posts extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Column({nullable : true, name: 'deleted_at', type: 'timestamp'})
+  deletedAt: Date;
+
 }
 
 @Entity()

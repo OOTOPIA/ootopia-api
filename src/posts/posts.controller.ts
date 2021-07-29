@@ -51,7 +51,11 @@ export class PostsController {
                 throw new HttpException("Video file is not sent", 400);
             }
 
-            return await this.postsService.createPost(file, JSON.parse(post.metadata), user.id);
+            const postResult = await this.postsService.createPost(file, JSON.parse(post.metadata), user.id);
+            if(postResult.type === 'image'){
+                await this.postsService.sendRewardToCreatorForPostPhoto(postResult.id)
+            }
+            return postResult;
             
         } catch (error) {
             new ErrorHandling(error);
