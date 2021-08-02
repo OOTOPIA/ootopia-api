@@ -37,20 +37,24 @@ export class FilesUploadService {
 
     return Location;
   }
-  
+
   async uploadFileToS3Minio(fileStreamOrBuffer, fileName, userId) {
     const extension = /(?:\.([^.]+))?$/.exec(fileName)[0];
     const name = `users/${userId}/photo-${new Date().getTime()}${extension}`;
+    const metaData = {
+      'x-amz-acl': 'public-read',
+    };
     try {
       await this.awsMinio.putObject(
         process.env.S3_BUCKET,
         name,
         fileStreamOrBuffer,
+        metaData,
       );
     } catch (error) {
       throw error;
     }
-    
+
     return `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${name}`;
   }
 }
