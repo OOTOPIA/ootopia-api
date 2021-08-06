@@ -33,6 +33,7 @@ export class WalletTransfersService {
             action : data.action,
             fromPlatform : data.fromPlatform || false,
             processed : data.processed || false,
+            postId : data.postId,
         }, isTransaction);
 
         if (!isTransaction) {
