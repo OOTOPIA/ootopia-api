@@ -42,8 +42,6 @@ export class DailyGoalDistributionHandlerService {
             return;
         }
 
-        console.log('usersIds >>>', usersIds);
-
         let globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
         let dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
         let dailyGoalEndTime = this.generalConfigService.getDailyGoalEndTime(globalGoalLimitTimeConfig.value);
@@ -133,7 +131,6 @@ export class DailyGoalDistributionHandlerService {
             await queryRunner.rollbackTransaction();
             throw err;
         }
-
 
     }
 
