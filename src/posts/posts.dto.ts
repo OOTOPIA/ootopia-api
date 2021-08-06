@@ -70,6 +70,9 @@ export class CreatedPostDto {
     @ApiProperty({ enum: ['video', 'image'] })
     type : string;
 
+    @ApiProperty({description : "OOZ generated as a reward for creating the post"}) 
+    oozGenerated : number;
+
     @ApiProperty()
     imageUrl : string;
 

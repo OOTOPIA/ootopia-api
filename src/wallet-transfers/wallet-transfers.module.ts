@@ -6,6 +6,7 @@ import { WalletTransfersController } from './wallet-transfers.controller';
 import { WalletsModule } from 'src/wallets/wallets.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { UsersModule } from 'src/users/users.module';
+import { GeneralConfigModule } from 'src/general-config/general-config.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UsersModule } from 'src/users/users.module';
     forwardRef(() => PostsModule),
     WalletsModule,
     forwardRef(() => UsersModule),
+    GeneralConfigModule,
   ],
   providers: [WalletTransfersService],
   controllers: [WalletTransfersController],

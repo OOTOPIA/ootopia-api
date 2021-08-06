@@ -2,8 +2,10 @@ import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { WalletsService } from '../wallets/wallets.service';
 import { WalletTransferAction, Origin, WalletTransfers } from './wallet-transfers.entity';
 import { WalletTransfersRepository } from './wallet-transfers.repository';
-import { getConnection, QueryRunner } from 'typeorm';
+import { getConnection, In, QueryRunner } from 'typeorm';
 import { PostsService } from 'src/posts/posts.service';
+import { GeneralConfigService } from 'src/general-config/general-config.service';
+import { ConfigName } from 'src/general-config/general-config.entity';
 
 @Injectable()
 export class WalletTransfersService {
@@ -12,7 +14,8 @@ export class WalletTransfersService {
         private readonly walletTransfersRepository : WalletTransfersRepository, 
         private readonly walletsService : WalletsService,
         @Inject(forwardRef(() => PostsService))
-        private readonly postsService : PostsService
+        private readonly postsService : PostsService,
+        private readonly generalConfigService : GeneralConfigService,
     ) {}
 
     //Esse método deveria ser privado, porém está exposto porque temos um endpoint para dar aumentar o valor da carteira do usuário manualmente
@@ -75,11 +78,11 @@ export class WalletTransfersService {
                 processed : true,
             }, true));
 
-            if (postId) {
-                await queryRunner.manager.save(await this.postsService.incrementOOZTotalCollected(balance, postId));
-            }
-
             if (senderUserId != receiverUserId) {
+
+                if (postId) {
+                    await queryRunner.manager.save(await this.postsService.incrementOOZTotalCollected(balance, postId));
+                }
 
                 await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(senderUserWalletId, senderUserId, balance));
                 await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, receiverUserId, balance));
@@ -103,7 +106,109 @@ export class WalletTransfersService {
         }
 
         let postAuthorId : any = (await this.postsService.getPostById(postId)).userId;
-        return await this.transferOOZBetweenUsers(userId, postAuthorId, balance, Origin.VIDEO_LIKE, postId);
+        return await this.transferOOZBetweenUsers(userId, postAuthorId, balance, Origin.GRATITUDE_REWARD, postId);
+
+    }
+
+    async transferPersonalGoalAchieved(userId : string) {
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            let globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
+            let dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
+
+            let receiverUserWalletId = (await this.walletsService.getWalletByUserId(userId)).id;
+
+            let notProcessedTransfers = await this.getTransfersNotProcessedInThisPeriod(userId, dailyGoalStartTime);
+            let balances = notProcessedTransfers.map((transfer) => +transfer.balance);
+
+            if (balances.length <= 0) {
+                return;
+            }
+
+            let balance = balances.reduce((total, value) => total + value);
+
+            if (balance <= 0) {
+                return;
+            }
+
+            await queryRunner.manager.save(await this.createTransfer(userId, {
+                userId : userId,
+                walletId : receiverUserWalletId,
+                balance : +balance,
+                origin : Origin.PERSONAL_GOAL_ACHIEVED,
+                action : WalletTransferAction.RECEIVED,
+                fromPlatform : true,
+                processed : true
+            }, true));
+
+            await queryRunner.manager.update(WalletTransfers, {
+                id: In(notProcessedTransfers.map((transfer) => transfer.id))
+            }, { removed : true});
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, +balance));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
+    }
+
+    async transferTodaysGameCompleted(userId : string) {
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            let globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
+            let dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
+
+            let receiverUserWalletId = (await this.walletsService.getWalletByUserId(userId)).id;
+
+            let notProcessedTransfers = await this.getTransfersNotProcessedInThisPeriod(userId, dailyGoalStartTime);
+            let balances = notProcessedTransfers.map((transfer) => +transfer.balance);
+
+            if (balances.length <= 0) {
+                return;
+            }
+
+            let balance = balances.reduce((total, value) => total + value);
+
+            if (balance <= 0) {
+                return;
+            }
+
+            await queryRunner.manager.save(await this.createTransfer(userId, {
+                userId : userId,
+                walletId : receiverUserWalletId,
+                balance : +balance,
+                origin : Origin.TOTAL_GAME_COMPLETED,
+                action : WalletTransferAction.RECEIVED,
+                fromPlatform : true,
+                processed : true
+            }, true));
+
+            await queryRunner.manager.update(WalletTransfers, {
+                id: In(notProcessedTransfers.map((transfer) => transfer.id))
+            }, { removed : true});
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, +balance));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
 
     }
 

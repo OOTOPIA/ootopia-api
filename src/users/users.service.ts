@@ -123,6 +123,10 @@ export class UsersService {
         return this.usersRepository.resetPassword(userId, password);    
     }
 
+    async updateDailyGoalAchieved(userId: string, dailyGoalAchieved: boolean) {
+        return this.usersRepository.updateDailyGoalAchieved(userId, dailyGoalAchieved);    
+    }
+
     async getUserByEmail(email : string) {
         return await this.usersRepository.getUserByEmail(email);
     }
@@ -177,11 +181,18 @@ export class UsersService {
 
         let totalAppUserUsageTimeInMs = await this.usersAppUsageTimeService.getTimeSumOfUserUsedAppInThisPeriod(id, dailyGoalStartTime);
         let totalTimeInMinutes = Math.floor(totalAppUserUsageTimeInMs / 60000);
-        let dailyGoalAchieved = (+totalTimeInMinutes > +user.dailyLearningGoalInMinutes);
+        let dailyGoalAchieved = (+totalTimeInMinutes >= +user.dailyLearningGoalInMinutes);
         let dailyGoalAchievedSoFar = this.msToTime(totalAppUserUsageTimeInMs);
         let accumulatedOOZ = await this.walletTransfersService.getUserOOZAccumulatedInThisPeriod(id, false, dailyGoalStartTime);
         let dailyLearningGoalInMs = +user.dailyLearningGoalInMinutes * 60000;
         let percentageOfDailyGoalAchieved = +((totalAppUserUsageTimeInMs/dailyLearningGoalInMs) * 100).toFixed(1);
+
+        if (user.dailyGoalAchieved != dailyGoalAchieved) {
+            let result = await this.updateDailyGoalAchieved(user.id, dailyGoalAchieved);
+            if (dailyGoalAchieved && result.status == 'ok') {
+                await this.walletTransfersService.transferPersonalGoalAchieved(user.id);
+            }
+        }
 
         return {
             id,

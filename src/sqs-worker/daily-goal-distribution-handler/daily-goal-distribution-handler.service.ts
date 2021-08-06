@@ -25,8 +25,6 @@ export class DailyGoalDistributionHandlerService {
         try {
 
             let usersIds : string[] = (JSON.parse(message.Body)).usersIds;
-            console.log('new message');
-
             this.startCheckingUsersDailyGoal(usersIds);
 
         }catch(err) {
@@ -47,33 +45,37 @@ export class DailyGoalDistributionHandlerService {
         let dailyGoalEndTime = this.generalConfigService.getDailyGoalEndTime(globalGoalLimitTimeConfig.value);
 
         for (let i = 0; i < usersIds.length; i++) {
-            let id = usersIds[i];
-            let userDailyGoalStats = await this.usersService.getUserDailyGoalStats(id, dailyGoalStartTime, dailyGoalEndTime);
+            let userId = usersIds[i];
+            let userDailyGoalStats = await this.usersService.getUserDailyGoalStats(userId, dailyGoalStartTime, dailyGoalEndTime);
 
             if (userDailyGoalStats.dailyGoalAchieved) {
 
-                let notProcessedTransfers = await this.walletTransfersService.getTransfersNotProcessedInThisPeriod(id, dailyGoalStartTime);
+                await this.walletTransfersService.transferTodaysGameCompleted(userId);
 
-                if (!notProcessedTransfers.length) {
-                    continue;
-                }
+                //Old code
 
-                let transfersGroupedByOrigin = {};
+                // let notProcessedTransfers = await this.walletTransfersService.getTransfersNotProcessedInThisPeriod(id, dailyGoalStartTime);
 
-                notProcessedTransfers.forEach((transfer) => {
-                    if (!transfersGroupedByOrigin[transfer.origin]) {
-                        transfersGroupedByOrigin[transfer.origin] = {totalOOZToTransfer : 0, transfers: []};
-                    }
-                    transfersGroupedByOrigin[transfer.origin]['transfers'].push(transfer);
-                });
+                // if (!notProcessedTransfers.length) {
+                //     continue;
+                // }
 
-                for (let i = 0; i < Object.keys(transfersGroupedByOrigin).length; i++) {
-                    let origin = Object.keys(transfersGroupedByOrigin)[i];
-                    let transfersGroup = transfersGroupedByOrigin[origin];
-                    transfersGroup['totalOOZToTransfer'] = (+notProcessedTransfers.filter((transfer) => transfer.origin == origin).map((transfer) => +transfer.balance).reduce((total, value) => total + value)).toFixed(2)
-                }
+                // let transfersGroupedByOrigin = {};
 
-                await this.performUserTransfers(id, transfersGroupedByOrigin, notProcessedTransfers.map((transfer) => transfer.id));
+                // notProcessedTransfers.forEach((transfer) => {
+                //     if (!transfersGroupedByOrigin[transfer.origin]) {
+                //         transfersGroupedByOrigin[transfer.origin] = {totalOOZToTransfer : 0, transfers: []};
+                //     }
+                //     transfersGroupedByOrigin[transfer.origin]['transfers'].push(transfer);
+                // });
+
+                // for (let i = 0; i < Object.keys(transfersGroupedByOrigin).length; i++) {
+                //     let origin = Object.keys(transfersGroupedByOrigin)[i];
+                //     let transfersGroup = transfersGroupedByOrigin[origin];
+                //     transfersGroup['totalOOZToTransfer'] = (+notProcessedTransfers.filter((transfer) => transfer.origin == origin).map((transfer) => +transfer.balance).reduce((total, value) => total + value)).toFixed(2)
+                // }
+
+                // await this.performUserTransfers(id, transfersGroupedByOrigin, notProcessedTransfers.map((transfer) => transfer.id));
                 
             }else{
                 console.log("not daily goal achieved >>>", userDailyGoalStats);
