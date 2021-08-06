@@ -27,6 +27,8 @@ export enum Origin {
   POSTED_PHOTOS = "posted_photos",
   TOTAL_GAME_COMPLETED = "total_game_completed",
   PERSONAL_GOAL_ACHIEVED = "personal_goal_achieved",
+  GRATITUDE_REWARD = "gratitude_reward",
+  INVITATION_CODE = "invitation_code",
 };
 
 export enum WalletTransferAction {

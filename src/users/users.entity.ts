@@ -67,6 +67,9 @@ export class Users extends BaseEntity {
     })
     badges : Badges[];
 
+    @Column({ nullable : true, name : 'daily_goal_achieved', type: 'boolean', default: () => "false" })
+    dailyGoalAchieved : boolean;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

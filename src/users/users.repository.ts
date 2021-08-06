@@ -31,6 +31,20 @@ export class UsersRepository extends Repository<Users>{
         }
     }
 
+    async updateDailyGoalAchieved(id: string, dailyGoalAchieved: boolean) {
+        let result = await getConnection()
+        .createQueryBuilder()
+        .update(Users)
+        .set({ dailyGoalAchieved })
+        .where("id = :id", { id })
+        .execute();
+        if (result && result.affected){
+            return { status: "ok" }
+        }else{
+            return null;
+        }
+    }
+
     async getUserByEmail(email: string) {
         const user = await this.find({
           where: { email },
