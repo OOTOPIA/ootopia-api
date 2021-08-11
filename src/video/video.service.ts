@@ -46,11 +46,7 @@ export class VideoService {
 
             try {
 
-              let result = await axios.get(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${mediaId}`, {
-                headers : this.headers
-              });
-
-              resolve(result.data.result);
+              resolve((await this.getVideoDetails(mediaId)).result);
 
             }catch(err) {
               //error on get uploaded video details
@@ -118,6 +114,18 @@ export class VideoService {
       let result = await axios.delete(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${streamMediaId}`, {
         headers : this.headers
       });
+      return result.data;
+    }
+
+    async getVideoDetails(mediaId) {
+      let result = await axios.get(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${mediaId}`, {
+        headers : this.headers
+      });
+
+      if (!result || !result.data) {
+        return null;
+      }
+
       return result.data;
     }
 

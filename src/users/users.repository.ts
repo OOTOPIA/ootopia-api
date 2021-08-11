@@ -17,6 +17,34 @@ export class UsersRepository extends Repository<Users>{
         return await this.save(user);
     }
 
+    async resetPassword(id: string, password: string) {
+        let result = await getConnection()
+        .createQueryBuilder()
+        .update(Users)
+        .set({ password })
+        .where("id = :id", { id })
+        .execute();
+        if (result && result.affected){
+            return { status: "ok" }
+        }else{
+            return null;
+        }
+    }
+
+    async updateDailyGoalAchieved(id: string, dailyGoalAchieved: boolean) {
+        let result = await getConnection()
+        .createQueryBuilder()
+        .update(Users)
+        .set({ dailyGoalAchieved })
+        .where("id = :id", { id })
+        .execute();
+        if (result && result.affected){
+            return { status: "ok" }
+        }else{
+            return null;
+        }
+    }
+
     async getUserByEmail(email: string) {
         const user = await this.find({
           where: { email },
@@ -28,7 +56,14 @@ export class UsersRepository extends Repository<Users>{
     async getUserById(id: string) {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
-                u.*
+                u.*, 
+                array (
+                    select 
+                    json_build_object('Icon', b.icon, 'Name', b.name) as bdg
+                    from user_badges
+                    inner join badges b ON b.id = user_badges.badges_id
+                    where user_badges.user_id = u.id
+                ) as badges
             FROM users u
             WHERE u.id = $1
         `, [id]), { deep : true });
@@ -38,6 +73,15 @@ export class UsersRepository extends Repository<Users>{
         if (!user) return user;
         delete user.password;
         return user;
+    }
+
+    async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
+        return getConnection()
+            .createQueryBuilder()
+            .update(Users)
+            .set({ dontAskAgainToConfirmGratitudeReward : true })
+            .where("id = :id", { id })
+            .execute();
     }
 
 }

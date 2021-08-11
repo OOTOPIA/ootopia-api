@@ -20,7 +20,15 @@ import { Users } from '../users/users.entity';
 export enum Origin {
   VIDEO_VIEW = "video_view",
   VIDEO_LIKE = "video_like",
-  TRANSFER = "transfer"
+  TRANSFER = "transfer",
+  TIMELINE_VIEW = "timeline_view",
+  WATCHED_VIDEOS = "watched_videos",
+  POSTED_VIDEOS = "posted_videos",
+  POSTED_PHOTOS = "posted_photos",
+  TOTAL_GAME_COMPLETED = "total_game_completed",
+  PERSONAL_GOAL_ACHIEVED = "personal_goal_achieved",
+  GRATITUDE_REWARD = "gratitude_reward",
+  INVITATION_CODE = "invitation_code",
 };
 
 export enum WalletTransferAction {
@@ -66,6 +74,17 @@ export class WalletTransfers extends BaseEntity {
 
   @Column({ nullable : false, type: 'numeric', default: () => "0"})
   balance : number;
+
+  @Column({ nullable : false, type: 'boolean', name: 'from_platform', default: () => "false" })
+  fromPlatform : boolean;
+
+  @Column({ nullable : false, type: 'boolean', default: () => "false"})
+  processed : boolean;
+
+  //Este campo será TRUE quando as transferências da mesma origem forem agrupadas e processadas pelo worker. 
+  //Sendo assim, as transferências "fragmentadas" são removidas pois elas foram agrupadas e somadas ao valor total de OOZ do usuário
+  @Column({ nullable : false, type: 'boolean', default: () => "false"})
+  removed : boolean; 
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

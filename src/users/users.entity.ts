@@ -1,3 +1,4 @@
+import { Badges } from 'src/badges/entities/badges.entity';
 import {
     Entity,
     Column,
@@ -6,7 +7,9 @@ import {
     UpdateDateColumn,
     BaseEntity,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    ManyToMany,
+    JoinTable
 } from 'typeorm';
 import { Addresses } from '../addresses/addresses.entity';
   
@@ -43,9 +46,29 @@ export class Users extends BaseEntity {
     @Column({ nullable: false, type: 'numeric', name : 'register_phase', default: () => "1" })
     registerPhase : number;
 
+    @Column({ nullable : true, name : 'dont_ask_again_to_confirm_gratitude_reward', type: 'boolean', default: () => "false" })
+    dontAskAgainToConfirmGratitudeReward : boolean;
+
     @ManyToOne(type => Addresses, address => address.id)
     @JoinColumn({ name : "address_id" })
     addressId : Addresses;
+    
+    @ManyToMany(() => Badges)
+    @JoinTable({
+        name: 'user_badges',
+        joinColumn: {
+          name: 'user_id',
+          referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+          name: 'badges_id',
+          referencedColumnName: 'id',
+        },
+    })
+    badges : Badges[];
+
+    @Column({ nullable : true, name : 'daily_goal_achieved', type: 'boolean', default: () => "false" })
+    dailyGoalAchieved : boolean;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

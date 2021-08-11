@@ -2,6 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { Wallets } from "./wallets.entity";
 import * as camelcaseKeys from 'camelcase-keys';
+import { Exception } from "handlebars";
 
 @Injectable()
 @EntityRepository(Wallets)
@@ -52,6 +53,9 @@ export class WalletsRepository extends Repository<Wallets>{
                 userId : userId
             },
         });
+        if (balance == NaN) {
+            throw new Exception("balance is invalid");
+        }
         wallet.totalBalance = +(+wallet.totalBalance + +balance).toFixed(2);
         return wallet;
     }

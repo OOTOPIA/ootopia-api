@@ -11,17 +11,15 @@ jobs:
   devmagic_staging_deploy:
     name: Beta deploy on DevMagic's server
     runs-on: ubuntu-latest
-    steps:      
+    steps:
       - name: Adding Known Hosts
-        run: ssh-keyscan -H ${SSH_HOST}
-          >> ~/.ssh/known_hosts
-        env:
-          SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
-          SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
+        run: |
+            mkdir -p ~/.ssh/
+            ssh-keyscan -H ${{ secrets.DEVMAGIC_SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${SSH_PRIVATE_KEY}
+          key: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
       - run: | 
             ssh ubuntu@${SSH_HOST} << EOSSH
             . ~/.nvm/nvm.sh

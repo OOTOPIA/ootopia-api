@@ -7,26 +7,34 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { WalletTransfersService } from './wallet-transfers.service';
 import { WalletTransfersDto, WalletTransfersFilterDto, WalletTransfersHistoryDto, WalletTransferToPostDto } from './wallet-transfers.dto';
 import { Origin, WalletTransferAction } from './wallet-transfers.entity';
+import { UsersService } from 'src/users/users.service';
+import { WalletsService } from 'src/wallets/wallets.service';
 
 @Controller('wallet-transfers')
 export class WalletTransfersController {
 
     constructor(
-        private readonly walletTransfersService : WalletTransfersService) {}
+        private readonly walletTransfersService : WalletTransfersService,
+        private readonly usersService : UsersService,
+        private readonly walletsService : WalletsService
+        ) {}
 
     //TODO: Remover este endpoint, serve apenas para testes
     @UseInterceptors(SentryInterceptor)
     @ApiTags('wallet-transfers')
-    @ApiParam({ name : "userId", type: "string", description: "User ID" })
+    @ApiParam({ name : "userIdOrEmail", type: "string", description: "User ID or E-mail" })
     @ApiOperation({ summary: "Performs a transfer to the user's wallet" })
     @ApiResponse({ status: 200, type: WalletTransfersDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-    @Get('/:userId')
-    async createTransferTest(@Param('userId') userId) {
+    @Get('/:userIdOrEmail')
+    async createTransferTest(@Param('userIdOrEmail') userIdOrEmail) {
         try {
-            return await this.walletTransfersService.createTransfer(userId, { balance : 50, origin : Origin.TRANSFER, action: WalletTransferAction.RECEIVED });
+            if (userIdOrEmail.indexOf("@") != -1) {
+                userIdOrEmail = (await this.usersService.getUserByEmail(userIdOrEmail)).id;
+            }
+            return await this.walletTransfersService.createTransferTest(userIdOrEmail);
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -47,6 +55,10 @@ export class WalletTransfersController {
     @HttpCode(200)
     async transferOOZFromPost(@Req() { user }, @Param('postId') postId, @Body() data : WalletTransferToPostDto) {
         try {
+
+            if (data.dontAskAgainToConfirmGratitudeReward) {
+                this.usersService.updateDontAskToConfirmGratitudeReward(user.id, data.dontAskAgainToConfirmGratitudeReward);
+            }
 
             await this.walletTransfersService.transferToPostAuthor(user.id, postId, data.balance);
 

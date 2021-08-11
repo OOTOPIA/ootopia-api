@@ -28,6 +28,7 @@ export class PostsRepository extends Repository<Posts>{
             throw new HttpException("Permission denied", 403);
         }
         post.videoStatus = "deleted";
+        post.deletedAt = new Date();
         return await this.save(post);
     }
 
@@ -120,14 +121,13 @@ export class PostsRepository extends Repository<Posts>{
         return post;
     }
 
-    async getPostById(id) {
+    async getPostById(id) : Promise<Posts> {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
                 p.*
             FROM posts p
-            WHERE p.id = $1 and video_status <> 'deleted'
+            WHERE p.id = $1 and deleted_at is null
         `, [id]), { deep : true });
-
         return results.length ? results[0] : null;
     }
 
@@ -139,14 +139,27 @@ export class PostsRepository extends Repository<Posts>{
 
     async getPostsTimeline(filters, userId? : string) {
 
-        let where = "video_status = 'ready' AND ", params = [];
-        let perPage = 10, limit = 'LIMIT ' + perPage;
-        let columns = [
-            'p.id', 'p.user_id', 'p.description', 'p.type', 'p.image_url', 'p.video_url', 'p.thumbnail_url', 'p.video_status', 'p.ooz_total_collected',
-            'users.photo_url', 'users.fullname as username', 
-            'COALESCE(pl.likes_count, 0)::integer as likes_count',
-            'COALESCE(pc.comments_count, 0)::integer as comments_count',
-            'c.city', 'c.state', 'c.country'
+        let where = "(video_status = 'ready' OR (video_status is null AND type = 'image')) AND deleted_at is null AND ";
+        const params = [];
+        const perPage = 10;
+        let limit = 'LIMIT ' + perPage;
+        const columns = [
+          'p.id',
+          'p.user_id',
+          'p.description',
+          'p.type',
+          'p.image_url',
+          'p.video_url',
+          'p.thumbnail_url',
+          'p.video_status',
+          'p.ooz_total_collected',
+          'users.photo_url',
+          'users.fullname as username',
+          'COALESCE(pl.likes_count, 0)::integer as likes_count',
+          'COALESCE(pc.comments_count, 0)::integer as comments_count',
+          'c.city',
+          'c.state',
+          'c.country',
         ];
 
         if (filters.userId) {
@@ -178,7 +191,14 @@ export class PostsRepository extends Repository<Posts>{
                     from interests_tags_posts tp
                     inner join interests_tags t on t.id = tp.tag_id
                     where tp.post_id = p.id
-                    ) as tags
+                    ) as tags,
+                    array (
+                        select 
+                        json_build_object('Icon', b.icon, 'Name', b.name) as bdg
+                        from user_badges
+                        inner join badges b ON b.id = user_badges.badges_id
+                        where user_badges.user_id = p.user_id
+                    ) as badges
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id

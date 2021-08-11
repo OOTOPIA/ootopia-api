@@ -70,6 +70,9 @@ export class CreatedPostDto {
     @ApiProperty({ enum: ['video', 'image'] })
     type : string;
 
+    @ApiProperty({description : "OOZ generated as a reward for creating the post"}) 
+    oozGenerated : number;
+
     @ApiProperty()
     imageUrl : string;
 
@@ -210,5 +213,33 @@ export class DeleteCommentsDto {
 
     @ApiProperty()
     commentsIds : string[];
+
+}
+
+export class PostWatchedVideoTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    postId : string;
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
+
+}
+
+export class PostsWatchedVideosTimeDto {
+
+    @ApiProperty({ required: true, type: PostWatchedVideoTimeDto, isArray: true, description: "The 'data' field must be a string in json array of objects format"})
+    @IsNotEmpty()
+    data : PostWatchedVideoTimeDto[];
+
+}
+
+export class PostTimelineViewTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
 
 }

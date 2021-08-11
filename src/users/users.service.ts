@@ -8,6 +8,11 @@ import { InterestsTagsService } from 'src/interests-tags/services/interests-tags
 import { CitiesService } from 'src/cities/cities.service';
 import { AddressesRepository } from '../addresses/addresses.repository';
 import { WalletsService } from 'src/wallets/wallets.service';
+import { GeneralConfigService } from 'src/general-config/general-config.service';
+import { ConfigName } from 'src/general-config/general-config.entity';
+import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +23,11 @@ export class UsersService {
         private readonly interestsTagsService : InterestsTagsService,
         private readonly citiesService : CitiesService,
         private readonly addressesRepository : AddressesRepository,
-        private readonly walletsService : WalletsService) {
+        private readonly walletsService : WalletsService,
+        private readonly walletTransfersService : WalletTransfersService,
+        private readonly generalConfigService : GeneralConfigService,
+        private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
+        ) {
     }
 
     async createUser(userData) {
@@ -109,6 +118,15 @@ export class UsersService {
 
     }
 
+    async resetPassword(userId: string, password: string) {        
+        password = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
+        return this.usersRepository.resetPassword(userId, password);    
+    }
+
+    async updateDailyGoalAchieved(userId: string, dailyGoalAchieved: boolean) {
+        return this.usersRepository.updateDailyGoalAchieved(userId, dailyGoalAchieved);    
+    }
+
     async getUserByEmail(email : string) {
         return await this.usersRepository.getUserByEmail(email);
     }
@@ -127,6 +145,81 @@ export class UsersService {
         delete user.createdAt;
         delete user.updatedAt;
         return user;
+    }
+
+    async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
+        return await this.usersRepository.updateDontAskToConfirmGratitudeReward(id, value);
+    }
+
+    async getUserDailyGoalStats(id : string, dailyGoalStartTime? : Date, dailyGoalEndTime? : Date) {
+        let user = await this.getUserById(id), globalGoalLimitTimeConfig;
+
+        if (!dailyGoalStartTime || !dailyGoalEndTime) {
+            globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
+        }
+
+        if (!dailyGoalStartTime) dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
+        if (!dailyGoalEndTime) dailyGoalEndTime = this.generalConfigService.getDailyGoalEndTime(globalGoalLimitTimeConfig.value);
+
+        let remainingTimeUntilEndOfGameInMs = moment(dailyGoalEndTime).diff(moment.utc(), 'milliseconds');
+        let remainingTimeUntilEndOfGame = this.msToTime(remainingTimeUntilEndOfGameInMs);
+
+        if (!+user.dailyLearningGoalInMinutes) {
+            return {
+                id,
+                dailyGoalInMinutes : 0,
+                dailyGoalEndsAt : dailyGoalEndTime,
+                dailyGoalAchieved : false,
+                totalAppUsageTimeSoFar : 0,
+                totalAppUsageTimeSoFarInMs : 0,
+                accumulatedOOZ : 0,
+                remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
+                remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
+                percentageOfDailyGoalAchieved : 0
+            };
+        }
+
+        let totalAppUserUsageTimeInMs = await this.usersAppUsageTimeService.getTimeSumOfUserUsedAppInThisPeriod(id, dailyGoalStartTime);
+        let totalTimeInMinutes = Math.floor(totalAppUserUsageTimeInMs / 60000);
+        let dailyGoalAchieved = (+totalTimeInMinutes >= +user.dailyLearningGoalInMinutes);
+        let dailyGoalAchievedSoFar = this.msToTime(totalAppUserUsageTimeInMs);
+        let accumulatedOOZ = await this.walletTransfersService.getUserOOZAccumulatedInThisPeriod(id, false, dailyGoalStartTime);
+        let dailyLearningGoalInMs = +user.dailyLearningGoalInMinutes * 60000;
+        let percentageOfDailyGoalAchieved = +((totalAppUserUsageTimeInMs/dailyLearningGoalInMs) * 100).toFixed(1);
+
+        if (user.dailyGoalAchieved != dailyGoalAchieved) {
+            let result = await this.updateDailyGoalAchieved(user.id, dailyGoalAchieved);
+            if (dailyGoalAchieved && result.status == 'ok') {
+                await this.walletTransfersService.transferPersonalGoalAchieved(user.id);
+            }
+        }
+
+        return {
+            id,
+            dailyGoalInMinutes : +user.dailyLearningGoalInMinutes,
+            dailyGoalEndsAt : dailyGoalEndTime,
+            dailyGoalAchieved : dailyGoalAchieved,
+            totalAppUsageTimeSoFar : dailyGoalAchievedSoFar,
+            totalAppUsageTimeSoFarInMs : totalAppUserUsageTimeInMs,
+            accumulatedOOZ : accumulatedOOZ,
+            remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
+            remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
+            percentageOfDailyGoalAchieved : percentageOfDailyGoalAchieved >= 100 ? 100 : percentageOfDailyGoalAchieved
+        };
+
+    }
+
+    msToTime(duration) {
+
+        var seconds : any = Math.floor((duration / 1000) % 60),
+          minutes : any = Math.floor((duration / (1000 * 60)) % 60),
+          hours : any = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+      
+        return (+hours ? hours + "h " : "") + minutes + "m " + seconds + "s";
     }
 
 }

@@ -71,6 +71,29 @@ export class UserLoginDto {
   
 }
 
+export class RecoverPasswordDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    email : string;    
+  
+}
+
+export class ResetPasswordDto {
+           
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    password : string;   
+  
+}
+
+export class ResetPasswordResponseDto {
+           
+    @ApiProperty()
+    status : string;   
+  
+}
+
 export class LoggedUserDto {
 
     @ApiProperty()
@@ -130,6 +153,34 @@ export class UserProfileDto {
 
 }
 
+export class UserDailyGoalStatsDto {
+
+    @ApiProperty({ description: "User id" })
+    id : string;
+
+    @ApiProperty({ description: "User-configured daily goal" })
+    dailyGoalInMinutes : number;
+
+    @ApiProperty({ description: "End time to meet daily goal" })
+    dailyGoalEndsAt : Date;
+
+    @ApiProperty({ description: "Indicates whether the daily goal was achieved or not" })
+    dailyGoalAchieved : boolean;
+
+    @ApiProperty({ description: "Daily goal time achieved so far (Format: 00h 00m 00s)" })
+    totalAppUsageTimeSoFar : string;
+
+    @ApiProperty({ description: "Daily goal time achieved so far in milliseconds" })
+    totalAppUsageTimeSoFarInMs : number;
+
+    @ApiProperty({ description: "Total OOZ accumulated so far" })
+    accumulatedOOZ : number;
+
+    @ApiProperty({ description: "Percentage of daily goal achieved" })
+    percentageOfDailyGoalAchieved : number;
+
+}
+
 export class UserProfileUpdateDto {
 
     @ApiProperty({ required: true, type: "file", description: "User photo" })
@@ -158,5 +209,13 @@ export class UserProfileUpdateDto {
 
     @ApiProperty({description: "IDs of selected tags separated by commas"})
     tagsIds : string;
+
+}
+
+export class UsersAppUsageTimeDto {
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    timeInMilliseconds : number;
 
 }
