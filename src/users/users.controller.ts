@@ -148,6 +148,30 @@ export class UsersController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
+    @ApiOperation({ summary: 'Update user dialog opened' })
+    @ApiBearerAuth('Bearer')
+    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name : "type", type: "string", description: "Type of dialog from users that will be updated", enum: [ 'personal', 'city', 'global' ] })
+    @ApiResponse({ status: 200, description: 'Successfully updated', type: CreatedUserDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Put('/:id/dialog-opened/:type')
+    async updateDialogOpened(@Param('id') id, @Param('type') type, @Req() { user }) {
+        try {
+            if (user.id != id) {
+                throw new HttpException('User Not Authorized', 403);
+            }
+            
+            return await this.usersService.putDialogOpened(id, type);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
     @ApiOperation({ summary: 'Get public details for a specific user' })
     @ApiParam({name : "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, type: UserProfileDto })
