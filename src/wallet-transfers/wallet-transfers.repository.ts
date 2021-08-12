@@ -34,7 +34,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         ];
 
         params.push(filters.userId);
-        where = where + `(w.user_id = $${params.length} OR w.other_user_id = $${params.length}) AND `;
+        where = where + `(w.user_id = $${params.length} OR (w.other_user_id = $${params.length} AND action = 'sent')) AND `;
 
         if (filters.action) {
             params.push(filters.action);
