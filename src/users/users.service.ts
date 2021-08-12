@@ -209,6 +209,10 @@ export class UsersService {
 
     }
 
+    async putDialogOpened(id : string, dialogType : string){
+       return await this.usersRepository.putDialogOpened(id, dialogType)
+    }
+
     msToTime(duration) {
 
         var seconds : any = Math.floor((duration / 1000) % 60),

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { Users } from "./users.entity";
@@ -73,6 +73,36 @@ export class UsersRepository extends Repository<Users>{
         if (!user) return user;
         delete user.password;
         return user;
+    }
+
+    async putDialogOpened(id : string, dialogType : string){
+        let data : any = {};
+        switch(dialogType) {
+            case "personal":
+                data.personalDialogOpened = true;
+                break;
+            case "city":
+                data.cityDialogOpened = true;
+                break;
+            case "global":
+                data.globalDialogOpened = true;
+                break;
+            default:
+                throw new HttpException("Undefined type", 401);
+        }
+        
+        let result = await getConnection()
+        .createQueryBuilder()
+        .update(Users)
+        .set(data)
+        .where("id = :id", { id })
+        .execute();
+        if (result && result.affected){
+            return { status: "ok" }
+        }else{
+            return null;
+        }
+
     }
 
     async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {

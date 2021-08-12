@@ -70,6 +70,15 @@ export class Users extends BaseEntity {
     @Column({ nullable : true, name : 'daily_goal_achieved', type: 'boolean', default: () => "false" })
     dailyGoalAchieved : boolean;
 
+    @Column({ nullable: true, name : 'personal_dialog_opened', type: 'boolean', default: () => "false" })
+    personalDialogOpened : boolean;
+
+    @Column({ nullable: true, name : 'city_dialog_opened', type: 'boolean', default: () => "false" })
+    cityDialogOpened : boolean;
+    
+    @Column({ nullable: true, name : 'global_dialog_opened', type: 'boolean', default: () => "false" })
+    globalDialogOpened : boolean;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
