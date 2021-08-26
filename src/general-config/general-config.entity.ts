@@ -16,6 +16,10 @@ export enum ConfigName {
     USER_REWARD_PER_MINUTE_OF_TIMELINE_VIEW_TIME = "user_reward_per_minute_of_timeline_view_time",
     CREATOR_REWARD_FOR_WOOW_RECEIVED = "creator_reward_for_woow_received",
     GLOBAL_GOAL_LIMIT_TIME_IN_UTC = "global_goal_limit_time_in_utc",
+    USER_SENT_SOWER_INVITATION_CODE_OOZ = "user_sent_sower_invitation_code_ooz",
+    USER_RECEIVED_SOWER_INVITATION_CODE_OOZ = "user_received_sower_invitation_code_ooz",
+    USER_SENT_DEFAULT_INVITATION_CODE_OOZ = "user_sent_default_invitation_code_ooz",
+    USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ = "user_received_default_invitation_code_ooz",
 };
   
 @Entity()

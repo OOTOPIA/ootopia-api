@@ -20,6 +20,9 @@ export class CreateUserDto {
     @ApiProperty({ required: true})
     acceptedTerms : boolean;
 
+    @ApiProperty({ required: false})
+    invitationCode : string;
+
 }
 
 export class CreatedUserDto {

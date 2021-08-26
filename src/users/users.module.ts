@@ -5,6 +5,7 @@ import { CitiesModule } from 'src/cities/cities.module';
 import { FilesUploadModule } from 'src/files-upload/files-upload.module';
 import { GeneralConfigModule } from 'src/general-config/general-config.module';
 import { InterestsTagsModule } from 'src/interests-tags/interests-tags.module';
+import { InvitationsCodesModule } from '../invitations-codes/invitations-codes.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
 import { WalletsModule } from 'src/wallets/wallets.module';
@@ -29,6 +30,7 @@ import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
     forwardRef(() => PostsModule),
     GeneralConfigModule,
     forwardRef(() => SqsWorkerModule),
+    InvitationsCodesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersAppUsageTimeService],

@@ -12,6 +12,7 @@ import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
 import { DailyGoalDistributionHandlerService } from 'src/sqs-worker/daily-goal-distribution-handler/daily-goal-distribution-handler.service';
+import { InvitationsCodesService } from 'src/invitations-codes/invitations-codes.service';
 //import { JwtResetPasswordStrategy } from 'src/auth/jwt-reset-password.strategy';
 
 
@@ -22,6 +23,7 @@ export class UsersController {
         private readonly usersService : UsersService,
         private readonly authService : AuthService,
         private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
+        private readonly invitationsCodesService : InvitationsCodesService,
         @Inject(forwardRef(() => DailyGoalDistributionHandlerService)) private readonly dailyGoalDistributionHandlerService : DailyGoalDistributionHandlerService,
         ) {}
 
@@ -265,6 +267,28 @@ export class UsersController {
                 throw new HttpException('User Not Authorized', 403);
             }
             return await this.dailyGoalDistributionHandlerService.startCheckingUsersDailyGoal([id]);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'Get public details for a specific user' })
+    @ApiParam({name : "id", type: "string", description: "User ID" })
+    @ApiResponse({ status: 200, type: UserProfileDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Get('/:id/invitation-code')
+    async getInvitationsCode(@Param('id') id, @Req() { user }) {
+        try {
+            if (user.id != id) {
+                throw new HttpException('User Not Authorized', 403);
+            }
+            return await this.invitationsCodesService.getInvitationsCodesByUserId(id);
         } catch (error) {
             new ErrorHandling(error);
         }

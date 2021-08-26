@@ -7,6 +7,10 @@ import {
     BaseEntity
 } from 'typeorm';
   
+enum BadgeType {
+    sower = 'sower',
+} 
+
 @Entity()
 export class Badges extends BaseEntity {
 
@@ -18,6 +22,9 @@ export class Badges extends BaseEntity {
 
     @Column({ nullable: false, type: 'varchar' })
     name : string; 
+
+    @Column({ nullable: true, type: 'enum', enum: BadgeType })
+    type : string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
