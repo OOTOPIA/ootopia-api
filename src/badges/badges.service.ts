@@ -17,4 +17,8 @@ export class BadgesService {
   findOne(id: string) {
     return this.badgesRepository.findOne(id)
   }
+
+  async findByType(type : string) {
+    return await this.badgesRepository.find({ where: {type}});
+  }
 }

@@ -17,6 +17,19 @@ export class UsersRepository extends Repository<Users>{
         return await this.save(user);
     }
 
+    async createUser(userData) {
+        const user = this.create();
+        Object.assign(user, userData);
+        return user;
+    }
+
+    async deleteUser(id) {
+        if (!id) {
+            return null;
+        }
+        return this.delete(id);
+    }
+
     async resetPassword(id: string, password: string) {
         let result = await getConnection()
         .createQueryBuilder()

@@ -20,6 +20,9 @@ export class CreateUserDto {
     @ApiProperty({ required: true})
     acceptedTerms : boolean;
 
+    @ApiProperty({ required: false})
+    invitationCode : string;
+
 }
 
 export class CreatedUserDto {
@@ -151,6 +154,27 @@ export class UserProfileDto {
     @ApiProperty()
     photoUrl : string;
 
+}
+
+export class UserInvitationsCodes {
+
+    @ApiProperty({example : '11111111-1111-1111-1111-111111111111'})
+    id : string;
+
+    @ApiProperty({example : 'kMK9iksGc'})
+    code : string;
+
+    @ApiProperty({example : 'true'})
+    type : string;
+
+    @ApiProperty({example : true})
+    active : boolean;
+
+    @ApiProperty({ example : "2021-08-26T21:57:24.365Z"})
+    createdAt : string;
+
+    @ApiProperty({ example : "2021-08-26T21:57:24.365Z"})
+    updatedAt : string;
 }
 
 export class UserDailyGoalStatsDto {

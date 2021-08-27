@@ -9,6 +9,10 @@ export class WalletsService {
         return await this.walletsRepository.createOrUpdateWallet(walletData);
     }
 
+    async delete(id) {
+        return await this.walletsRepository.delete(id);
+    }
+
     async getWalletByUserId(userId) {
         return await this.walletsRepository.getWalletByUserId(userId);
     }

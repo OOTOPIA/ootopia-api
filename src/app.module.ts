@@ -19,6 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SqsModule } from '@ssut/nestjs-sqs';
 import { SqsWorkerModule } from './sqs-worker/sqs-worker.module';
 import { BadgesModule } from './badges/badges.module';
+import { InvitationsCodesModule } from './invitations-codes/invitations-codes.module'
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -64,6 +65,7 @@ const sqs = new AWS.SQS({
     EmailsModule,
     SqsWorkerModule,
     BadgesModule,
+    InvitationsCodesModule,
   ],
   controllers: [AppController],
   providers: [AppService, CronService],
