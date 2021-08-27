@@ -12,7 +12,10 @@ import { GeneralConfigService } from 'src/general-config/general-config.service'
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
+import { InvitationsCodesService } from '../invitations-codes/invitations-codes.service';
 import * as moment from 'moment-timezone';
+import { Origin, WalletTransferAction } from 'src/wallet-transfers/wallet-transfers.entity';
+import { BadgesService } from 'src/badges/badges.service';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +30,8 @@ export class UsersService {
         private readonly walletTransfersService : WalletTransfersService,
         private readonly generalConfigService : GeneralConfigService,
         private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
+        private readonly invitationsCodesService : InvitationsCodesService,
+        private readonly badgesService : BadgesService,
         ) {
     }
 
@@ -44,10 +49,62 @@ export class UsersService {
             throw new HttpException("EMAIL_ALREADY_EXISTS", 401);
         }
 
-        let user = await this.usersRepository.createOrUpdateUser(userData);
-        await this.walletsService.createOrUpdateWallet({
-            userId : user.id,
-        });
+        const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        let user;
+        let wallet;
+		let invitation;
+
+        try {
+            userData.invitationCodeAccepted = userData.invitationCode || null;
+            user = await this.usersRepository.createOrUpdateUser(userData);
+            wallet = await this.walletsService.createOrUpdateWallet({userId : user.id});
+
+            if(userData.invitationCode) {
+                invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCode);
+                if (!invitation) {
+                    throw new HttpException("Invitation Code invalid", 401);
+                }
+				
+                switch (invitation.type) {
+                    case "sower":
+                        await this.sendInvitationCodeReward( invitation.userId, null, ConfigName.USER_SENT_SOWER_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_SENT, queryRunner);
+                        await this.sendInvitationCodeReward (user.id, wallet.id, ConfigName.USER_RECEIVED_SOWER_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
+					break;
+                    case "default":
+                        await this.sendInvitationCodeReward( invitation.userId, null, ConfigName.USER_SENT_DEFAULT_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_SENT, queryRunner);
+                        await this.sendInvitationCodeReward( user.id, wallet.id, ConfigName.USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
+                    break;
+                }
+            }
+			
+			let userId = user.id;
+			await queryRunner.manager.save(
+				await this.invitationsCodesService.createOrUpdateInvitation({userId, type: 'default', active: true})
+			);
+			await queryRunner.manager.save(
+				await this.invitationsCodesService.createOrUpdateInvitation({userId, type: 'sower', active: invitation?.type == 'sower'})
+			);
+
+            if (invitation?.type == 'sower') {
+                let badge = await this.badgesService.findByType('sower');
+                user.badges = badge;
+                
+                await queryRunner.manager.save(
+                    user
+                );
+            }
+
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+			if (wallet && wallet.id)	await this.walletsService.delete(wallet.id);
+			if (user && user.id)	await this.usersRepository.delete(user.id);
+            throw err;
+        }
+
         delete user.password;
 
         return user;
@@ -225,5 +282,45 @@ export class UsersService {
       
         return (+hours ? hours + "h " : "") + minutes + "m " + seconds + "s";
     }
+
+    private async sendInvitationCodeReward(userId, walletId: string, configName : string, origin : string, queryRunner) {
+        const oozToReward = +(
+          await this.generalConfigService.getConfig(
+              configName,
+          )
+        ).value;
+        
+        if (!walletId) {
+            walletId = (
+              await this.walletsService.getWalletByUserId(userId)
+            ).id;
+        } 
+  
+        await queryRunner.manager.save(
+          await this.walletTransfersService.createTransfer(
+            userId,
+            {
+              userId: userId,
+              walletId: walletId,
+              balance: oozToReward,
+              origin: origin,
+              action: WalletTransferAction.RECEIVED,
+              fromPlatform: true,
+              processed: true,
+            },
+            true,
+          ),
+        );
+		
+        await queryRunner.manager.save(
+			
+          await this.walletsService.increaseTotalBalance(
+            walletId,
+            userId,
+            oozToReward,
+          ),
+        );
+
+  }
 
 }

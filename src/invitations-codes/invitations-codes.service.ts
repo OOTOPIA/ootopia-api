@@ -7,16 +7,16 @@ import { UpdateInvitationsCodeDto } from './dto/update-invitations-code.dto';
 export class InvitationsCodesService {
   constructor(private readonly invitationsCodeRepository : InvitationsCodeRepository){}
 
-  create(invitation) {
-    return this.invitationsCodeRepository.createOrUpdateInvitation(invitation);
+  async createOrUpdateInvitation(invitation) {
+    return await this.invitationsCodeRepository.createOrUpdateInvitation(invitation);
   }
 
-  getInvitationsCodesByUserId(userId: string) {
-    return this.invitationsCodeRepository.getInvitationsCodesByUserId(userId);
+  async getInvitationsCodesByUserId(userId: string) {
+    return await this.invitationsCodeRepository.getInvitationsCodesByUserId(userId);
   }
 
-  // update(id: number, updateInvitationsCodeDto: UpdateInvitationsCodeDto) {
-  //   return `This action updates a #${id} invitationsCode`;
-  // }
+  async getInvitationsCodesByCode(code: string) {
+    return await this.invitationsCodeRepository.getInvitationsCodesByCode(code);
+  }
 
 }

@@ -2,6 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { InvitationsCode } from "./entities/invitations-code.entity";
+import * as shortid from "shortid";
 
 @Injectable()
 @EntityRepository(InvitationsCode)
@@ -14,13 +15,25 @@ export class InvitationsCodeRepository extends Repository<InvitationsCode>{
     async createOrUpdateInvitation(data) {
         const invitationCode = this.create();
         Object.assign(invitationCode, data);
-        return await this.save(invitationCode);
+        if (!invitationCode.code) {
+            invitationCode.code = shortid.generate().toUpperCase();
+        }
+        return invitationCode;
     }
 
     async getInvitationsCodesByUserId(userId: string) {
         return await this.find({
           where: {userId, active: true},
         });
+    }
+
+    async getInvitationsCodesByCode(code: string) {
+        let invitation = camelcaseKeys(await getConnection().query(`
+            SELECT * FROM invitations_code
+            WHERE code = $1 and active is true
+            `, [code]), { deep : true });
+
+        return invitation && invitation.length ? invitation[0] : null;
     }
 
 }

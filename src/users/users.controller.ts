@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -277,7 +277,7 @@ export class UsersController {
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: 'Get public details for a specific user' })
     @ApiParam({name : "id", type: "string", description: "User ID" })
-    @ApiResponse({ status: 200, type: UserProfileDto })
+    @ApiResponse({ status: 200, type: UserInvitationsCodes })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })

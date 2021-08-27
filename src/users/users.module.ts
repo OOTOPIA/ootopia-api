@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-app-usage-time.service';
 import { UsersAppUsageTimeRepository } from './repositories/users-app-usage-time.repository';
 import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
+import { BadgesModule } from 'src/badges/badges.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
     InterestsTagsModule,
     CitiesModule,
     WalletsModule,
+    BadgesModule,
     forwardRef(() => WalletTransfersModule),
     forwardRef(() => PostsModule),
     GeneralConfigModule,
