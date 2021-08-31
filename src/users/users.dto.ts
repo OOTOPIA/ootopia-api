@@ -177,6 +177,13 @@ export class UserInvitationsCodes {
     updatedAt : string;
 }
 
+export class InvitationCodeValidateDto {
+
+    @ApiProperty({ enum: ['valid', 'invalid'], example : 'valid'})
+    status : string;
+    
+}
+
 export class UserDailyGoalStatsDto {
 
     @ApiProperty({ description: "User id" })
