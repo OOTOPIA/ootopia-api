@@ -24,6 +24,9 @@ export class InvitationsCodeRepository extends Repository<InvitationsCode>{
     async getInvitationsCodesByUserId(userId: string) {
         return await this.find({
           where: {userId, active: true},
+          order: {
+            type: 'DESC',
+          },
         });
     }
 
