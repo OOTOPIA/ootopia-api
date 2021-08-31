@@ -19,4 +19,16 @@ export class InvitationsCodesService {
     return await this.invitationsCodeRepository.getInvitationsCodesByCode(code);
   }
 
+  async validateInvitationCode(code : string) {
+    if (!code) {
+      return { "status" : "invalid" };
+    }
+    let response = await this.getInvitationsCodesByCode(code);
+    if (response) {
+      return { "status" : "valid" };
+    }else{
+      return { "status" : "invalid" };
+    }
+  }
+
 }
