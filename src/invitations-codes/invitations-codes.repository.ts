@@ -2,7 +2,8 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { InvitationsCode } from "./entities/invitations-code.entity";
-import * as shortid from "shortid";
+import { nanoid } from 'nanoid';
+
 
 @Injectable()
 @EntityRepository(InvitationsCode)
@@ -16,7 +17,7 @@ export class InvitationsCodeRepository extends Repository<InvitationsCode>{
         const invitationCode = this.create();
         Object.assign(invitationCode, data);
         if (!invitationCode.code) {
-            invitationCode.code = shortid.generate().toUpperCase();
+            invitationCode.code = nanoid(10);
         }
         return invitationCode;
     }
