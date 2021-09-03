@@ -17,11 +17,13 @@ import { UsersAppUsageTimeService } from './services/users-app-usage-time/users-
 import { UsersAppUsageTimeRepository } from './repositories/users-app-usage-time.repository';
 import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 import { BadgesModule } from 'src/badges/badges.module';
+import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
+import { UsersTrophiesRepository } from './repositories/users-trophies.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UsersRepository, UsersAppUsageTimeRepository]),
-    TypeOrmModule.forFeature([AddressesRepository]),
+    TypeOrmModule.forFeature([AddressesRepository, UsersTrophiesRepository]),
     forwardRef(() => AuthModule),
     FilesUploadModule,
     InterestsTagsModule,
@@ -35,7 +37,7 @@ import { BadgesModule } from 'src/badges/badges.module';
     InvitationsCodesModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersAppUsageTimeService],
+  providers: [UsersService, UsersAppUsageTimeService, UsersTrophiesService],
   exports: [UsersService, UsersAppUsageTimeService]
 })
 export class UsersModule {}

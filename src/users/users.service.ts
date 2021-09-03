@@ -16,6 +16,8 @@ import { InvitationsCodesService } from '../invitations-codes/invitations-codes.
 import * as moment from 'moment-timezone';
 import { Origin, WalletTransferAction } from 'src/wallet-transfers/wallet-transfers.entity';
 import { BadgesService } from 'src/badges/badges.service';
+import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
+import { TrophyType } from './entities/users-trophies.entity';
 
 @Injectable()
 export class UsersService {
@@ -32,6 +34,7 @@ export class UsersService {
         private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
         private readonly invitationsCodesService : InvitationsCodesService,
         private readonly badgesService : BadgesService,
+        private readonly usersTrophiesService : UsersTrophiesService,
         ) {
     }
 
@@ -247,6 +250,10 @@ export class UsersService {
         if (user.dailyGoalAchieved != dailyGoalAchieved) {
             let result = await this.updateDailyGoalAchieved(user.id, dailyGoalAchieved);
             if (dailyGoalAchieved && result.status == 'ok') {
+                await this.usersTrophiesService.createOrUpdateTrophy({
+                    userId : user.id,
+                    trophyType : TrophyType.PERSONAL,
+                });
                 await this.walletTransfersService.transferPersonalGoalAchieved(user.id);
             }
         }

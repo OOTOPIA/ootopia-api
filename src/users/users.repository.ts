@@ -84,8 +84,35 @@ export class UsersRepository extends Repository<Users>{
         let user = results.length ? results[0] : null;
 
         if (!user) return user;
+
+        let trophies = await this.getUserTrophies(user.id);
+        
+        user.personalTrophyQuantity = trophies.personal ? +trophies.personal.quantity : 0;
+        user.cityTrophyQuantity = trophies.city ? +trophies.city.quantity : 0;
+        user.globalTrophyQuantity = trophies.global ? +trophies.global.quantity : 0;
+        user.totalTrophyQuantity = +trophies.total || 0;
+
         delete user.password;
         return user;
+    }
+
+    async getUserTrophies(userId: string) {
+        let results : any[] = camelcaseKeys(await getConnection().query(`
+            SELECT * FROM users_trophies WHERE user_id = $1
+        `, [userId]), { deep : true });
+        let trophies : any = results.length ? results : null;
+        if (trophies) {
+            let personalTrophy = results.filter((t) => t.trophyType == "personal");
+            let cityTrophy = results.filter((t) => t.trophyType == "city");
+            let globalTrophy = results.filter((t) => t.trophyType == "global");
+            trophies = {
+                "personal" : personalTrophy.length ? personalTrophy[0] : null,
+                "city" : cityTrophy.length ? cityTrophy[0] : null,
+                "global" : globalTrophy.length ? globalTrophy[0] : null,
+                "total" : results.map((t) => +t.quantity).reduce((total, value) => total + value),
+            };
+        }
+        return trophies;
     }
 
     async putDialogOpened(id : string, dialogType : string){

@@ -154,6 +154,19 @@ export class UserProfileDto {
     @ApiProperty()
     photoUrl : string;
 
+    @ApiProperty()
+    personalTrophyQuantity : number;
+
+    @ApiProperty()
+    cityTrophyQuantity : number;
+
+    @ApiProperty()
+    globalTrophyQuantity : number;
+
+    @ApiProperty()
+    totalTrophyQuantity : number;
+    
+
 }
 
 export class UserInvitationsCodes {
