@@ -17,6 +17,7 @@ import { PostsTimelineViewTime } from 'src/posts/entities/posts-timeline-view-ti
 import { UsersAppUsageTime } from 'src/users/entities/users-app-usage-time.entity';
 import { Badges } from 'src/badges/entities/badges.entity';
 import { InvitationsCode } from 'src/invitations-codes/entities/invitations-code.entity';
+import { UsersTrophies } from 'src/users/entities/users-trophies.entity';
 
 require('dotenv').config();
 
@@ -55,7 +56,7 @@ class ConfigService {
         password: this.getValue('POSTGRES_PASSWORD'),
         database: this.getValue('POSTGRES_DATABASE'),
         extra: {
-          max: 200, // set pool max size to 20
+          max: 100, // set pool max size to 20
           idleTimeoutMillis: 1000 * 60, // close idle clients after 1 second
           connectionTimeoutMillis: 15000, // return an error after 1 second if connection could not be established
         },
@@ -80,6 +81,7 @@ class ConfigService {
           UsersAppUsageTime,
           Badges,
           InvitationsCode,
+          UsersTrophies,
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
