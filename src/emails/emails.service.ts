@@ -18,10 +18,18 @@ export class EmailsService {
     });
   }
   
-  async sendRecoverPasswordEmail(email : string, payload : { url_recover_password : string }) {
+  async sendRecoverPasswordEmail(email : string, language : string, payload : { url_recover_password : string }) {
 
-    const body = this.loadTemplate("recover-password");
-    return this.sendEmail(email, "Recuperar senha", body, payload);
+    let templateName = "recover-password-en";
+    let subject = "Recover password";
+
+    if (language == "ptbr") {
+      templateName = "recover-password-ptbr";
+      subject = "Recuperar senha";
+    }
+
+    const body = this.loadTemplate(templateName);
+    return this.sendEmail(email, subject, body, payload);
 
   }
 

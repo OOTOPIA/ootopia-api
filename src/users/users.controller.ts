@@ -85,7 +85,7 @@ export class UsersController {
                 throw new HttpException({ status: 400, error: "Invalid Body" }, 400);
             }
 
-            return this.authService.recoverPassword(recoverPasswordData.email);
+            return this.authService.recoverPassword(recoverPasswordData.email, recoverPasswordData.language);
 
         } catch (error) {
             new ErrorHandling(error);

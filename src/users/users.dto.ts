@@ -78,7 +78,10 @@ export class RecoverPasswordDto {
 
     @ApiProperty({ required: true })
     @IsNotEmpty()
-    email : string;    
+    email : string;
+
+    @ApiProperty({ required: false, enum: ['ptbr', 'en'] })
+    language : string;    
   
 }
 
