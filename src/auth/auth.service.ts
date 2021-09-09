@@ -60,7 +60,7 @@ export class AuthService {
     });
   }
 
-  async recoverPassword(email: string) {
+  async recoverPassword(email: string, language : string) {
     const user = await this.usersService.getUserByEmail(email);
 
     if(!user) {
@@ -77,6 +77,7 @@ export class AuthService {
 
     await this.emailsService.sendRecoverPasswordEmail(
       user.email,
+      language,
       {
         url_recover_password: util.format(process.env.SITE_URL + '/auth/login?resetPasswordToken=%s', token)
       }
