@@ -87,10 +87,10 @@ export class UsersRepository extends Repository<Users>{
 
         let trophies = await this.getUserTrophies(user.id);
         
-        user.personalTrophyQuantity = trophies.personal ? +trophies.personal.quantity : 0;
-        user.cityTrophyQuantity = trophies.city ? +trophies.city.quantity : 0;
-        user.globalTrophyQuantity = trophies.global ? +trophies.global.quantity : 0;
-        user.totalTrophyQuantity = +trophies.total || 0;
+        user.personalTrophyQuantity = trophies && trophies.personal ? +trophies.personal.quantity : 0;
+        user.cityTrophyQuantity = trophies && trophies.city ? +trophies.city.quantity : 0;
+        user.globalTrophyQuantity = trophies && trophies.global ? +trophies.global.quantity : 0;
+        user.totalTrophyQuantity = trophies ? +trophies.total || 0 : 0;
 
         delete user.password;
         return user;
