@@ -22,8 +22,8 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
 
     async getTransfers(filters) {
 
-        if (!filters.userId) {
-            throw new HttpException("Mandatory field 'userId' is not found", 400);
+        if (!filters.walletId) {
+            throw new HttpException("Mandatory field 'walletId' is not found", 400);
         }
 
         let where = "w.processed = true AND w.removed = false AND ", params = [];
@@ -33,8 +33,8 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
             'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon'
         ];
 
-        params.push(filters.userId);
-        where = where + `(w.user_id = $${params.length} OR (w.other_user_id = $${params.length} AND action = 'sent')) AND `;
+        params.push(filters.walletId);
+        where = where + `w.wallet_id = $${params.length} AND `;
 
         if (filters.action) {
             params.push(filters.action);
