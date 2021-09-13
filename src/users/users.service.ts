@@ -70,15 +70,19 @@ export class UsersService {
                 if (!invitation) {
                     throw new HttpException("Invitation Code invalid", 401);
                 }
-				
+
+                let oozToRewardSent, oozToRewardReceived;
+			
                 switch (invitation.type) {
                     case "sower":
-                        await this.sendInvitationCodeReward( invitation.userId, null, ConfigName.USER_SENT_SOWER_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_SENT, queryRunner);
-                        await this.sendInvitationCodeReward (user.id, wallet.id, ConfigName.USER_RECEIVED_SOWER_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
+                        oozToRewardSent = +(await this.generalConfigService.getConfig(ConfigName.USER_SENT_SOWER_INVITATION_CODE_OOZ)).value;
+                        oozToRewardReceived = +(await this.generalConfigService.getConfig(ConfigName.USER_RECEIVED_SOWER_INVITATION_CODE_OOZ)).value;
+                        await this.sendInvitationCodeReward(invitation.userId, user.id, oozToRewardSent, oozToRewardReceived, Origin.INVITATION_CODE_SENT, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
 					break;
                     case "default":
-                        await this.sendInvitationCodeReward( invitation.userId, null, ConfigName.USER_SENT_DEFAULT_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_SENT, queryRunner);
-                        await this.sendInvitationCodeReward( user.id, wallet.id, ConfigName.USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
+                        oozToRewardSent = +(await this.generalConfigService.getConfig(ConfigName.USER_SENT_DEFAULT_INVITATION_CODE_OOZ)).value;
+                        oozToRewardReceived = +(await this.generalConfigService.getConfig(ConfigName.USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ)).value;
+                        await this.sendInvitationCodeReward(invitation.userId, user.id, oozToRewardSent, oozToRewardReceived, Origin.INVITATION_CODE_SENT, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
                     break;
                 }
             }
@@ -290,27 +294,37 @@ export class UsersService {
         return (+hours ? hours + "h " : "") + minutes + "m " + seconds + "s";
     }
 
-    private async sendInvitationCodeReward(userId, walletId: string, configName : string, origin : string, queryRunner) {
-        const oozToReward = +(
-          await this.generalConfigService.getConfig(
-              configName,
-          )
-        ).value;
-        
-        if (!walletId) {
-            walletId = (
-              await this.walletsService.getWalletByUserId(userId)
-            ).id;
-        } 
+    private async sendInvitationCodeReward(fromUserId: string, toUserId: string, oozToRewardSent : number, oozToRewardReceived : number, originSent : string, originReceived : string, queryRunner) {
+
+        const fromUserWalletId = (await this.walletsService.getWalletByUserId(fromUserId)).id;
+        const toUserWalletId = (await this.walletsService.getWalletByUserId(toUserId)).id;
+
+        await queryRunner.manager.save(
+            await this.walletTransfersService.createTransfer(
+                fromUserId,
+                {
+                userId: fromUserId,
+                walletId: fromUserWalletId,
+                otherUserId : toUserId,
+                balance: oozToRewardSent,
+                origin: originSent,
+                action: WalletTransferAction.SENT,
+                fromPlatform: true,
+                processed: true,
+                },
+                true,
+            ),
+        );
   
         await queryRunner.manager.save(
           await this.walletTransfersService.createTransfer(
-            userId,
+            toUserId,
             {
-              userId: userId,
-              walletId: walletId,
-              balance: oozToReward,
-              origin: origin,
+              userId: toUserId,
+              walletId: toUserWalletId,
+              otherUserId : fromUserId,
+              balance: oozToRewardReceived,
+              origin: originReceived,
               action: WalletTransferAction.RECEIVED,
               fromPlatform: true,
               processed: true,
@@ -320,14 +334,21 @@ export class UsersService {
         );
 		
         await queryRunner.manager.save(
-			
-          await this.walletsService.increaseTotalBalance(
-            walletId,
-            userId,
-            oozToReward,
-          ),
+            await this.walletsService.increaseTotalBalance(
+                fromUserWalletId,
+                fromUserId,
+                oozToRewardReceived,
+            ),
         );
 
-  }
+        await queryRunner.manager.save(
+            await this.walletsService.increaseTotalBalance(
+                toUserWalletId,
+                toUserId,
+                oozToRewardReceived,
+            ),
+        );
+
+    }
 
 }

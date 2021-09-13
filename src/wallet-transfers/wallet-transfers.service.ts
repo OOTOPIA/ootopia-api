@@ -214,6 +214,9 @@ export class WalletTransfersService {
     }
 
     async getTransfers(filters) {
+        if (filters.userId) {
+            filters.walletId = (await this.walletsService.getWalletByUserId(filters.userId)).id
+        }
         return (await this.walletTransfersRepository.getTransfers(filters)).map((transfer) => {
             transfer.balance = ((+transfer.balance).toFixed(2));
             return transfer;
