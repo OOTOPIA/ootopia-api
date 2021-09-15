@@ -124,7 +124,7 @@ export class UsersController {
     @ApiBearerAuth('Bearer')
     @ApiBody({ type: UserProfileUpdateDto })
     @ApiParam({ name : "id", type: "string", description: "User ID" })
-    @ApiResponse({ status: 200, description: 'Successfully updated', type: CreatedUserDto })
+    @ApiResponse({ status: 200, description: 'Successfully updated', type: UserProfileDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })

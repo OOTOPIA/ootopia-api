@@ -19,6 +19,8 @@ import { BadgesService } from 'src/badges/badges.service';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { TrophyType } from './entities/users-trophies.entity';
 
+import { UserProfileUpdateDto } from './users.dto';
+
 @Injectable()
 export class UsersService {
 
@@ -118,7 +120,7 @@ export class UsersService {
        
     }
 
-    async updateUser(userData, photoFile = null) {
+    async updateUser(userData: UserProfileUpdateDto, photoFile = null) {
 
         let queryRunner = getConnection().createQueryRunner();
 
@@ -127,11 +129,14 @@ export class UsersService {
 
         let currentUser = await this.getUserById(userData.id);
 
-        let _userData : any = {
-            id : userData.id,
+        let _userData: any = {
+            id: userData.id,
+            fullname: userData.fullname,
+            phone: userData.phone,
+            bio: userData.bio,
             birthdate : userData.birthdate,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
-        };
+        };  
 
         if (photoFile != null) {
             let fileUrl = await this.filesUploadService.uploadFileToS3(photoFile.buffer, photoFile.originalname, currentUser.id);
