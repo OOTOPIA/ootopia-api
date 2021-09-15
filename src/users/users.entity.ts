@@ -28,6 +28,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: false, type: 'varchar' })
     password : string;
 
+    @Column({ nullable: true, type: 'varchar' })
+    phone : string;
+
     @Column({ nullable: true, type: 'date' })
     birthdate : Date;
 

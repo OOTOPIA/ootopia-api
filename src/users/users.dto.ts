@@ -151,6 +151,9 @@ export class UserProfileDto {
     @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
     birthdate : string;
 
+    @ApiProperty({ type: "number", minimum: 10, maximum: 60 })
+    dailyLearningGoalInMinutes: number;
+
     @ApiProperty()
     bio : string;
 
@@ -229,6 +232,18 @@ export class UserDailyGoalStatsDto {
 }
 
 export class UserProfileUpdateDto {
+
+    @ApiProperty()
+    id: string;
+
+    @ApiProperty()
+    fullname: string;
+
+    @ApiProperty()
+    phone: string;
+
+    @ApiProperty()
+    bio: string;
 
     @ApiProperty({ required: true, type: "file", description: "User photo" })
     file : object;
