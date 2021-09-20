@@ -244,7 +244,7 @@ export class UsersController {
     async recordTimeUserUsedApp(@Req() { user }, @Body() data) {
         try {
             data.userId = user.id;
-            return await this.usersAppUsageTimeService.recordAppUsageTime(data);
+            return await this.usersService.recordAppUsageTime(data);
         } catch (error) {
             new ErrorHandling(error);
         }
