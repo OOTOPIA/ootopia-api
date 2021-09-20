@@ -221,6 +221,13 @@ export class UsersService {
         return await this.usersRepository.updateDontAskToConfirmGratitudeReward(id, value);
     }
 
+    async recordAppUsageTime(data) {
+
+        await this.usersAppUsageTimeService.recordAppUsageTime(data);
+        await this.getUserDailyGoalStats(data.userId);
+        
+    }
+
     async getUserDailyGoalStats(id : string, dailyGoalStartTime? : Date, dailyGoalEndTime? : Date) {
         let user = await this.getUserById(id), globalGoalLimitTimeConfig;
 
