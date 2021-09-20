@@ -133,6 +133,7 @@ export class UsersService {
             id: userData.id,
             fullname: userData.fullname,
             phone: userData.phone,
+            countryCode: userData.countryCode,
             bio: userData.bio,
             birthdate : userData.birthdate,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
@@ -182,7 +183,7 @@ export class UsersService {
 
         await queryRunner.manager.save(await this.usersRepository.create(_userData));
         await queryRunner.commitTransaction();
-        
+
         return Object.assign(currentUser, _userData);
 
     }

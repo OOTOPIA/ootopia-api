@@ -240,6 +240,9 @@ export class UserProfileUpdateDto {
     fullname: string;
 
     @ApiProperty()
+    countryCode: string;
+
+    @ApiProperty()
     phone: string;
 
     @ApiProperty()
