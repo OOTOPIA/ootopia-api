@@ -275,7 +275,7 @@ export class UsersService {
             }
         }
 
-        return {
+        var dailyGoalStats = {
             id,
             dailyGoalInMinutes : +user.dailyLearningGoalInMinutes,
             dailyGoalEndsAt : dailyGoalEndTime,
@@ -287,6 +287,10 @@ export class UsersService {
             remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
             percentageOfDailyGoalAchieved : percentageOfDailyGoalAchieved >= 100 ? 100 : percentageOfDailyGoalAchieved
         };
+
+
+
+        return dailyGoalStats;
 
     }
 
