@@ -373,12 +373,12 @@ export class LearningTracksController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('learning-tracks')
-    @ApiOperation({ summary: "Returns a last Learning Track" })
+    @ApiOperation({ summary: "Returns last Learning Track" })
     @ApiResponse({ status: 200, type: LearningTrackDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-    @Get()
+    @Get('/last')
     async getLastLearningTrack() {
         try {
 
