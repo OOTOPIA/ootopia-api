@@ -53,6 +53,9 @@ export class LearningTrackDto {
     @ApiProperty()
     totalTimeInMinutes : number;
 
+    @ApiProperty()
+    location : string;
+
     @ApiProperty({isArray : true, type: ChapterDto})
     chapters : ChapterDto;
 

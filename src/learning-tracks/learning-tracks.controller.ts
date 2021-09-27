@@ -31,6 +31,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -75,6 +76,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -118,6 +120,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -161,6 +164,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -205,6 +209,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -249,6 +254,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -293,6 +299,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -337,6 +344,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -381,6 +389,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
@@ -443,6 +452,7 @@ export class LearningTracksController {
                     imageUrl : "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_cover.png",
                     ooz : 2.45,
                     totalTimeInMinutes : 15,
+                    location : "Belo Horizonte - Brazil",
                     chapters : [
                         {
                             id : 1,
