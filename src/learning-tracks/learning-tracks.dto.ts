@@ -44,6 +44,15 @@ export class LearningTrackDto {
     @ApiProperty()
     description : string;
 
+    @ApiProperty()
+    imageUrl : string;
+
+    @ApiProperty()
+    ooz : number;
+
+    @ApiProperty()
+    totalTimeInMinutes : number;
+
     @ApiProperty({isArray : true, type: ChapterDto})
     chapters : ChapterDto;
 
