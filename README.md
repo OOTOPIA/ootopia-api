@@ -2,11 +2,12 @@
 
 # OOTOPIA API
 
-[![GitHub license](https://img.shields.io/github/license/OOTOPIA/ootopia-api)](https://github.com/OOTOPIA/ootopia-api/blob/staging/LICENSE)
+[![GPL-3.0 license](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://github.com/OOTOPIA/ootopia-api/blob/staging/LICENSE)
 [![.github/workflows/github-ci.yml](https://github.com/OOTOPIA/ootopia-api/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/OOTOPIA/ootopia-api/actions/workflows/github-ci.yml)
 [![GitHub stars](https://img.shields.io/github/stars/OOTOPIA/ootopia-api)](https://github.com/OOTOPIA/ootopia-api/stargazers)
 ![GitHub repo size](https://img.shields.io/github/repo-size/OOTOPIA/ootopia-api)
 ![GitHub last commit](https://img.shields.io/github/last-commit/OOTOPIA/ootopia-api)
+
 
 ## Project description
 
