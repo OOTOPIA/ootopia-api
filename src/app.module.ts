@@ -21,6 +21,7 @@ import { SqsWorkerModule } from './sqs-worker/sqs-worker.module';
 import { BadgesModule } from './badges/badges.module';
 import { InvitationsCodesModule } from './invitations-codes/invitations-codes.module'
 import { LearningTracksModule } from './learning-tracks/learning-tracks.module';
+import { StrapiModule } from './strapi/strapi.module';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -68,6 +69,7 @@ const sqs = new AWS.SQS({
     BadgesModule,
     InvitationsCodesModule,
     LearningTracksModule,
+    StrapiModule,
   ],
   controllers: [AppController],
   providers: [AppService, CronService],

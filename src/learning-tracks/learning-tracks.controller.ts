@@ -4,9 +4,12 @@ import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { ErrorHandling } from './../config/error-handling';
 import { HttpResponseDto } from './../config/http-response.dto';
 import { LearningTrackDto, LearningTracksFilterDto } from './learning-tracks.dto';
+import { LearningTracksService } from './learning-tracks.service';
 
 @Controller('learning-tracks')
 export class LearningTracksController {
+
+    constructor(private readonly learningTracksService: LearningTracksService) {}
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('learning-tracks')
@@ -75,9 +78,9 @@ export class LearningTracksController {
                 });
             }
 
-            console.log("testando", learningTracks.length);
+            //return learningTracks;
 
-            return learningTracks;
+            return await this.learningTracksService.getLearningTracks(filters);
 
         } catch (error) {
             new ErrorHandling(error);
