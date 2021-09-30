@@ -26,7 +26,6 @@ export class UsersTrophiesRepository extends Repository<UsersTrophies>{
             trophyData.userId,
             trophyData.trophyType,
         ]), { deep : true });
-        console.log('testing bro', result);
         if (!result || !result.length) {
             result = camelcaseKeys(await getConnection().query(`
                 SELECT * FROM users_trophies WHERE user_id = $1 AND trophy_type = $2
