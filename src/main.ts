@@ -44,6 +44,7 @@ async function bootstrap() {
     .addTag('interests-tags')
     .addTag('wallets')
     .addTag('wallet-transfers')
+    .addTag('market-place')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', in: 'header' },
       'Bearer',
