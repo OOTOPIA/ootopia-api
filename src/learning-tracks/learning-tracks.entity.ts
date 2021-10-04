@@ -34,6 +34,9 @@ export class LearningTracks extends BaseEntity {
     @Column({ nullable: true, type: 'varchar' })
     locale : string;
 
+    @Column({ nullable: true, type: 'varchar' })
+    location : string;
+
     @Column({ nullable: true, type: 'varchar', name : 'image_url' })
     imageUrl : string;
 

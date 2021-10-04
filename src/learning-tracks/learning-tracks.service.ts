@@ -54,6 +54,7 @@ export class LearningTracksService {
             chapters : learningTrackData.episode,
             createdAt : learningTrackData.created_at,
             updatedAt : learningTrackData.updated_at,
+            location : learningTrackData.location,
             time : "",
             ooz : 0,
         };
