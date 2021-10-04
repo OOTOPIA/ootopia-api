@@ -13,7 +13,7 @@ export class EmailsService {
     this.ses = new AWS.SES({
       accessKeyId: process.env.SES_ACCESS_KEY_ID,
       secretAccessKey: process.env.SES_SECRET_ACCESS_KEY,
-      region: process.env.REGION,
+      region: process.env.SES_REGION,
       apiVersion: '2012-11-05'
     });
   }

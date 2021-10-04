@@ -10,11 +10,11 @@ export class FilesUploadService {
 
   constructor() {
     this.aws = new AWS.S3({
-      accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.SECRET_ACCESS_KEY,
-      region: process.env.REGION,
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      region: process.env.S3_REGION,
       params: {
-        Bucket: process.env.BUCKET,
+        Bucket: process.env.S3_BUCKET,
         ACL: 'public-read',
       },
     });
