@@ -43,8 +43,8 @@ export class LearningTracks extends BaseEntity {
     @Column({ nullable: true, type: 'numeric' })
     ooz : number;
 
-    @Column({ nullable: true, type: 'numeric', name : 'total_time_in_minutes' })
-    totalTimeInMinutes : number;
+    @Column({ nullable: true, type: 'varchar' })
+    time : string;
 
     @Column({ nullable: true, type: 'simple-json' })
     chapters : any;
