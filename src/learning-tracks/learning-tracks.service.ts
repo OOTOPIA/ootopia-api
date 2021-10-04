@@ -54,8 +54,11 @@ export class LearningTracksService {
             chapters : learningTrackData.episode,
             createdAt : learningTrackData.created_at,
             updatedAt : learningTrackData.updated_at,
+            time : "",
             ooz : 0,
         };
+
+        let totalDurationInSecs = 0;
 
         for (let i = 0; i < learningTrack.chapters.length; i++) {
             let chapter = learningTrack.chapters[i];
@@ -70,12 +73,15 @@ export class LearningTracksService {
                     chapter.time = this.msToTime(videoDetails.duration * 1000); //convert duration to ms and get formatted time
                     chapter.ooz = await this.postsService.calcOOZToTransferForPostVideos(videoDetails.duration);
                     learningTrack.ooz += chapter.ooz;
+                    totalDurationInSecs += videoDetails.duration;
                 }catch(err) {
                     console.log("Error when get video details " + chapter.video, err);
                     throw err;
                 }
             }
         }
+
+        learningTrack.time = this.msToTime(totalDurationInSecs * 1000);
 
         return await this.learningTracksRepository.createOrUpdate(learningTrack);
 
