@@ -18,6 +18,7 @@ import { UsersAppUsageTime } from 'src/users/entities/users-app-usage-time.entit
 import { Badges } from 'src/badges/entities/badges.entity';
 import { InvitationsCode } from 'src/invitations-codes/entities/invitations-code.entity';
 import { UsersTrophies } from 'src/users/entities/users-trophies.entity';
+import { LearningTracks } from 'src/learning-tracks/learning-tracks.entity';
 
 require('dotenv').config();
 
@@ -82,6 +83,7 @@ class ConfigService {
           Badges,
           InvitationsCode,
           UsersTrophies,
+          LearningTracks,
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
