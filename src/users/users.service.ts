@@ -135,7 +135,7 @@ export class UsersService {
             phone: userData.phone,
             countryCode: userData.countryCode,
             bio: userData.bio,
-            birthdate : userData.birthdate,
+            birthdate : userData.birthdate || null,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
         };  
 
