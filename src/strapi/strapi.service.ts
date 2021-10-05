@@ -16,7 +16,7 @@ export class StrapiService {
 
         switch(data.model) {
             case "learning-tracks":
-                if (data.event == "entry.update" || data.event == "entry.create") {
+                if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
                     await this.sqsWorkerService.sendStrapiWebhookMessage(data);
                 }
             break;

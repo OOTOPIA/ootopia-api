@@ -21,9 +21,15 @@ export class LearningTracksService {
 
     }
 
-    async createOrUpdate(learningTrackData) {
+    async createOrUpdate(learningTrackData, strapiEvent : string) {
 
         let findLearningTrack = await this.learningTracksRepository.getByStrapiId(learningTrackData.id);
+
+        if (strapiEvent == "entry.update" && (!findLearningTrack || !learningTrackData.published_at)) { 
+            //Não vamos fazer nada se houver atualização sem que o dado esteja registrado no banco e publicado no strapi
+            return;
+        }
+
         let uploadNewImage = learningTrackData.photo != null;
         let photoUrl = learningTrackData.photo ? (learningTrackData.photo.formats?.large?.url || learningTrackData.photo.formats?.medium?.url || learningTrackData.photo.formats?.small?.url) : ""; 
         let imageUrl = learningTrackData.photo ? `${process.env.STRAPI_URL}${photoUrl}` : "";
@@ -47,16 +53,17 @@ export class LearningTracksService {
             id : learningTrackData.id,
             strapiId : learningTrackData.strapiId,
             title : learningTrackData.title,
-            description : learningTrackData.description,
+            description : learningTrackData.description || "",
             locale : learningTrackData.locale,
             imageUrl : imageUrl,
             imageUpdatedAt  : learningTrackData.photo ? learningTrackData.photo.updated_at : null,
-            chapters : learningTrackData.episode,
+            chapters : learningTrackData.episode || [],
             createdAt : learningTrackData.created_at,
             updatedAt : learningTrackData.updated_at,
-            location : learningTrackData.location,
+            location : learningTrackData.location || "",
             time : "",
             ooz : 0,
+            deletedAt : null,
         };
 
         let totalDurationInSecs = 0;

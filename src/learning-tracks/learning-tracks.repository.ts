@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
+import { EntityRepository, Repository, UpdateResult, getConnection, IsNull } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { LearningTracks } from "./learning-tracks.entity";
 import { LearningTracksFilterDto } from "./learning-tracks.dto";
@@ -20,7 +20,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
 
     getLearningTracks(filters : LearningTracksFilterDto) {
 
-        let limit = 50, offset = 0, where : any = {}, locale = "en";
+        let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
 
         if (filters.limit) {
             if (filters.limit > 50) {

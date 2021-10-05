@@ -18,9 +18,9 @@ export class StrapiWebhookHandlerService {
 
             switch(data.model) {
                 case "learning-tracks":
-                    if (data.event == "entry.create" || data.event == "entry.update") {
-                        await this.createOrUpdateLearningTrack(data.entry);
-                    }else if (data.event == "entry.delete") {
+                    if (data.event == "entry.publish" || data.event == "entry.update") {
+                        await this.createOrUpdateLearningTrack(data.entry, data.event);
+                    }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
                         await this.deleteLearningTrack(data.entry.id);
                     }
                 break;
@@ -34,10 +34,10 @@ export class StrapiWebhookHandlerService {
         }
     }
 
-    async createOrUpdateLearningTrack(entry) {
+    async createOrUpdateLearningTrack(entry, event : string) {
         console.log("received data from strapi webhook", entry);
 
-        await this.learningTracksService.createOrUpdate(entry);
+        await this.learningTracksService.createOrUpdate(entry, event);
     }
 
     async deleteLearningTrack(entryId) {
