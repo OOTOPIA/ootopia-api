@@ -22,7 +22,7 @@ export class LearningTracksController {
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @Get()
-    async getHistory(@Query() filters : LearningTracksFilterDto) {
+    async getLearningTracks(@Query() filters : LearningTracksFilterDto) {
         try {
             return await this.learningTracksService.getLearningTracks(filters);
         } catch (error) {
