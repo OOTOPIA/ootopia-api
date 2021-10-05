@@ -162,6 +162,11 @@ export class PostsRepository extends Repository<Posts>{
           'c.country',
         ];
 
+        if (filters.postId) {
+            params.push(filters.postId);
+            where = where + `p.id = $${params.length} AND `;
+        }
+
         if (filters.userId) {
             params.push(filters.userId);
             where = where + `p.user_id = $${params.length} AND `;

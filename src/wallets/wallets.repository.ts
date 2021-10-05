@@ -18,6 +18,13 @@ export class WalletsRepository extends Repository<Wallets>{
         return this.save(wallet);
     }
 
+    async deleteWallet(id) {
+        if (!id) {
+            return null;
+        }
+        return this.delete(id);
+    }
+
     async getWalletByUserId(userId) {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 

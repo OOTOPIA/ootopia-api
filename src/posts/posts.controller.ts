@@ -111,13 +111,18 @@ export class PostsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
     @Get('/:id')
-    async getPostDetails(@Request() req: Request) {
+    async getPostDetails(@Req() req, @Param('id') id) {
         try {
+
+            let filters = {
+                postId : id
+            };
+
+            let posts = await this.postsService.getPostsTimeline(filters, req.user ? req.user.id : null);
             
-            /*console.log("file!", file);
-            console.log("post!", post.metadata.type);
-            console.log("file.buffer", file.buffer);*/
+            return posts.length ? posts[0] : null;
             
         } catch (error) {
             new ErrorHandling(error);
@@ -160,8 +165,6 @@ export class PostsController {
     @Post('/video/webhook')
     async webhook(@Headers() headers, @Body() data: WebhookDto, @Request() req : Request) {
         try {
-            console.log("headers", headers);
-            //console.log("body", typeof raw, raw);
             const webhookSignature = headers['webhook-signature'];
 
             if (!webhookSignature) {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import * as Minio from 'minio';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class FilesUploadService {
@@ -9,11 +10,11 @@ export class FilesUploadService {
 
   constructor() {
     this.aws = new AWS.S3({
-      accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.SECRET_ACCESS_KEY,
-      region: process.env.REGION,
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      region: process.env.S3_REGION,
       params: {
-        Bucket: process.env.BUCKET,
+        Bucket: process.env.S3_BUCKET,
         ACL: 'public-read',
       },
     });
@@ -30,7 +31,21 @@ export class FilesUploadService {
       .upload({
         Key: `users/${userId}/photo-${new Date().getTime()}${extension}`,
         Body: fileStreamOrBuffer,
-        Bucket: process.env.BUCKET,
+        Bucket: process.env.S3_BUCKET,
+        ACL: 'public-read',
+      })
+      .promise();
+
+    return Location;
+  }
+
+  async uploadLearningTrackImageToS3(fileStreamOrBuffer, fileName) {
+    const extension = /(?:\.([^.]+))?$/.exec(fileName)[0];
+    const { Location } = await this.aws
+      .upload({
+        Key: `learning-tracks/image-${nanoid(10)}-${new Date().getTime()}${extension}`,
+        Body: fileStreamOrBuffer,
+        Bucket: process.env.S3_BUCKET,
         ACL: 'public-read',
       })
       .promise();

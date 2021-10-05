@@ -20,6 +20,9 @@ export class CreateUserDto {
     @ApiProperty({ required: true})
     acceptedTerms : boolean;
 
+    @ApiProperty({ required: false})
+    invitationCode : string;
+
 }
 
 export class CreatedUserDto {
@@ -75,7 +78,10 @@ export class RecoverPasswordDto {
 
     @ApiProperty({ required: true })
     @IsNotEmpty()
-    email : string;    
+    email : string;
+
+    @ApiProperty({ required: false, enum: ['ptbr', 'en'] })
+    language : string;    
   
 }
 
@@ -145,12 +151,56 @@ export class UserProfileDto {
     @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
     birthdate : string;
 
+    @ApiProperty({ type: "number", minimum: 10, maximum: 60 })
+    dailyLearningGoalInMinutes: number;
+
     @ApiProperty()
     bio : string;
 
     @ApiProperty()
     photoUrl : string;
 
+    @ApiProperty()
+    personalTrophyQuantity : number;
+
+    @ApiProperty()
+    cityTrophyQuantity : number;
+
+    @ApiProperty()
+    globalTrophyQuantity : number;
+
+    @ApiProperty()
+    totalTrophyQuantity : number;
+    
+
+}
+
+export class UserInvitationsCodes {
+
+    @ApiProperty({example : '11111111-1111-1111-1111-111111111111'})
+    id : string;
+
+    @ApiProperty({example : 'kMK9iksGc'})
+    code : string;
+
+    @ApiProperty({example : 'true'})
+    type : string;
+
+    @ApiProperty({example : true})
+    active : boolean;
+
+    @ApiProperty({ example : "2021-08-26T21:57:24.365Z"})
+    createdAt : string;
+
+    @ApiProperty({ example : "2021-08-26T21:57:24.365Z"})
+    updatedAt : string;
+}
+
+export class InvitationCodeValidateDto {
+
+    @ApiProperty({ enum: ['valid', 'invalid'], example : 'valid'})
+    status : string;
+    
 }
 
 export class UserDailyGoalStatsDto {
@@ -182,6 +232,21 @@ export class UserDailyGoalStatsDto {
 }
 
 export class UserProfileUpdateDto {
+
+    @ApiProperty()
+    id: string;
+
+    @ApiProperty()
+    fullname: string;
+
+    @ApiProperty()
+    countryCode: string;
+
+    @ApiProperty()
+    phone: string;
+
+    @ApiProperty()
+    bio: string;
 
     @ApiProperty({ required: true, type: "file", description: "User photo" })
     file : object;

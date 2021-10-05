@@ -28,6 +28,12 @@ export class Users extends BaseEntity {
     @Column({ nullable: false, type: 'varchar' })
     password : string;
 
+    @Column({ nullable: true, type: 'varchar' })
+    phone : string;
+
+    @Column({ nullable: true, type: 'varchar', name: "country_code" })
+    countryCode : string;
+
     @Column({ nullable: true, type: 'date' })
     birthdate : Date;
 
@@ -36,6 +42,9 @@ export class Users extends BaseEntity {
 
     @Column({ nullable: true, type: 'varchar' })
     bio : string;
+     
+    @Column({ nullable: true, type: 'varchar', name: "invitation_code_accepted" })
+    invitationCodeAccepted : string;
 
     @Column({ nullable: true, name: 'daily_learning_goal_in_minutes', type: 'numeric', default: () => "0" })
     dailyLearningGoalInMinutes : number;
@@ -69,6 +78,15 @@ export class Users extends BaseEntity {
 
     @Column({ nullable : true, name : 'daily_goal_achieved', type: 'boolean', default: () => "false" })
     dailyGoalAchieved : boolean;
+
+    @Column({ nullable: true, name : 'personal_dialog_opened', type: 'boolean', default: () => "false" })
+    personalDialogOpened : boolean;
+
+    @Column({ nullable: true, name : 'city_dialog_opened', type: 'boolean', default: () => "false" })
+    cityDialogOpened : boolean;
+    
+    @Column({ nullable: true, name : 'global_dialog_opened', type: 'boolean', default: () => "false" })
+    globalDialogOpened : boolean;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

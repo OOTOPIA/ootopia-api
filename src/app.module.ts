@@ -19,6 +19,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SqsModule } from '@ssut/nestjs-sqs';
 import { SqsWorkerModule } from './sqs-worker/sqs-worker.module';
 import { BadgesModule } from './badges/badges.module';
+import { InvitationsCodesModule } from './invitations-codes/invitations-codes.module'
+import { LearningTracksModule } from './learning-tracks/learning-tracks.module';
+import { StrapiModule } from './strapi/strapi.module';
+import { MarketPlaceModule } from './market-place/market-place.module';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -41,11 +45,22 @@ const sqs = new AWS.SQS({
             name: "daily_goal_distribution",
             queueUrl: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE,
             sqs : sqs,
+          },
+          {
+            name: "strapi_webhook",
+            queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
+            sqs : sqs,
           }],
           producers: [{
             name: "daily_goal_distribution",
             queueUrl: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE,
             region: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE_REGION,
+            sqs: sqs,
+          },
+          {
+            name: "strapi_webhook",
+            queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
+            region: process.env.SQS_STRAPI_WEBHOOK_QUEUE_REGION,
             sqs: sqs,
           }],
         };
@@ -64,6 +79,10 @@ const sqs = new AWS.SQS({
     EmailsModule,
     SqsWorkerModule,
     BadgesModule,
+    InvitationsCodesModule,
+    LearningTracksModule,
+    StrapiModule,
+    MarketPlaceModule,
   ],
   controllers: [AppController],
   providers: [AppService, CronService],

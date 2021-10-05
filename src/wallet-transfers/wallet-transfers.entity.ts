@@ -29,6 +29,8 @@ export enum Origin {
   PERSONAL_GOAL_ACHIEVED = "personal_goal_achieved",
   GRATITUDE_REWARD = "gratitude_reward",
   INVITATION_CODE = "invitation_code",
+  INVITATION_CODE_SENT = "invitation_code_sent",
+  INVITATION_CODE_ACCEPTED = "invitation_code_accepted",
 };
 
 export enum WalletTransferAction {
