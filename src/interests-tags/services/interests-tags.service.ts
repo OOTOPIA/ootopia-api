@@ -16,8 +16,12 @@ export class InterestsTagsService {
 
     }
 
-    getTags(language : string) {
-        return this.interestsTagsRepository.getTags(language);
+    async getTags(language : string) {
+        let tags = await this.interestsTagsRepository.getTags(language);
+        return tags.map(function (tag) {
+            tag.tagOrder = +tag.tagOrder;
+            return tag;
+        });
     }
 
     async updateUserTags(userId : string, tagsIds : string[], originQueryRunner = null) {
