@@ -20,6 +20,11 @@ export class StrapiService {
                     await this.sqsWorkerService.sendStrapiWebhookMessage(data);
                 }
             break;
+            case "market-places":
+                if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
+                    await this.sqsWorkerService.sendStrapiWebhookMessage(data);
+                }
+            break;
         }
 
         return { "status" : "success" };
