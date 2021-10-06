@@ -69,6 +69,9 @@ export class WalletTransfers extends BaseEntity {
   @Column({ nullable : true, type: 'simple-json', name : 'market_place_data'})
   marketPlaceData : any;
 
+  @Column({ nullable: true, type: 'varchar' })
+  description : string;
+
   @Column({ 
     nullable: true, 
     type: "enum",

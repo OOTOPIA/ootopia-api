@@ -35,6 +35,8 @@ export class WalletTransfersService {
             fromPlatform : data.fromPlatform || false,
             processed : data.processed || false,
             postId : data.postId,
+            marketPlaceData : data.marketPlaceData,
+            description : data.description,
         }, isTransaction);
 
         if (!isTransaction) {
@@ -271,6 +273,8 @@ export class WalletTransfersService {
                 balance : +marketPlaceProduct.price,
                 origin : Origin.MARKET_PLACE_TRANSFER,
                 action : WalletTransferAction.SENT,
+                marketPlaceData : marketPlaceProduct,
+                description : marketPlaceProduct.title,
                 fromPlatform : true,
                 processed : true
             }, true));

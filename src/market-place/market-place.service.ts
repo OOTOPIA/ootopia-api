@@ -77,7 +77,7 @@ export class MarketPlaceService {
     let marketPlaceProduct = await this.marketPlaceRepository.getById(id);
     
     if (!marketPlaceProduct) {
-      return {};
+      return null;
     }
 
     return this.mapper(marketPlaceProduct);
@@ -87,7 +87,7 @@ export class MarketPlaceService {
     let marketPlaceProduct = await this.marketPlaceRepository.getByStrapiId(id);
 
     if (!marketPlaceProduct) {
-      return {};
+      return null;
     }
 
     return this.mapper(marketPlaceProduct);
@@ -96,6 +96,11 @@ export class MarketPlaceService {
   async purchase(marketPlaceProductId : string, userId : string) {
 
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
+
+    if (!marketPlaceProduct) {
+      throw new HttpException("PRODUCT_NOT_FOUND", 400);
+    }
+
     await this.walletTransfersService.transferMarketPlacePurchase(userId, marketPlaceProduct);
 
   }
@@ -104,8 +109,7 @@ export class MarketPlaceService {
     if (!marketPlaceProduct.userId) {
       marketPlaceProduct.userId = "ootopia";
       marketPlaceProduct.userName = "OOTOPIA Team";
-      marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/woman_pic.PNG";
-
+      marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
     }
     return marketPlaceProduct;
   }

@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, Query, UseGuards, Req, HttpCode } from '@nestjs/common';
 import { MarketPlaceService } from './market-place.service';
 import { MarketPlaceByIdDto, MarketPlaceDto, MarketPlaceFilterDto } from './dto/create-market-place.dto';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
 import { SentryInterceptor } from 'src/interceptors/sentry.interceptor';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { MarketPlacePurchaseCreateDto } from './dto/market-place-purchase-create.dto';
 
 @Controller('market-place')
 export class MarketPlaceProductsController {
@@ -58,6 +59,7 @@ export class MarketPlaceProductsController {
   @ApiTags('market-place')
   @ApiOperation({ summary: "Make purchase" })
   @ApiBearerAuth('Bearer')
+  @ApiBody({ type: MarketPlacePurchaseCreateDto })
   @ApiParam({ name : "id", type: "string", description: "Market Place Product ID" })
   @ApiResponse({ status: 200, description: 'Successfully created' })
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
@@ -66,9 +68,8 @@ export class MarketPlaceProductsController {
   @UseGuards(JwtAuthGuard)
   @Post('/:id/purchase')
   @HttpCode(201)
-  async purchase(@Req() { user }, @Param('id') id : string) {
+  async purchase(@Req() { user }, @Param('id') id : string,  @Body() data : MarketPlacePurchaseCreateDto) {
     try {
-
       return await this.marketPlaceService.purchase(id, user.id);
     }
     catch (error) {
