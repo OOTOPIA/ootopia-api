@@ -8,12 +8,12 @@ import { SentryInterceptor } from 'src/interceptors/sentry.interceptor';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('market-place')
-export class MarketPlaceController {
+export class MarketPlaceProductsController {
   constructor(private readonly marketPlaceService: MarketPlaceService) {}
-
 
   @UseInterceptors(SentryInterceptor)
   @ApiTags('market-place')
+  @ApiBearerAuth('Bearer')
   @ApiOperation({ summary: "Returns a list of Market Place" })
   @ApiQuery({ name : "limit", type: "number", description: "Limit of entries (50 max.)", required: false })
   @ApiQuery({ name : "offset", type: "number", required: false })
@@ -21,6 +21,7 @@ export class MarketPlaceController {
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getMarketPlaces(@Query() filters : MarketPlaceFilterDto) {
     try {
@@ -55,13 +56,15 @@ export class MarketPlaceController {
 
   @UseInterceptors(SentryInterceptor)
   @ApiTags('market-place')
+  @ApiBearerAuth('Bearer')
   @ApiOperation({ summary: "Return Market Place by id" })
   @ApiResponse({ status: 200, type: MarketPlaceDto })
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+  @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  async getMarketPlaceById(@Param('id') id : string) {
+  async getMarketPlaceProductById(@Param('id') id : string) {
     try {
 
       // return {
@@ -77,7 +80,7 @@ export class MarketPlaceController {
       //   userLocation:  "BR",
       // }
 
-      return this.marketPlaceService.getMarketPlacesByStrapidId(id);
+      return this.marketPlaceService.getMarketPlaceProductById(id);
     }
     catch (error) {
       new ErrorHandling(error);

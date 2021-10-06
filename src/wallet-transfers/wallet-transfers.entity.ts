@@ -1,5 +1,5 @@
 
-import { MarketPlace } from 'src/market-place/entities/market-place.entity';
+import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
 import { Posts } from 'src/posts/posts.entity';
 import { Wallets } from 'src/wallets/wallets.entity';
 import {
@@ -62,7 +62,7 @@ export class WalletTransfers extends BaseEntity {
   @JoinColumn({ name: "post_id" })
   postId? : string;
 
-  @ManyToOne(type => MarketPlace, marketPlace => marketPlace.id, { nullable : true })
+  @ManyToOne(type => MarketPlaceProducts, marketPlace => marketPlace.id, { nullable : true })
   @JoinColumn({ name: "market_place_id" })
   marketPlaceId? : string;
 

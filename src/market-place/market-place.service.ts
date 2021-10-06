@@ -77,19 +77,18 @@ export class MarketPlaceService {
     await this.marketPlaceRepository.deleteMarketPlace(entryId);
   }
 
-  async getMarketPlaces(filters: MarketPlaceFilterDto) {
+  async getMarketPlaceProducts(filters: MarketPlaceFilterDto) {
 
     // return await this.marketPlaceRepository.getByStrapiId(filters);
   }
 
-  async getMarketPlacesById(id : String) {
-    return await this.marketPlaceRepository.getByStrapiId(id);
+  async getMarketPlaceProductById(id : string) {
+    return await this.marketPlaceRepository.getById(id);
   }
 
-  async getMarketPlacesByStrapidId(id : String) {
+  async getMarketPlaceProductByStrapiId(id : string) {
     return await this.marketPlaceRepository.getByStrapiId(id);
   }
-   
 
   async purchase(marketPlaceId : string, userId : string) {
     let userWallet = await this.walletsService.getWalletByUserId(userId);

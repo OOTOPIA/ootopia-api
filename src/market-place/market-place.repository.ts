@@ -1,12 +1,12 @@
 import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection, IsNull } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
-import { MarketPlace } from "./entities/market-place.entity";
+import { MarketPlaceProducts } from "./entities/market-place-products.entity";
 import { MarketPlaceDto, MarketPlaceFilterDto} from "./dto/create-market-place.dto";
 
 @Injectable()
-@EntityRepository(MarketPlace)
-export class MarketPlaceRepository extends Repository<MarketPlace>{
+@EntityRepository(MarketPlaceProducts)
+export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
 
     constructor(
     ) {
@@ -46,9 +46,15 @@ export class MarketPlaceRepository extends Repository<MarketPlace>{
 
     }
 
+    getById(id : string) {
+        return this.findOne({
+            where : { id, deletedAt : IsNull() }
+        });
+    }
+
     getByStrapiId(strapiId) {
         return this.findOne({
-            where :{ strapiId }
+            where : { strapiId }
         });
     }
 

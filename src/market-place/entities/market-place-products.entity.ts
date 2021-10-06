@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class MarketPlace extends BaseEntity {
+export class MarketPlaceProducts extends BaseEntity {
 
     @PrimaryGeneratedColumn("uuid")
     id : string;
