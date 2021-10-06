@@ -9,7 +9,8 @@ export class StrapiService {
     ){};
 
     async webhook(data) {
-
+        console.log(data,'kole');
+        
         if (!data) {
             return;
         }
@@ -20,8 +21,10 @@ export class StrapiService {
                     await this.sqsWorkerService.sendStrapiWebhookMessage(data);
                 }
             break;
-            case "market-places":
+            case "market-place":
                 if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
+                    console.log('chegou aqui no minimo ?');
+                    
                     await this.sqsWorkerService.sendStrapiWebhookMessage(data);
                 }
             break;

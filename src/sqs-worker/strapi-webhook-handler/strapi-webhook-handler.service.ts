@@ -27,7 +27,9 @@ export class StrapiWebhookHandlerService {
                         await this.deleteLearningTrack(data.entry.id);
                     }
                 break;
-                case "market-places":
+                case "market-place":
+                    console.log('opa do epa');
+                    
                     if (data.event == "entry.publish" || data.event == "entry.update") {
                         await this.createOrUpdateMarketPlaces(data.entry, data.event);
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {

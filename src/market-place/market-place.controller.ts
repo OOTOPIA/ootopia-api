@@ -45,7 +45,7 @@ export class MarketPlaceController {
           userLocation:  "BR",
         });
       }
-
+      // return this.marketPlaceService.getMarketPlaces()
       return marketPlace;
 
     } catch (error) {
@@ -61,7 +61,7 @@ export class MarketPlaceController {
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
   @Get('/:id')
-  async getMarketPlaceById(@Param('id') id: MarketPlaceByIdDto) {
+  async getMarketPlaceById(@Param('id') id: string) {
     try {
 
       // return {
@@ -77,7 +77,7 @@ export class MarketPlaceController {
       //   userLocation:  "BR",
       // }
 
-      return this.marketPlaceService.getLearningTracks(id);
+      return this.marketPlaceService.getMarketPlacesByStrapidId(id);
     }
     catch (error) {
       new ErrorHandling(error);

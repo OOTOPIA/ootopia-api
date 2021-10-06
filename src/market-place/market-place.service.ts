@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MarketPlaceByIdDto, MarketPlaceDto } from './dto/create-market-place.dto';
+import { MarketPlaceByIdDto, MarketPlaceDto, MarketPlaceFilterDto } from './dto/create-market-place.dto';
 import { MarketPlaceRepository } from './market-place.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
@@ -16,6 +16,9 @@ export class MarketPlaceService {
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
+    console.log('Comp cas pow saao');
+    
+    try {
     let findMarketPlace = await this.marketPlaceRepository.getByStrapiId(marketPlaceData.id);
 
     if (strapiEvent == "entry.update" && (!findMarketPlace || !marketPlaceData.published_at)) { 
@@ -60,21 +63,41 @@ export class MarketPlaceService {
 
     console.log(' OPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', marketPlace);
 
-    return
     return await this.marketPlaceRepository.createOrUpdate(marketPlace);
+  }
+  catch(error) {
+    console.log(error);
+    return
+  }
   }
 
   async deleteMarketPlaces(entryId) {
     await this.marketPlaceRepository.deleteMarketPlace(entryId);
   }
 
-  async getLearningTracks(id : MarketPlaceByIdDto) {
+  async getMarketPlaces(filters: MarketPlaceFilterDto) {
+
+    // return await this.marketPlaceRepository.getByStrapiId(filters);
+  }
+
+  async getMarketPlacesById(id : String) {
+    return await this.marketPlaceRepository.getByStrapiId(id);
+  }
+
+  async getMarketPlacesByStrapidId(id : String) {
     return await this.marketPlaceRepository.getByStrapiId(id);
   }
 
   async purchase(marketPlaceId : string, userId : string) {
-
-    
-
   }
+
+  private mapper(learningTrack) {
+    if (!learningTrack.userId) {
+        learningTrack.userId = "ootopia";
+        learningTrack.userName = "OOTOPIA Team";
+        learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/woman_pic.PNG";
+    }
+    learningTrack.ooz = +learningTrack.ooz;
+    return learningTrack;
+}
 }
