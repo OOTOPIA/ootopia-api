@@ -18,9 +18,7 @@ export class MarketPlaceService {
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
-    console.log('Comp cas pow saao');
     
-    try {
     let findMarketPlace = await this.marketPlaceRepository.getByStrapiId(marketPlaceData.id);
 
     if (strapiEvent == "entry.update" && (!findMarketPlace || !marketPlaceData.published_at)) { 
@@ -48,29 +46,22 @@ export class MarketPlaceService {
     }
 
     let marketPlace : any = {
-        id : marketPlaceData.id,
-        strapiId : marketPlaceData.strapiId,
-        userId : marketPlaceData.userId,
-        title : marketPlaceData.title,
-        description : marketPlaceData.description || "",
-        locale : marketPlaceData.locale,
-        imageUrl : imageUrl,
-        imageUpdatedAt  : marketPlaceData.photo ? marketPlaceData.photo.updated_at : null,
-        price : marketPlaceData.price,
-        location : marketPlaceData.location || "",
-        deletedAt : null,
-        createdAt : marketPlaceData.created_at,
-        updatedAt : marketPlaceData.updated_at,
+      id : marketPlaceData.id,
+      strapiId : marketPlaceData.strapiId,
+      userId : marketPlaceData.userId,
+      title : marketPlaceData.title,
+      description : marketPlaceData.description || "",
+      locale : marketPlaceData.locale,
+      imageUrl : imageUrl,
+      imageUpdatedAt  : marketPlaceData.photo ? marketPlaceData.photo.updated_at : null,
+      price : marketPlaceData.price,
+      location : marketPlaceData.location || "",
+      deletedAt : null,
+      createdAt : marketPlaceData.created_at,
+      updatedAt : marketPlaceData.updated_at,
     };
 
-    console.log(' OPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', marketPlace);
-
     return await this.marketPlaceRepository.createOrUpdate(marketPlace);
-  }
-  catch(error) {
-    console.log(error);
-    return
-  }
   }
 
   async deleteMarketPlaces(entryId) {
@@ -78,16 +69,28 @@ export class MarketPlaceService {
   }
 
   async getMarketPlaceProducts(filters: MarketPlaceFilterDto) {
-
-    // return await this.marketPlaceRepository.getByStrapiId(filters);
+    let marketPlaceProducts = await this.marketPlaceRepository.getMarketPlaceProducts(filters);
+    return marketPlaceProducts.map(this.mapper);
   }
 
   async getMarketPlaceProductById(id : string) {
-    return await this.marketPlaceRepository.getById(id);
+    let marketPlaceProduct = await this.marketPlaceRepository.getById(id);
+    
+    if (!marketPlaceProduct) {
+      return {};
+    }
+
+    return this.mapper(marketPlaceProduct);
   }
 
-  async getMarketPlaceProductByStrapiId(id : string) {
-    return await this.marketPlaceRepository.getByStrapiId(id);
+  async getMarketPlaceProductByStrapiId(id : number) {
+    let marketPlaceProduct = await this.marketPlaceRepository.getByStrapiId(id);
+
+    if (!marketPlaceProduct) {
+      return {};
+    }
+
+    return this.mapper(marketPlaceProduct);
   }
 
   async purchase(marketPlaceProductId : string, userId : string) {
@@ -103,7 +106,6 @@ export class MarketPlaceService {
         learningTrack.userName = "OOTOPIA Team";
         learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/woman_pic.PNG";
     }
-    learningTrack.ooz = +learningTrack.ooz;
     return learningTrack;
-}
+  }
 }

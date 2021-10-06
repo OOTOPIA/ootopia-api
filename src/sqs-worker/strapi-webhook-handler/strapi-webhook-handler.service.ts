@@ -17,8 +17,6 @@ export class StrapiWebhookHandlerService {
 
             let data : any = JSON.parse(message.Body);
 
-            console.log("Message received at", new Date(), "Message ID:", message.MessageId);
-
             switch(data.model) {
                 case "learning-tracks":
                     if (data.event == "entry.publish" || data.event == "entry.update") {
@@ -28,8 +26,6 @@ export class StrapiWebhookHandlerService {
                     }
                 break;
                 case "market-place":
-                    console.log('opa do epa');
-                    
                     if (data.event == "entry.publish" || data.event == "entry.update") {
                         await this.createOrUpdateMarketPlaces(data.entry, data.event);
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
@@ -38,17 +34,12 @@ export class StrapiWebhookHandlerService {
                 break;
             }
 
-            console.log("Message read successfully at", new Date(), "Message ID:", message.MessageId);
-
         }catch(err) {
-            console.log("SQS 'strapi_webhook' Error:", err);
             throw err;
         }
     }
 
     async createOrUpdateLearningTrack(entry, event : string) {
-        console.log("received data from strapi webhook", entry);
-
         await this.learningTracksService.createOrUpdate(entry, event);
     }
 
@@ -57,8 +48,6 @@ export class StrapiWebhookHandlerService {
     }
 
     async createOrUpdateMarketPlaces(entry, event : string) {
-        console.log("received data from strapi webhook", entry, event);
-
         await this.marketPlaceService.createOrUpdate(entry, event);
     }
 

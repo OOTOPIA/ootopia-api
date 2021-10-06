@@ -19,7 +19,7 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
         return this.save(marketPlace);
     }
 
-    getMarketPlaces(filters : MarketPlaceFilterDto) {
+    async getMarketPlaceProducts(filters : MarketPlaceFilterDto) {
 
         let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
 
@@ -37,7 +37,7 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
             where.locale = locale;
         }
         
-        return this.createQueryBuilder("market-place")
+        return await this.createQueryBuilder()
             .where(where)
             .orderBy("strapi_id", "DESC")
             .limit(limit)
@@ -46,14 +46,14 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
 
     }
 
-    getById(id : string) {
-        return this.findOne({
+    async getById(id : string) {
+        return await this.findOne({
             where : { id, deletedAt : IsNull() }
         });
     }
 
-    getByStrapiId(strapiId) {
-        return this.findOne({
+    async getByStrapiId(strapiId? :number) {
+        return await this.findOne({
             where : { strapiId }
         });
     }
