@@ -6,6 +6,7 @@ import { getConnection, In, QueryRunner } from 'typeorm';
 import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
+import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
 
 @Injectable()
 export class WalletTransfersService {
@@ -248,6 +249,41 @@ export class WalletTransfersService {
 
     async getTransfersNotProcessedInThisPeriod(userId : string, startDateTime : Date) {
         return await this.walletTransfersRepository.getTransfersNotProcessedInThisPeriod(userId, startDateTime);
+    }
+
+    async transferMarketPlacePurchase(userId : string, marketPlaceProduct : MarketPlaceProducts) {
+
+        let userWallet = await this.walletsService.getWalletByUserId(userId);
+
+        if ((+userWallet.totalBalance - +marketPlaceProduct.price) < 0) {
+            throw new HttpException("INSUFFICIENT_BALANCE", 400);
+        }
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(await this.createTransfer(userId, {
+                userId : userId,
+                walletId : userWallet.id,
+                balance : +marketPlaceProduct.price,
+                origin : Origin.MARKET_PLACE_TRANSFER,
+                action : WalletTransferAction.SENT,
+                fromPlatform : true,
+                processed : true
+            }, true));
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(userWallet.id, userId, +marketPlaceProduct.price));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
     }
 
 }

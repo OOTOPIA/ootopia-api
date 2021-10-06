@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { MarketPlaceByIdDto, MarketPlaceDto, MarketPlaceFilterDto } from './dto/create-market-place.dto';
 import { MarketPlaceRepository } from './market-place.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
-import { WalletsService } from 'src/wallets/wallets.service';
+import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 
 const axios = Axios.default;
 
@@ -14,7 +14,7 @@ export class MarketPlaceService {
   constructor(
     private marketPlaceRepository: MarketPlaceRepository,
     private filesUploadService : FilesUploadService,
-    private walletsService : WalletsService,
+    private walletTransfersService : WalletTransfersService,
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
@@ -90,8 +90,11 @@ export class MarketPlaceService {
     return await this.marketPlaceRepository.getByStrapiId(id);
   }
 
-  async purchase(marketPlaceId : string, userId : string) {
-    let userWallet = await this.walletsService.getWalletByUserId(userId);
+  async purchase(marketPlaceProductId : string, userId : string) {
+
+    let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
+    await this.walletTransfersService.transferMarketPlacePurchase(userId, marketPlaceProduct);
+
   }
 
   private mapper(learningTrack) {
