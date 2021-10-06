@@ -100,12 +100,13 @@ export class MarketPlaceService {
 
   }
 
-  private mapper(learningTrack) {
-    if (!learningTrack.userId) {
-        learningTrack.userId = "ootopia";
-        learningTrack.userName = "OOTOPIA Team";
-        learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/woman_pic.PNG";
+  private mapper(marketPlaceProduct) {
+    if (!marketPlaceProduct.userId) {
+      marketPlaceProduct.userId = "ootopia";
+      marketPlaceProduct.userName = "OOTOPIA Team";
+      marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/woman_pic.PNG";
+
     }
-    return learningTrack;
+    return marketPlaceProduct;
   }
 }

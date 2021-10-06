@@ -35,6 +35,7 @@ export class StrapiWebhookHandlerService {
             }
 
         }catch(err) {
+            console.log("SQS 'strapi_webhook' Error:", err);
             throw err;
         }
     }
