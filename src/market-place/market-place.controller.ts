@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, Query, UseGuards, Req } from '@nestjs/common';
 import { MarketPlaceService } from './market-place.service';
 import { MarketPlaceByIdDto, MarketPlaceDto, MarketPlaceFilterDto } from './dto/create-market-place.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
 import { SentryInterceptor } from 'src/interceptors/sentry.interceptor';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('market-place')
 export class MarketPlaceController {
@@ -83,23 +84,25 @@ export class MarketPlaceController {
     }
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.marketPlaceService.findAll();
-  // }
+  @UseInterceptors(SentryInterceptor)
+  @ApiTags('market-place')
+  @ApiOperation({ summary: "Make purchase" })
+  @ApiBearerAuth('Bearer')
+  @ApiParam({ name : "id", type: "string", description: "Market Place Product ID" })
+  @ApiResponse({ status: 200, type: MarketPlaceDto })
+  @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+  @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+  @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+  @UseGuards(JwtAuthGuard)
+  @Post('/:id/purchase')
+  async purchase(@Req() { user }, @Param('id') id : string) {
+    try {
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.marketPlaceService.findOne(+id);
-  // }
+      return await this.marketPlaceService.purchase(id, user.id);
+    }
+    catch (error) {
+      new ErrorHandling(error);
+    }
+  }
 
-  // @Put(':id')
-  // update(@Param('id') id: string, @Body() updateMarketPlaceDto: UpdateMarketPlaceDto) {
-  //   return this.marketPlaceService.update(+id, updateMarketPlaceDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.marketPlaceService.remove(+id);
-  // }
 }

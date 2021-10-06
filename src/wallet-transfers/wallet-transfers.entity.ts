@@ -1,4 +1,5 @@
 
+import { MarketPlace } from 'src/market-place/entities/market-place.entity';
 import { Posts } from 'src/posts/posts.entity';
 import { Wallets } from 'src/wallets/wallets.entity';
 import {
@@ -31,6 +32,7 @@ export enum Origin {
   INVITATION_CODE = "invitation_code",
   INVITATION_CODE_SENT = "invitation_code_sent",
   INVITATION_CODE_ACCEPTED = "invitation_code_accepted",
+  MARKET_PLACE_TRANSFER = "market_place_transfer",
 };
 
 export enum WalletTransferAction {
@@ -59,6 +61,13 @@ export class WalletTransfers extends BaseEntity {
   @ManyToOne(type => Posts, post => post.id, { nullable : true })
   @JoinColumn({ name: "post_id" })
   postId? : string;
+
+  @ManyToOne(type => MarketPlace, marketPlace => marketPlace.id, { nullable : true })
+  @JoinColumn({ name: "market_place_id" })
+  marketPlaceId? : string;
+
+  @Column({ nullable : true, type: 'simple-json', name : 'market_place_data'})
+  marketPlaceData : any;
 
   @Column({ 
     nullable: true, 

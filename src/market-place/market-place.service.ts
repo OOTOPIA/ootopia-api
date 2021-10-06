@@ -71,4 +71,10 @@ export class MarketPlaceService {
   async getLearningTracks(id : MarketPlaceByIdDto) {
     return await this.marketPlaceRepository.getByStrapiId(id);
   }
+
+  async purchase(marketPlaceId : string, userId : string) {
+
+    
+
+  }
 }
