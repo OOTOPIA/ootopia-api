@@ -22,7 +22,7 @@ export class MarketPlaceController {
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
   @Get()
-  async getHistory(@Query() filters : MarketPlaceFilterDto) {
+  async getMarketPlaces(@Query() filters : MarketPlaceFilterDto) {
     try {
 
       if (filters.offset > 10) {
@@ -61,7 +61,7 @@ export class MarketPlaceController {
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
   @Get('/:id')
-  async getMarketPlaceById(@Param('id') id: string) {
+  async getMarketPlaceById(@Param('id') id : string) {
     try {
 
       // return {

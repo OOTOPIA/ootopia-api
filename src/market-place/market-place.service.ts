@@ -4,6 +4,7 @@ import { MarketPlaceRepository } from './market-place.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
+import { WalletsService } from 'src/wallets/wallets.service';
 
 const axios = Axios.default;
 
@@ -13,6 +14,7 @@ export class MarketPlaceService {
   constructor(
     private marketPlaceRepository: MarketPlaceRepository,
     private filesUploadService : FilesUploadService,
+    private walletsService : WalletsService,
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
@@ -87,8 +89,10 @@ export class MarketPlaceService {
   async getMarketPlacesByStrapidId(id : String) {
     return await this.marketPlaceRepository.getByStrapiId(id);
   }
+   
 
   async purchase(marketPlaceId : string, userId : string) {
+    let userWallet = await this.walletsService.getWalletByUserId(userId);
   }
 
   private mapper(learningTrack) {
