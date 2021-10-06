@@ -45,11 +45,22 @@ const sqs = new AWS.SQS({
             name: "daily_goal_distribution",
             queueUrl: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE,
             sqs : sqs,
+          },
+          {
+            name: "strapi_webhook",
+            queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
+            sqs : sqs,
           }],
           producers: [{
             name: "daily_goal_distribution",
             queueUrl: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE,
             region: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE_REGION,
+            sqs: sqs,
+          },
+          {
+            name: "strapi_webhook",
+            queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
+            region: process.env.SQS_STRAPI_WEBHOOK_QUEUE_REGION,
             sqs: sqs,
           }],
         };

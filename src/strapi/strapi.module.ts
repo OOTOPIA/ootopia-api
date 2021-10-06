@@ -1,9 +1,14 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { StrapiService } from './strapi.service';
-import { LearningTracksService } from './learning-tracks/learning-tracks.service';
+import { StrapiController } from './strapi.controller';
+import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 
 @Module({
-  providers: [StrapiService, LearningTracksService],
+  imports: [
+    forwardRef(() => SqsWorkerModule)
+  ],
+  providers: [StrapiService],
   exports: [StrapiService],
+  controllers: [StrapiController],
 })
 export class StrapiModule {}

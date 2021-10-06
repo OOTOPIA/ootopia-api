@@ -1,14 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { LearningTracksService } from './learning-tracks/learning-tracks.service';
-import { LearningTracksInterface } from './strapi.interface';
+import { SqsWorkerService } from 'src/sqs-worker/sqs-worker.service';
 
 @Injectable()
 export class StrapiService {
-    
-    learningTracks : LearningTracksInterface;
 
-    constructor(learningTracks : LearningTracksService){
-        this.learningTracks = learningTracks;
-    };
+    constructor(
+        private readonly sqsWorkerService : SqsWorkerService,
+    ){};
+
+    async webhook(data) {
+
+        if (!data) {
+            return;
+        }
+
+        switch(data.model) {
+            case "learning-tracks":
+                if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
+                    await this.sqsWorkerService.sendStrapiWebhookMessage(data);
+                }
+            break;
+        }
+
+        return { "status" : "success" };
+
+    }
 
 }

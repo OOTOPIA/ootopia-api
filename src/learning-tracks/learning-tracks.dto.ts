@@ -17,6 +17,9 @@ export class ChapterDto {
     videoThumbUrl : string;
 
     @ApiProperty()
+    time : string;
+
+    @ApiProperty()
     ooz : number;
 
     @ApiProperty()
@@ -54,7 +57,7 @@ export class LearningTrackDto {
     totalTimeInMinutes : number;
 
     @ApiProperty()
-    location : string;
+    location? : string;
 
     @ApiProperty({isArray : true, type: ChapterDto})
     chapters : ChapterDto;
@@ -69,10 +72,20 @@ export class LearningTrackDto {
 
 export class LearningTracksFilterDto {
 
-    @ApiProperty({ type: "number", required: false })
-    limit : number;
+    @ApiProperty({ type: "string", required: true, enum: ["en", "pt-BR"] })
+    locale : string;
 
     @ApiProperty({ type: "number", required: false })
-    offset : number;
+    limit? : number;
+
+    @ApiProperty({ type: "number", required: false })
+    offset? : number;
+
+}
+
+export class LastLearningTracksFilterDto {
+
+    @ApiProperty({ type: "string", required: true, enum: ["en", "pt-BR"] })
+    locale : string;
 
 }

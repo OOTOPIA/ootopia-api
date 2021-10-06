@@ -216,8 +216,7 @@ export class PostsService {
     return result;
   }
 
-  private async calcOOZToTransferForPostVideos(durationInSecs : number) {
-    console.log("uai so", durationInSecs);
+  async calcOOZToTransferForPostVideos(durationInSecs : number) {
     const oozToReward = +(
       await this.generalConfigService.getConfig(
         ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO,
