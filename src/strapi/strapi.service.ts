@@ -9,7 +9,8 @@ export class StrapiService {
     ){};
 
     async webhook(data) {
-
+        console.log(data,'kole');
+        
         if (!data) {
             return;
         }
@@ -17,6 +18,13 @@ export class StrapiService {
         switch(data.model) {
             case "learning-tracks":
                 if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
+                    await this.sqsWorkerService.sendStrapiWebhookMessage(data);
+                }
+            break;
+            case "market-place":
+                if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
+                    console.log('chegou aqui no minimo ?');
+                    
                     await this.sqsWorkerService.sendStrapiWebhookMessage(data);
                 }
             break;

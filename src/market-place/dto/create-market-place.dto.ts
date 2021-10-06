@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 export class MarketPlaceDto {
 
     @ApiProperty()
-    id : number;
+    id : string;
 
     @ApiProperty()
     title : string;
@@ -41,4 +41,15 @@ export class MarketPlaceFilterDto {
 
     @ApiProperty({ type: "number", required: false })
     offset : number;
+
+    @ApiProperty({ type: "string", required: true, enum: ["en", "pt-BR"] })
+    locale : string;
+
+}
+
+export class MarketPlaceByIdDto {
+    
+    @ApiProperty({ type: "string", required: true })
+    id : string;
+
 }

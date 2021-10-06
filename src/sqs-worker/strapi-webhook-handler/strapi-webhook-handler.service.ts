@@ -1,12 +1,15 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SqsMessageHandler } from "@ssut/nestjs-sqs";
 import { LearningTracksService } from 'src/learning-tracks/learning-tracks.service';
+import { MarketPlaceService } from 'src/market-place/market-place.service';
 
 @Injectable()
 export class StrapiWebhookHandlerService {
 
     constructor(
-        private readonly learningTracksService : LearningTracksService){}
+        private readonly learningTracksService : LearningTracksService,
+        private readonly marketPlaceService : MarketPlaceService
+    ){}
 
     @SqsMessageHandler('strapi_webhook', false)
     public async handleMessage(message: AWS.SQS.Message) {
@@ -22,6 +25,15 @@ export class StrapiWebhookHandlerService {
                         await this.createOrUpdateLearningTrack(data.entry, data.event);
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
                         await this.deleteLearningTrack(data.entry.id);
+                    }
+                break;
+                case "market-place":
+                    console.log('opa do epa');
+                    
+                    if (data.event == "entry.publish" || data.event == "entry.update") {
+                        await this.createOrUpdateMarketPlaces(data.entry, data.event);
+                    }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
+                        await this.deleteMarketPlaces(data.entry.id);
                     }
                 break;
             }
@@ -42,6 +54,16 @@ export class StrapiWebhookHandlerService {
 
     async deleteLearningTrack(entryId) {
         await this.learningTracksService.deleteLearningTrack(entryId);
+    }
+
+    async createOrUpdateMarketPlaces(entry, event : string) {
+        console.log("received data from strapi webhook", entry, event);
+
+        await this.marketPlaceService.createOrUpdate(entry, event);
+    }
+
+    async deleteMarketPlaces(entryId) {
+        await this.marketPlaceService.deleteMarketPlaces(entryId);
     }
 
 }
