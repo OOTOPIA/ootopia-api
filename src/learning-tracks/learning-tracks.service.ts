@@ -112,8 +112,8 @@ export class LearningTracksService {
     private mapper(learningTrack) {
         if (!learningTrack.userId) {
             learningTrack.userId = "ootopia";
-            learningTrack.userName = "OOTOPIA Team";
-            learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/woman_pic.PNG";
+            learningTrack.userName = "OOTOPIA";
+            learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
         }
         learningTrack.ooz = +learningTrack.ooz;
         return learningTrack;
