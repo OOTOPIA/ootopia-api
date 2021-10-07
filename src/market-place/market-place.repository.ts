@@ -68,7 +68,7 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
             }
         });
         if (!data) {
-            throw new HttpException("Permission denied", 403);
+            return;
         }
         data.deletedAt = new Date();
         return await this.save(data);
