@@ -31,7 +31,7 @@ export class LearningTracksService {
         }
 
         let uploadNewImage = learningTrackData.photo != null;
-        let photoUrl = learningTrackData.photo ? (learningTrackData.photo.formats?.large?.url || learningTrackData.photo.formats?.medium?.url || learningTrackData.photo.formats?.small?.url) : ""; 
+        let photoUrl = learningTrackData.photo ? (learningTrackData.photo.formats?.large?.url || learningTrackData.photo.formats?.medium?.url || learningTrackData.photo.formats?.small?.url || learningTrackData.photo.formats?.thumbnail?.url) : ""; 
         let imageUrl = learningTrackData.photo ? `${process.env.STRAPI_URL}${photoUrl}` : "";
 
         if (findLearningTrack) {
@@ -39,6 +39,7 @@ export class LearningTracksService {
             uploadNewImage = learningTrackData.photo && moment(learningTrackData.photo.updated_at) > moment(findLearningTrack.imageUpdatedAt);
             learningTrackData.id = findLearningTrack.id;
             learningTrackData.strapiId = strapiId;
+            imageUrl = learningTrackData.imageUrl;
         }else{
             learningTrackData.strapiId = learningTrackData.id;
             delete learningTrackData.id;
