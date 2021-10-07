@@ -27,7 +27,7 @@ export class MarketPlaceService {
     }
 
     let uploadNewImage = marketPlaceData.photo != null;
-    let photoUrl = marketPlaceData.photo ? (marketPlaceData.photo.formats?.large?.url || marketPlaceData.photo.formats?.medium?.url || marketPlaceData.photo.formats?.small?.url) : ""; 
+    let photoUrl = marketPlaceData.photo ? (marketPlaceData.photo.formats?.large?.url || marketPlaceData.photo.formats?.medium?.url || marketPlaceData.photo.formats?.small?.url || marketPlaceData.photo.formats?.thumbnail?.url) : ""; 
     let imageUrl = marketPlaceData.photo ? `${process.env.STRAPI_URL}${photoUrl}` : "";
 
     if (findMarketPlace) {
@@ -35,6 +35,7 @@ export class MarketPlaceService {
         uploadNewImage = marketPlaceData.photo && moment(marketPlaceData.photo.updated_at) > moment(findMarketPlace.imageUpdatedAt);
         marketPlaceData.id = findMarketPlace.id;
         marketPlaceData.strapiId = strapiId;
+        imageUrl = findMarketPlace.imageUrl;
     } else {
       marketPlaceData.strapiId = marketPlaceData.id;
       delete marketPlaceData.id;

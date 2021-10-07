@@ -222,6 +222,10 @@ export class WalletTransfersService {
         }
         return (await this.walletTransfersRepository.getTransfers(filters)).map((transfer) => {
             transfer.balance = ((+transfer.balance).toFixed(2));
+            if (transfer.marketPlaceData) {
+                transfer.marketPlaceData = JSON.parse(transfer.marketPlaceData);
+                transfer.photoUrl = transfer.marketPlaceData.imageUrl;
+            }
             return transfer;
         });
     }
@@ -279,7 +283,7 @@ export class WalletTransfersService {
                 processed : true
             }, true));
 
-            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(userWallet.id, userId, +marketPlaceProduct.price));
+            await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(userWallet.id, userId, +marketPlaceProduct.price));
 
             await queryRunner.commitTransaction();
 
