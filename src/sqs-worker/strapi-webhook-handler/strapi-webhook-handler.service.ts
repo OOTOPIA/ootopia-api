@@ -20,16 +20,40 @@ export class StrapiWebhookHandlerService {
             switch(data.model) {
                 case "learning-tracks":
                     if (data.event == "entry.publish" || data.event == "entry.update") {
-                        await this.createOrUpdateLearningTrack(data.entry, data.event);
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.createOrUpdateLearningTrack(entry, data.event);
+                        }
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
-                        await this.deleteLearningTrack(data.entry.id);
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.deleteLearningTrack(entry.id);
+                        }
                     }
                 break;
                 case "market-place":
                     if (data.event == "entry.publish" || data.event == "entry.update") {
-                        await this.createOrUpdateMarketPlaces(data.entry, data.event);
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.createOrUpdateMarketPlaces(entry, data.event);
+                        }
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
-                        await this.deleteMarketPlaces(data.entry.id);
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.deleteMarketPlaces(entry.id);
+                        }
                     }
                 break;
             }
