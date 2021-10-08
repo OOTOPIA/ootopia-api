@@ -23,6 +23,9 @@ export class ChapterDto {
     ooz : number;
 
     @ApiProperty()
+    completed : boolean;
+
+    @ApiProperty()
     createdAt : Date;
 
     @ApiProperty()

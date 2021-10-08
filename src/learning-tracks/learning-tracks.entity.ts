@@ -52,6 +52,9 @@ export class LearningTracks extends BaseEntity {
     @Column({ nullable: true, type: 'simple-json' })
     chapters : any;
 
+    @Column({ nullable : false, type: 'boolean', default: () => "false" })
+    completed : boolean;
+
     @Column({nullable : true, name: 'deleted_at', type: 'timestamp'})
     deletedAt: Date;
 

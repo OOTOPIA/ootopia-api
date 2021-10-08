@@ -6,6 +6,8 @@ import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
 import { VideoService } from 'src/video/video.service';
 import { PostsService } from 'src/posts/posts.service';
+import { GeneralConfigService } from 'src/general-config/general-config.service';
+import { ConfigName } from 'src/general-config/general-config.entity';
 
 const axios = Axios.default;
 
@@ -16,7 +18,7 @@ export class LearningTracksService {
         private readonly learningTracksRepository : LearningTracksRepository,
         private readonly filesUploadService: FilesUploadService,
         private readonly videoService: VideoService,
-        private readonly postsService: PostsService,
+        private readonly generalConfigService: GeneralConfigService,
         ) {
 
     }
@@ -80,9 +82,10 @@ export class LearningTracksService {
                     chapter.videoUrl = videoDetails.playback.hls;
                     chapter.videoThumbUrl = videoDetails.thumbnail;
                     chapter.time = this.msToTime(videoDetails.duration * 1000); //convert duration to ms and get formatted time
-                    chapter.ooz = await this.postsService.calcOOZToTransferForPostVideos(videoDetails.duration);
+                    chapter.ooz = await this.calcOOZToTransferForChapter(videoDetails.duration);
                     learningTrack.ooz += chapter.ooz;
                     totalDurationInSecs += videoDetails.duration;
+                    chapter = this.mapperChapter(chapter);
                 }catch(err) {
                     console.log("Error when get video details " + chapter.video, err);
                     throw err;
@@ -135,6 +138,31 @@ export class LearningTracksService {
         seconds = (seconds < 10) ? "0" + seconds : seconds;
       
         return (+hours ? hours + "h " : "") + (+minutes ? minutes + "m " : (+hours ? "00m " : "")) + seconds + "s";
+
+    }
+
+    async calcOOZToTransferForChapter(durationInSecs) {
+        const oozToReward = +(
+            await this.generalConfigService.getConfig(
+                ConfigName.LEARNING_TRACK_PER_MINUTE_OF_WATCHED_VIDEO,
+            )
+        ).value;
+        const duration = +(durationInSecs).toFixed(0);
+        return +((oozToReward * (duration / 60)).toFixed(2));
+    }
+
+    private mapperChapter(chapter) {
+        return {
+            id : chapter.id,
+            title : chapter.title,
+            videoUrl : chapter.videoUrl,
+            videoThumbUrl : chapter.videoThumbUrl,
+            time : chapter.time,
+            ooz : chapter.ooz,
+            completed : chapter.completed,
+            createdAt : chapter.createdAt,
+            updatedAt : chapter.updatedAt,
+        }
     }
 
 }

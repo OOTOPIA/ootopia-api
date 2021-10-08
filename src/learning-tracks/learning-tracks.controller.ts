@@ -46,5 +46,22 @@ export class LearningTracksController {
             new ErrorHandling(error);
         }
     }
+
+    // @UseInterceptors(SentryInterceptor)
+    // @ApiTags('learning-tracks')
+    // @ApiOperation({ summary: "Returns last Learning Track" })
+    // @ApiQuery({ name : "locale", type: "string", enum: ["en", "pt-BR"], required: true })
+    // @ApiResponse({ status: 200, type: LearningTrackDto })
+    // @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    // @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    // @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+    // @Get('/last')
+    // async getLastLearningTrack(@Query() filters : LastLearningTracksFilterDto) {
+    //     try {
+    //         return this.learningTracksService.getLastLearningTrack(filters.locale);
+    //     } catch (error) {
+    //         new ErrorHandling(error);
+    //     }
+    // }
     
 }
