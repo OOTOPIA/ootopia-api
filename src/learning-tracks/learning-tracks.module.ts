@@ -7,6 +7,7 @@ import { LearningTracksRepository } from './learning-tracks.repository';
 import { FilesUploadModule } from 'src/files-upload/files-upload.module';
 import { VideoModule } from 'src/video/video.module';
 import { PostsModule } from 'src/posts/posts.module';
+import { GeneralConfigModule } from 'src/general-config/general-config.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PostsModule } from 'src/posts/posts.module';
     StrapiModule,
     FilesUploadModule,
     VideoModule,
+    GeneralConfigModule,
     forwardRef(() => PostsModule),
   ],
   providers: [LearningTracksService],
