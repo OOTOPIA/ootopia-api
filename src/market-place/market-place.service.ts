@@ -112,6 +112,7 @@ export class MarketPlaceService {
       marketPlaceProduct.userName = "OOTOPIA Team";
       marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
     }
+    marketPlaceProduct.price = +marketPlaceProduct.price;
     return marketPlaceProduct;
   }
 }
