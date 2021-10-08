@@ -20,6 +20,7 @@ import { InvitationsCode } from 'src/invitations-codes/entities/invitations-code
 import { UsersTrophies } from 'src/users/entities/users-trophies.entity';
 import { LearningTracks } from 'src/learning-tracks/learning-tracks.entity';
 import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
+import { LearningTrackCompletedChapters } from 'src/learning-tracks/entities/learning-track-completed-chapters.entity';
 
 require('dotenv').config();
 
@@ -86,6 +87,7 @@ class ConfigService {
           UsersTrophies,
           LearningTracks,
           MarketPlaceProducts,
+          LearningTrackCompletedChapters
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],

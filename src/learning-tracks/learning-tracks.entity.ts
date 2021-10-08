@@ -7,12 +7,6 @@ import {
     BaseEntity
 } from 'typeorm';
 
-enum TagType {
-    Top = "top",
-    Secondary = "secondary"
-}
-  
-  
 @Entity()
 export class LearningTracks extends BaseEntity {
 

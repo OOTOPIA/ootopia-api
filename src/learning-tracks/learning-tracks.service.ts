@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { LearningTracksFilterDto } from './learning-tracks.dto';
 import { LearningTracksRepository } from './learning-tracks.repository';
 import * as moment from 'moment-timezone';
@@ -159,10 +159,26 @@ export class LearningTracksService {
             videoThumbUrl : chapter.videoThumbUrl,
             time : chapter.time,
             ooz : chapter.ooz,
-            completed : chapter.completed,
+            completed : chapter.completed || false,
             createdAt : chapter.createdAt,
             updatedAt : chapter.updatedAt,
         }
+    }
+
+    async markLearningTrackChapterCompleted(learningTrackId : string, chapterId : string, userId : string) {
+
+        let learningTrack = await this.learningTracksRepository.getById(learningTrackId);
+
+        if (!learningTrack) {
+            throw new HttpException("LEARNING_TRACK_NOT_FOUND", 400);
+        }
+
+        let chapter = learningTrack.chapters.filter((c) => c.id == chapterId);
+
+        await this.learningTracksRepository.markChapterCompleted(learningTrackId, chapter.id, userId);
+
+        
+
     }
 
 }
