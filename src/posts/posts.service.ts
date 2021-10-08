@@ -120,7 +120,7 @@ export class PostsService {
         postResult.oozGenerated = transfer.balance;
       }else{
         const totalOOZ = await this.calcOOZToTransferForPostVideos(+(postData.durationInSecs).toFixed(1));
-        postResult.oozGenerated = totalOOZ.toFixed(2);
+        postResult.oozGenerated = totalOOZ;
       }
 
       return postResult;
@@ -223,7 +223,7 @@ export class PostsService {
       )
     ).value;
     const duration = +(durationInSecs).toFixed(0);
-    return oozToReward * (duration / 60);
+    return (oozToReward * (duration / 60)).toFixed(2);
   }
 
   async sendRewardToCreatorForPost(postId: string) {
