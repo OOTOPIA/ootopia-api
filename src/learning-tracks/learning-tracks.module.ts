@@ -8,11 +8,13 @@ import { FilesUploadModule } from 'src/files-upload/files-upload.module';
 import { VideoModule } from 'src/video/video.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { GeneralConfigModule } from 'src/general-config/general-config.module';
+import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       LearningTracksRepository,
+      LearningTrackCompletedChaptersRepository
     ]),
     StrapiModule,
     FilesUploadModule,

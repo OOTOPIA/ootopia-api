@@ -18,7 +18,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         return this.save(learningTrack);
     }
 
-    getLearningTracks(filters : LearningTracksFilterDto) {
+    async getLearningTracks(filters : LearningTracksFilterDto) {
 
         let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
 
@@ -73,7 +73,8 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         return await this.save(data);
     }
 
-    async markChapterCompleted(learningTrackId : string, chapterId : string, userId : string) {
+    async markChapterCompleted(learningTrackId, chapterId, userId) {
+        console.log('args', learningTrackId, chapterId, userId);
         await getConnection().query(`
             INSERT INTO learning_track_completed_chapters (learning_track_id, chapter_id, user_id)
             SELECT $1, $2, $3
