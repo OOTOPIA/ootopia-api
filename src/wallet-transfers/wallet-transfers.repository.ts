@@ -83,8 +83,8 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         }
         if (transfer.origin == Origin.LEARNING_TRACK) {
             transfer.icon = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/compass.png";
-            if (!transfer.otherUserName) {
-                transfer.otherUserName = "Ootopia";
+            if (!transfer.otherUsername) {
+                transfer.otherUsername = "Ootopia";
             }
         }
         return transfer;
