@@ -9,6 +9,8 @@ import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
+import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import { WalletsService } from 'src/wallets/wallets.service';
 
 const axios = Axios.default;
 
@@ -21,6 +23,8 @@ export class LearningTracksService {
         private readonly filesUploadService: FilesUploadService,
         private readonly videoService: VideoService,
         private readonly generalConfigService: GeneralConfigService,
+        private readonly walletsService: WalletsService,
+        private readonly walletTransfersService: WalletTransfersService,
         ) {
 
     }
@@ -105,8 +109,6 @@ export class LearningTracksService {
         let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
 
         let learningTracksIds : string[] = learningTracks.map((data) => data.id);
-
-        //console.log(">>>> learningTracks", learningTracks);
 
         if (learningTracks.length) {
             let chapters = await this.learningTrackCompletedChaptersRepository.getCompletedChaptersOfLearningTracks(learningTracksIds);
@@ -196,14 +198,25 @@ export class LearningTracksService {
 
         chapter = chapter[0];
 
-        console.log("testing!", chapter, chapterId);
+        var result = await this.learningTracksRepository.markChapterCompleted(learningTrackId, chapter.id, userId);
 
-        try {
+        //Se vier vazio, é porque o capitulo já foi marcado como completo, então não precisamos fazer nada
+        
+        if (result.length) {
 
-            await this.learningTracksRepository.markChapterCompleted(learningTrackId, chapter.id, userId);
+            let wallet = await this.walletsService.getWalletByUserId(userId);
 
-        }catch(err) {
-            console.log("ERRO AQUI", err);
+            let learningTrackTransfers = await this.walletTransfersService.getTransfers({
+                walletId : wallet.id,
+                learningTrackId : learningTrackId
+            });
+
+            if (!learningTrackTransfers.length) {
+                await this.walletTransfersService.transferLearningTrack(chapter.ooz || 0, learningTrackId, learningTrack.title, userId, wallet);
+            }else{
+                await this.walletTransfersService.updateLearningTrackTransfer(chapter.ooz || 0, learningTrackTransfers[0], userId, wallet);
+            }
+
         }
 
     }

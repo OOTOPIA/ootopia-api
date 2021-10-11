@@ -56,7 +56,7 @@ export class LearningTracksController {
     @ApiTags('learning-tracks')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Mark Learning Track chapter completed" })
-    @ApiResponse({ status: 200, type: LearningTrackDto })
+    @ApiResponse({ status: 200, description: 'Successfully marked complete' })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })

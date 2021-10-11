@@ -74,8 +74,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
     }
 
     async markChapterCompleted(learningTrackId, chapterId, userId) {
-        console.log('args', learningTrackId, chapterId, userId);
-        await getConnection().query(`
+        return await getConnection().query(`
             INSERT INTO learning_track_completed_chapters (learning_track_id, chapter_id, user_id)
             SELECT $1, $2, $3
             WHERE NOT EXISTS (

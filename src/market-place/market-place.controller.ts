@@ -61,7 +61,7 @@ export class MarketPlaceProductsController {
   @ApiBearerAuth('Bearer')
   @ApiBody({ type: MarketPlacePurchaseCreateDto })
   @ApiParam({ name : "id", type: "string", description: "Market Place Product ID" })
-  @ApiResponse({ status: 200, description: 'Successfully created' })
+  @ApiResponse({ status: 201, description: 'Successfully created' })
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })

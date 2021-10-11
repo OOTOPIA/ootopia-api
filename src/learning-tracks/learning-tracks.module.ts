@@ -9,6 +9,8 @@ import { VideoModule } from 'src/video/video.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { GeneralConfigModule } from 'src/general-config/general-config.module';
 import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
+import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
+import { WalletsModule } from 'src/wallets/wallets.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { LearningTrackCompletedChaptersRepository } from './repositories/learnin
     VideoModule,
     GeneralConfigModule,
     forwardRef(() => PostsModule),
+    forwardRef(() => WalletsModule),
+    forwardRef(() => WalletTransfersModule),
   ],
   providers: [LearningTracksService],
   controllers: [LearningTracksController],
