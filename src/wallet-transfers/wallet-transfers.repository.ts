@@ -81,6 +81,12 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         if (transfer.origin == Origin.TOTAL_GAME_COMPLETED || transfer.origin == Origin.PERSONAL_GOAL_ACHIEVED || transfer.origin == Origin.INVITATION_CODE_SENT || transfer.origin == Origin.INVITATION_CODE_ACCEPTED) {
             transfer.icon = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/transfer_ooz.svg";
         }
+        if (transfer.origin == Origin.LEARNING_TRACK) {
+            transfer.icon = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/compass.png";
+            if (!transfer.otherUserName) {
+                transfer.otherUserName = "Ootopia";
+            }
+        }
         return transfer;
     }
 
