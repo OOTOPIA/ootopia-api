@@ -62,6 +62,7 @@ export class LearningTracksController {
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
     @Post('/:learningTrackId/chapter/:chapterId')
+    @HttpCode(200)
     async markChapterCompleted(
         @Req() { user },
         @Param('learningTrackId') learningTrackId : string, 

@@ -232,6 +232,10 @@ export class WalletTransfersService {
                 transfer.marketPlaceData = JSON.parse(transfer.marketPlaceData);
                 transfer.photoUrl = transfer.marketPlaceData.imageUrl;
             }
+            if (transfer.lImageUrl) {
+                transfer.photoUrl = transfer.lImageUrl;
+            }
+            delete transfer.lImageUrl;
             return transfer;
         });
     }
@@ -300,7 +304,7 @@ export class WalletTransfersService {
 
     }
 
-    async transferLearningTrack(chapterOOZ : number, learningTrackId : string, learningTrackTitle : string, userId : string, userWallet?) {
+    async transferLearningTrack(chapterOOZ : number, learningTrack, userId : string, userWallet?) {
 
         if (!userWallet) {
             userWallet = await this.walletsService.getWalletByUserId(userId);
@@ -318,8 +322,8 @@ export class WalletTransfersService {
                 balance : +(+chapterOOZ).toFixed(2),
                 origin : Origin.LEARNING_TRACK,
                 action : WalletTransferAction.RECEIVED,
-                learningTrackId : learningTrackId,
-                description : learningTrackTitle,
+                learningTrackId : learningTrack.id,
+                description : learningTrack.title,
                 fromPlatform : true,
                 processed : true
             }, true));

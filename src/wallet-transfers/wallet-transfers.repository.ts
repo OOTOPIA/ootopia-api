@@ -41,7 +41,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         let columns = [
             'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.from_platform', 'w.created_at', 'w.updated_at',
             'w.description', 'w.market_place_data',
-            'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon'
+            'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon', 'learning_tracks.image_url as l_image_url'
         ];
 
         params.push(filters.walletId);
@@ -70,6 +70,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
             SELECT ${columns} FROM wallet_transfers w
             LEFT JOIN users ON users.id = w.other_user_id
             LEFT JOIN posts ON posts.id = w.post_id
+            LEFT JOIN learning_tracks ON learning_tracks.id = w.learning_track_id
             WHERE ${where}
             ORDER BY w.created_at DESC
             ${limit}

@@ -212,7 +212,7 @@ export class LearningTracksService {
             });
 
             if (!learningTrackTransfers.length) {
-                await this.walletTransfersService.transferLearningTrack(chapter.ooz || 0, learningTrackId, learningTrack.title, userId, wallet);
+                await this.walletTransfersService.transferLearningTrack(chapter.ooz || 0, learningTrack, userId, wallet);
             }else{
                 await this.walletTransfersService.updateLearningTrackTransfer(chapter.ooz || 0, learningTrackTransfers[0], userId, wallet);
             }
