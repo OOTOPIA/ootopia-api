@@ -20,6 +20,16 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         return walletTransfer;
     }
 
+    updateTransfer(walletTransferId : string, walletTransferData, isTransaction? : boolean) {
+        const walletTransfer = this.create();
+        Object.assign(walletTransfer, walletTransferData);
+        walletTransfer.id = walletTransferId;
+        if (!isTransaction) {
+            return this.save(walletTransfer);
+        }
+        return walletTransfer;
+    }
+
     async getTransfers(filters) {
 
         if (!filters.walletId) {
@@ -40,6 +50,11 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         if (filters.action) {
             params.push(filters.action);
             where = where + `w.action = $${params.length} AND `;
+        }
+
+        if (filters.learningTrackId) {
+            params.push(filters.learningTrackId);
+            where = where + `w.learning_track_id = $${params.length} AND `;
         }
 
         if (filters.limit && filters.offset) {

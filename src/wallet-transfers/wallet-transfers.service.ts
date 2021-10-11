@@ -37,6 +37,8 @@ export class WalletTransfersService {
             postId : data.postId,
             marketPlaceData : data.marketPlaceData,
             description : data.description,
+            marketPlaceId : data.marketPlaceId,
+            learningTrackId : data.learningTrackId,
         }, isTransaction);
 
         if (!isTransaction) {
@@ -45,6 +47,10 @@ export class WalletTransfersService {
 
         return walletTransfer;
 
+    }
+
+    updateTransfer(walletTransferId : string, walletTransferData, isTransaction? : boolean) {
+        return this.walletTransfersRepository.updateTransfer(walletTransferId, walletTransferData, isTransaction);
     }
 
     private async transferOOZBetweenUsers(senderUserId : string, receiverUserId : string, balance : number, origin : Origin, postId? : string, queryRunner? : QueryRunner) {
@@ -274,7 +280,7 @@ export class WalletTransfersService {
             await queryRunner.manager.save(await this.createTransfer(userId, {
                 userId : userId,
                 walletId : userWallet.id,
-                balance : +marketPlaceProduct.price,
+                balance : +(+marketPlaceProduct.price).toFixed(2),
                 origin : Origin.MARKET_PLACE_TRANSFER,
                 action : WalletTransferAction.SENT,
                 marketPlaceData : marketPlaceProduct,
@@ -284,6 +290,68 @@ export class WalletTransfersService {
             }, true));
 
             await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(userWallet.id, userId, +marketPlaceProduct.price));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
+    }
+
+    async transferLearningTrack(chapterOOZ : number, learningTrackId : string, learningTrackTitle : string, userId : string, userWallet?) {
+
+        if (!userWallet) {
+            userWallet = await this.walletsService.getWalletByUserId(userId);
+        }
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(await this.createTransfer(userId, {
+                userId : userId,
+                walletId : userWallet.id,
+                balance : +(+chapterOOZ).toFixed(2),
+                origin : Origin.LEARNING_TRACK,
+                action : WalletTransferAction.RECEIVED,
+                learningTrackId : learningTrackId,
+                description : learningTrackTitle,
+                fromPlatform : true,
+                processed : true
+            }, true));
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(userWallet.id, userId, +chapterOOZ));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
+    }
+
+    async updateLearningTrackTransfer(chapterOOZ : number, walletTransfer, userId : string,  userWallet?) {
+
+        if (!userWallet) {
+            userWallet = await this.walletsService.getWalletByUserId(userId);
+        }
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(await this.updateTransfer(walletTransfer.id, {
+                balance : +(+chapterOOZ + +walletTransfer.balance).toFixed(2),
+            }, true));
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(userWallet.id, userId, +chapterOOZ));
 
             await queryRunner.commitTransaction();
 
