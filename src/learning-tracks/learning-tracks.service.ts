@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { LearningTracksFilterDto } from './learning-tracks.dto';
 import { LearningTracksRepository } from './learning-tracks.repository';
 import * as moment from 'moment-timezone';
@@ -8,6 +8,7 @@ import { VideoService } from 'src/video/video.service';
 import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
+import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
 
 const axios = Axios.default;
 
@@ -16,6 +17,7 @@ export class LearningTracksService {
 
     constructor(
         private readonly learningTracksRepository : LearningTracksRepository,
+        private readonly learningTrackCompletedChaptersRepository : LearningTrackCompletedChaptersRepository,
         private readonly filesUploadService: FilesUploadService,
         private readonly videoService: VideoService,
         private readonly generalConfigService: GeneralConfigService,
@@ -101,6 +103,19 @@ export class LearningTracksService {
 
     async getLearningTracks(filters : LearningTracksFilterDto) {
         let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
+
+        let learningTracksIds : string[] = learningTracks.map((data) => data.id);
+
+        //console.log(">>>> learningTracks", learningTracks);
+
+        if (learningTracks.length) {
+            let chapters = await this.learningTrackCompletedChaptersRepository.getCompletedChaptersOfLearningTracks(learningTracksIds);
+            learningTracks.forEach((learningTrack) => {
+                let learningTrackCompletedChapters = chapters.filter((c) => c.learningTrackId == learningTrack.id);
+                learningTrack.completed = (learningTrackCompletedChapters.length == learningTrack.chapters.length && learningTrack.chapters.length > 0);
+            });
+        }
+
         return learningTracks.map(this.mapper);
     }
 
@@ -109,7 +124,7 @@ export class LearningTracksService {
             limit: 1,
             locale,
         };
-        let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
+        let learningTracks : any = await this.getLearningTracks(filters);
         return (learningTracks.length ? learningTracks.map(this.mapper)[0] : null);
     }
 
@@ -159,10 +174,38 @@ export class LearningTracksService {
             videoThumbUrl : chapter.videoThumbUrl,
             time : chapter.time,
             ooz : chapter.ooz,
-            completed : chapter.completed,
+            completed : chapter.completed || false,
             createdAt : chapter.createdAt,
             updatedAt : chapter.updatedAt,
         }
+    }
+
+    async markLearningTrackChapterCompleted(learningTrackId : string, chapterId : string, userId : string) {
+
+        let learningTrack = await this.learningTracksRepository.getById(learningTrackId);
+
+        if (!learningTrack) {
+            throw new HttpException("LEARNING_TRACK_NOT_FOUND", 400);
+        }
+
+        let chapter = learningTrack.chapters.filter((c) => c.id == chapterId);
+
+        if (!chapter.length) {
+            throw new HttpException("CHAPTER_NOT_FOUND", 400);
+        }
+
+        chapter = chapter[0];
+
+        console.log("testing!", chapter, chapterId);
+
+        try {
+
+            await this.learningTracksRepository.markChapterCompleted(learningTrackId, chapter.id, userId);
+
+        }catch(err) {
+            console.log("ERRO AQUI", err);
+        }
+
     }
 
 }

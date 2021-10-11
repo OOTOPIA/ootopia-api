@@ -18,7 +18,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         return this.save(learningTrack);
     }
 
-    getLearningTracks(filters : LearningTracksFilterDto) {
+    async getLearningTracks(filters : LearningTracksFilterDto) {
 
         let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
 
@@ -51,6 +51,12 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         });
     }
 
+    async getById(id : string) {
+        return await this.findOne({
+            where : { id, deletedAt : IsNull() }
+        });
+    }
+
     async deleteLearningTrack(strapiId) {
         if (!strapiId) {
             throw new HttpException("Permission denied (id not found)", 403);
@@ -65,6 +71,22 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         }
         data.deletedAt = new Date();
         return await this.save(data);
+    }
+
+    async markChapterCompleted(learningTrackId, chapterId, userId) {
+        console.log('args', learningTrackId, chapterId, userId);
+        await getConnection().query(`
+            INSERT INTO learning_track_completed_chapters (learning_track_id, chapter_id, user_id)
+            SELECT $1, $2, $3
+            WHERE NOT EXISTS (
+                SELECT * FROM learning_track_completed_chapters WHERE learning_track_id = $1 AND chapter_id = $2 AND user_id = $3
+            )
+            RETURNING *;
+        `, [
+            learningTrackId,
+            `${chapterId}`,
+            userId
+        ]);
     }
 
 }
