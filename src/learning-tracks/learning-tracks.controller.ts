@@ -25,9 +25,9 @@ export class LearningTracksController {
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
     @Get()
-    async getLearningTracks(@Query() filters : LearningTracksFilterDto) {
+    async getLearningTracks(@Req() { user }, @Query() filters : LearningTracksFilterDto) {
         try {
-            return await this.learningTracksService.getLearningTracks(filters);
+            return await this.learningTracksService.getLearningTracks(filters, user.id);
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -44,9 +44,9 @@ export class LearningTracksController {
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
     @Get('/last')
-    async getLastLearningTrack(@Query() filters : LastLearningTracksFilterDto) {
+    async getLastLearningTrack(@Req() { user }, @Query() filters : LastLearningTracksFilterDto) {
         try {
-            return this.learningTracksService.getLastLearningTrack(filters.locale);
+            return this.learningTracksService.getLastLearningTrack(filters.locale, user.id);
         } catch (error) {
             new ErrorHandling(error);
         }

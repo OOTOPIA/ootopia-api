@@ -12,10 +12,11 @@ export class LearningTrackCompletedChaptersRepository extends Repository<Learnin
         super();
     }
 
-    async getCompletedChaptersOfLearningTracks(learningTrackIds : string[]) {
+    async getCompletedChaptersOfLearningTracks(learningTrackIds : string[], userId : string) {
         return camelcaseKeys(await this.createQueryBuilder()
             .select(["id", "chapter_id", "learning_track_id"])
             .where("learning_track_id IN (:...ids)", { ids : learningTrackIds })
+            .andWhere("user_id = :userId", { userId })
             .getRawMany(), { deep : true });
     }
 
