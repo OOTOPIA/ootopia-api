@@ -105,28 +105,31 @@ export class LearningTracksService {
 
     }
 
-    async getLearningTracks(filters : LearningTracksFilterDto) {
+    async getLearningTracks(filters : LearningTracksFilterDto, userId : string) {
         let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
 
         let learningTracksIds : string[] = learningTracks.map((data) => data.id);
 
         if (learningTracks.length) {
-            let chapters = await this.learningTrackCompletedChaptersRepository.getCompletedChaptersOfLearningTracks(learningTracksIds);
+            let chapters = await this.learningTrackCompletedChaptersRepository.getCompletedChaptersOfLearningTracks(learningTracksIds, userId);
             learningTracks.forEach((learningTrack) => {
                 let learningTrackCompletedChapters = chapters.filter((c) => c.learningTrackId == learningTrack.id);
                 learningTrack.completed = (learningTrackCompletedChapters.length == learningTrack.chapters.length && learningTrack.chapters.length > 0);
+                learningTrack.chapters.forEach((chapter) => {
+                    chapter.completed = (chapters.filter((c) => +c.chapterId == +chapter.id).length > 0);
+                });
             });
         }
 
         return learningTracks.map(this.mapper);
     }
 
-    async getLastLearningTrack(locale : string) {
+    async getLastLearningTrack(locale : string, userId : string) {
         let filters : LearningTracksFilterDto = {
             limit: 1,
             locale,
         };
-        let learningTracks : any = await this.getLearningTracks(filters);
+        let learningTracks : any = await this.getLearningTracks(filters, userId);
         return (learningTracks.length ? learningTracks.map(this.mapper)[0] : null);
     }
 
