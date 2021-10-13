@@ -7,6 +7,7 @@ import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
+import * as _ from 'lodash';
 
 @Injectable()
 export class WalletTransfersService {
@@ -235,6 +236,13 @@ export class WalletTransfersService {
             if (transfer.lImageUrl) {
                 transfer.photoUrl = transfer.lImageUrl;
             }
+
+            if(transfer.origin == "learning_track") {
+                let imageClone = _.cloneDeep(transfer.photoUrl);
+                transfer.photoUrl = transfer.icon;
+                transfer.icon = imageClone;
+            }
+            
             delete transfer.lImageUrl;
             return transfer;
         });
