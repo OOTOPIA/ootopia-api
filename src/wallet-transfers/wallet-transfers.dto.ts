@@ -31,6 +31,9 @@ export class WalletTransfersHistoryDto {
     userId : string;
 
     @ApiProperty()
+    learningTrackId : string;
+
+    @ApiProperty()
     walletId : string;
 
     @ApiProperty({ description: "ID of the other user related to the transaction, if any. Applicable to display the user's name on incoming transfers" })

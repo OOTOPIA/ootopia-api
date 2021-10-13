@@ -51,9 +51,9 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         });
     }
 
-    async getById(id : string) {
+    async getById(learningTrackId : string) {
         return await this.findOne({
-            where : { id, deletedAt : IsNull() }
+            where :{ id : learningTrackId, deletedAt : IsNull() }
         });
     }
 
