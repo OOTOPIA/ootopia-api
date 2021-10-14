@@ -36,6 +36,25 @@ export class LearningTracksController {
     @UseInterceptors(SentryInterceptor)
     @ApiTags('learning-tracks')
     @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: "Returns a Learning Tracks" })
+    @ApiResponse({ status: 200, type: LearningTrackDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Get('/:learningTrackId')
+    async getLearningTracksById(@Req() { user }, @Param() { learningTrackId } ) {
+        try {
+            return  await this.learningTracksService.getLearningTracksById(learningTrackId, user.id);
+        } catch (error) {
+            new ErrorHandling(error);
+            return error
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('learning-tracks')
+    @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Returns last Learning Track" })
     @ApiQuery({ name : "locale", type: "string", enum: ["en", "pt-BR"], required: true })
     @ApiResponse({ status: 200, type: LearningTrackDto })

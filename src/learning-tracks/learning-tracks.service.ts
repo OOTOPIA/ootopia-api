@@ -124,6 +124,10 @@ export class LearningTracksService {
         return learningTracks.map(this.mapper);
     }
 
+    async getLearningTracksById(id : string, userId : string  ) {
+        return (await this.getLearningTracks({ id }, userId))[0];
+    }
+
     async getLastLearningTrack(locale : string, userId : string) {
         let filters : LearningTracksFilterDto = {
             limit: 1,

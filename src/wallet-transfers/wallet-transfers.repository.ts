@@ -40,7 +40,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
             'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.from_platform', 'w.created_at', 'w.updated_at',
-            'w.description', 'w.market_place_data',
+            'w.description', 'w.market_place_data', 'w.learning_track_id',
             'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon', 'learning_tracks.image_url as l_image_url'
         ];
 
@@ -83,10 +83,16 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
             transfer.icon = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/transfer_ooz.svg";
         }
         if (transfer.origin == Origin.LEARNING_TRACK) {
-            transfer.icon = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/compass.png";
+            transfer.photoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/compass.png";
             if (!transfer.otherUsername) {
                 transfer.otherUsername = "Ootopia";
             }
+        }
+        if (transfer.origin == Origin.MARKET_PLACE_TRANSFER) {
+            let makrketPlace = JSON.parse(transfer.marketPlaceData);
+            transfer.icon = makrketPlace.imageUrl;
+            transfer.otherUsername = makrketPlace.userName;
+
         }
         return transfer;
     }

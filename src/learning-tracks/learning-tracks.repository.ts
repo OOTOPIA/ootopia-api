@@ -22,6 +22,11 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
 
         let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
 
+        
+        if (filters.id) {
+            where.id = filters.id;
+        }
+
         if (filters.limit) {
             if (filters.limit > 50) {
                 filters.limit = 50;
@@ -51,9 +56,9 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         });
     }
 
-    async getById(id : string) {
+    async getById(learningTrackId : string) {
         return await this.findOne({
-            where : { id, deletedAt : IsNull() }
+            where :{ id : learningTrackId, deletedAt : IsNull() }
         });
     }
 

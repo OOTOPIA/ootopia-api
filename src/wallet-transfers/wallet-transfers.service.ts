@@ -233,8 +233,9 @@ export class WalletTransfersService {
                 transfer.photoUrl = transfer.marketPlaceData.imageUrl;
             }
             if (transfer.lImageUrl) {
-                transfer.photoUrl = transfer.lImageUrl;
+                transfer.icon = transfer.lImageUrl;
             }
+            
             delete transfer.lImageUrl;
             return transfer;
         });
