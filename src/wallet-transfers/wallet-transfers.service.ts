@@ -7,7 +7,6 @@ import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
-import * as _ from 'lodash';
 
 @Injectable()
 export class WalletTransfersService {

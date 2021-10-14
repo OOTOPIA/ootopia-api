@@ -88,6 +88,12 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
                 transfer.otherUsername = "Ootopia";
             }
         }
+        if (transfer.origin == Origin.MARKET_PLACE_TRANSFER) {
+            let makrketPlace = JSON.parse(transfer.marketPlaceData);
+            transfer.icon = makrketPlace.imageUrl;
+            transfer.otherUsername = makrketPlace.userName;
+
+        }
         return transfer;
     }
 
