@@ -234,13 +234,7 @@ export class WalletTransfersService {
                 transfer.photoUrl = transfer.marketPlaceData.imageUrl;
             }
             if (transfer.lImageUrl) {
-                transfer.photoUrl = transfer.lImageUrl;
-            }
-
-            if(transfer.origin == "learning_track") {
-                let imageClone = _.cloneDeep(transfer.photoUrl);
-                transfer.photoUrl = transfer.icon;
-                transfer.icon = imageClone;
+                transfer.icon = transfer.lImageUrl;
             }
             
             delete transfer.lImageUrl;
