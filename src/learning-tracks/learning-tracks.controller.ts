@@ -62,9 +62,9 @@ export class LearningTracksController {
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
     @Get('/:learningTrackId')
-    async getLearningTracksById(@Req() { user }, @Param() { learningTrackId } ) {
+    async getLearningTracksById(@Req() { user }, @Param('learningTrackId') learningTrackId : string) {
         try {
-            return  await this.learningTracksService.getLearningTracksById(learningTrackId, user.id);
+            return await this.learningTracksService.getLearningTracksById(learningTrackId, user.id);
         } catch (error) {
             new ErrorHandling(error);
             return error
