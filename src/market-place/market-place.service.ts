@@ -21,13 +21,21 @@ export class MarketPlaceService {
     
     let findMarketPlace = await this.marketPlaceRepository.getByStrapiId(marketPlaceData.id);
 
-    if (strapiEvent == "entry.update" && (!findMarketPlace || !marketPlaceData.published_at)) { 
+    if (strapiEvent == "entry.update" && (!findMarketPlace || !marketPlaceData.published_at)) {
         //Não vamos fazer nada se houver atualização sem que o dado esteja registrado no banco e publicado no strapi
         return;
     }
 
     let uploadNewImage = marketPlaceData.photo != null;
-    let photoUrl = marketPlaceData.photo ? (marketPlaceData.photo.formats?.large?.url || marketPlaceData.photo.formats?.medium?.url || marketPlaceData.photo.formats?.small?.url || marketPlaceData.photo.formats?.thumbnail?.url) : ""; 
+    let photoUrl = marketPlaceData.photo ? (
+      marketPlaceData.photo.formats?.large?.url || 
+      marketPlaceData.photo.formats?.medium?.url || 
+      marketPlaceData.photo.formats?.small?.url || 
+      marketPlaceData.photo.formats?.thumbnail?.url || 
+      marketPlaceData.photo.formats?.url ||
+      marketPlaceData.photo.url
+    ) : ""; 
+    
     let imageUrl = marketPlaceData.photo ? `${process.env.STRAPI_URL}${photoUrl}` : "";
 
     if (findMarketPlace) {
