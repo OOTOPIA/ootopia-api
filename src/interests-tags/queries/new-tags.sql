@@ -159,6 +159,13 @@ INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('co
 INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('sintrópico', 'secondary', 'pt-BR', 0, true);
 INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('moedassociais', 'secondary', 'pt-BR', 0, true);
 INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('moedascomplementares', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('20minParaMudarOMundo', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOchangemakers', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOcast', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOcampfire', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OotopiaOriginals', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOnews', 'secondary', 'pt-BR', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOcastexperience', 'secondary', 'pt-BR', 0, true);
 
 -- adds new en-US top tags
 
@@ -319,3 +326,10 @@ INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('re
 INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('syntropic', 'secondary', 'en-US', 0, true);
 INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('social currencies', 'secondary', 'en-US', 0, true);
 INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('complementary coins', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('20minParaMudarOMundo', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOchangemakers', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOcast', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOcampfire', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OotopiaOriginals', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOnews', 'secondary', 'en-US', 0, true);
+INSERT INTO interests_tags (name, type, language, tag_order, active) VALUES ('OOcastexperience', 'secondary', 'en-US', 0, true);
