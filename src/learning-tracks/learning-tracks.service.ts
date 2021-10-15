@@ -39,7 +39,14 @@ export class LearningTracksService {
         }
 
         let uploadNewImage = learningTrackData.photo != null;
-        let photoUrl = learningTrackData.photo ? (learningTrackData.photo.formats?.large?.url || learningTrackData.photo.formats?.medium?.url || learningTrackData.photo.formats?.small?.url || learningTrackData.photo.formats?.thumbnail?.url) : ""; 
+        let photoUrl = learningTrackData.photo ? (
+            learningTrackData.photo.formats?.large?.url || 
+            learningTrackData.photo.formats?.medium?.url || 
+            learningTrackData.photo.formats?.small?.url || 
+            learningTrackData.photo.formats?.thumbnail?.url ||
+            learningTrackData.photo.formats?.url || 
+            learningTrackData.photo.url
+        ) : ""; 
         let imageUrl = learningTrackData.photo ? `${process.env.STRAPI_URL}${photoUrl}` : "";
 
         if (findLearningTrack) {
