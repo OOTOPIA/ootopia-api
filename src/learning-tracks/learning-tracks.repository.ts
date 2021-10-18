@@ -25,20 +25,21 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         
         if (filters.id) {
             where.id = filters.id;
-        }
+        } else {
 
-        if (filters.limit) {
-            if (filters.limit > 50) {
-                filters.limit = 50;
+            if (filters.limit) {
+                if (filters.limit > 50) {
+                    filters.limit = 50;
+                }
+                limit = filters.limit;
+                offset = filters.offset || 0;
             }
-            limit = filters.limit;
-            offset = filters.offset || 0;
-        }
-
-        if (filters.locale) {
-            where.locale = filters.locale;
-        }else{
-            where.locale = locale;
+    
+            if (filters.locale) {
+                where.locale = filters.locale;
+            }else{
+                where.locale = locale;
+            }
         }
 
         return this.createQueryBuilder("learning-tracks")
