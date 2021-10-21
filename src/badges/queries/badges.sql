@@ -1,1 +1,1 @@
-insert into badges (icon, name) values ('url', 'Semeador')
+insert into badges (icon, name, "type") values ('https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/semeador_badge.png', 'Semeador', 'sower')
