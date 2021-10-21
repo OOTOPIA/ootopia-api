@@ -23,6 +23,9 @@ export class ChapterDto {
     ooz : number;
 
     @ApiProperty()
+    completed : boolean;
+
+    @ApiProperty()
     createdAt : Date;
 
     @ApiProperty()
@@ -72,8 +75,11 @@ export class LearningTrackDto {
 
 export class LearningTracksFilterDto {
 
-    @ApiProperty({ type: "string", required: true, enum: ["en", "pt-BR"] })
-    locale : string;
+    @ApiProperty({ type: "string", required: false })
+    id? : string;
+    
+    @ApiProperty({ type: "string", required: false, enum: ["en", "pt-BR"] })
+    locale? : string;
 
     @ApiProperty({ type: "number", required: false })
     limit? : number;

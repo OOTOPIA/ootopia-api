@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class LearningTracks extends BaseEntity {
+export class MarketPlaceProducts extends BaseEntity {
 
     @PrimaryGeneratedColumn("uuid")
     id : string;
@@ -28,9 +28,6 @@ export class LearningTracks extends BaseEntity {
     @Column({ nullable: true, type: 'varchar' })
     locale : string;
 
-    @Column({ nullable: true, type: 'varchar' })
-    location : string;
-
     @Column({ nullable: true, type: 'varchar', name : 'image_url' })
     imageUrl : string;
 
@@ -38,16 +35,10 @@ export class LearningTracks extends BaseEntity {
     imageUpdatedAt : string;
 
     @Column({ nullable: true, type: 'numeric' })
-    ooz : number;
+    price : number;
 
     @Column({ nullable: true, type: 'varchar' })
-    time : string;
-
-    @Column({ nullable: true, type: 'simple-json' })
-    chapters : any;
-
-    @Column({ nullable : false, type: 'boolean', default: () => "false" })
-    completed : boolean;
+    location : string;
 
     @Column({nullable : true, name: 'deleted_at', type: 'timestamp'})
     deletedAt: Date;

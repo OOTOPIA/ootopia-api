@@ -1,12 +1,15 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SqsMessageHandler } from "@ssut/nestjs-sqs";
 import { LearningTracksService } from 'src/learning-tracks/learning-tracks.service';
+import { MarketPlaceService } from 'src/market-place/market-place.service';
 
 @Injectable()
 export class StrapiWebhookHandlerService {
 
     constructor(
-        private readonly learningTracksService : LearningTracksService){}
+        private readonly learningTracksService : LearningTracksService,
+        private readonly marketPlaceService : MarketPlaceService
+    ){}
 
     @SqsMessageHandler('strapi_webhook', false)
     public async handleMessage(message: AWS.SQS.Message) {
@@ -14,19 +17,46 @@ export class StrapiWebhookHandlerService {
 
             let data : any = JSON.parse(message.Body);
 
-            console.log("Message received at", new Date(), "Message ID:", message.MessageId);
-
             switch(data.model) {
                 case "learning-tracks":
-                    if (data.event == "entry.create" || data.event == "entry.update") {
-                        await this.createOrUpdateLearningTrack(data.entry);
-                    }else if (data.event == "entry.delete") {
-                        await this.deleteLearningTrack(data.entry.id);
+                    if (data.event == "entry.publish" || data.event == "entry.update") {
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.createOrUpdateLearningTrack(entry, data.event);
+                        }
+                    }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.deleteLearningTrack(entry.id);
+                        }
+                    }
+                break;
+                case "market-place":
+                    if (data.event == "entry.publish" || data.event == "entry.update") {
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.createOrUpdateMarketPlaces(entry, data.event);
+                        }
+                    }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            await this.deleteMarketPlaces(entry.id);
+                        }
                     }
                 break;
             }
-
-            console.log("Message read successfully at", new Date(), "Message ID:", message.MessageId);
 
         }catch(err) {
             console.log("SQS 'strapi_webhook' Error:", err);
@@ -34,14 +64,20 @@ export class StrapiWebhookHandlerService {
         }
     }
 
-    async createOrUpdateLearningTrack(entry) {
-        console.log("received data from strapi webhook", entry);
-
-        await this.learningTracksService.createOrUpdate(entry);
+    async createOrUpdateLearningTrack(entry, event : string) {
+        await this.learningTracksService.createOrUpdate(entry, event);
     }
 
     async deleteLearningTrack(entryId) {
         await this.learningTracksService.deleteLearningTrack(entryId);
+    }
+
+    async createOrUpdateMarketPlaces(entry, event : string) {
+        await this.marketPlaceService.createOrUpdate(entry, event);
+    }
+
+    async deleteMarketPlaces(entryId) {
+        await this.marketPlaceService.deleteMarketPlaces(entryId);
     }
 
 }

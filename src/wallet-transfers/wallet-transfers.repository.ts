@@ -20,6 +20,16 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         return walletTransfer;
     }
 
+    updateTransfer(walletTransferId : string, walletTransferData, isTransaction? : boolean) {
+        const walletTransfer = this.create();
+        Object.assign(walletTransfer, walletTransferData);
+        walletTransfer.id = walletTransferId;
+        if (!isTransaction) {
+            return this.save(walletTransfer);
+        }
+        return walletTransfer;
+    }
+
     async getTransfers(filters) {
 
         if (!filters.walletId) {
@@ -30,7 +40,8 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         let perPage = 10, limit = 'LIMIT ' + perPage;
         let columns = [
             'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.from_platform', 'w.created_at', 'w.updated_at',
-            'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon'
+            'w.description', 'w.market_place_data', 'w.learning_track_id',
+            'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon', 'learning_tracks.image_url as l_image_url'
         ];
 
         params.push(filters.walletId);
@@ -39,6 +50,11 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         if (filters.action) {
             params.push(filters.action);
             where = where + `w.action = $${params.length} AND `;
+        }
+
+        if (filters.learningTrackId) {
+            params.push(filters.learningTrackId);
+            where = where + `w.learning_track_id = $${params.length} AND `;
         }
 
         if (filters.limit && filters.offset) {
@@ -54,6 +70,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
             SELECT ${columns} FROM wallet_transfers w
             LEFT JOIN users ON users.id = w.other_user_id
             LEFT JOIN posts ON posts.id = w.post_id
+            LEFT JOIN learning_tracks ON learning_tracks.id = w.learning_track_id
             WHERE ${where}
             ORDER BY w.created_at DESC
             ${limit}
@@ -64,6 +81,19 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
     mapper(transfer) {
         if (transfer.origin == Origin.TOTAL_GAME_COMPLETED || transfer.origin == Origin.PERSONAL_GOAL_ACHIEVED || transfer.origin == Origin.INVITATION_CODE_SENT || transfer.origin == Origin.INVITATION_CODE_ACCEPTED) {
             transfer.icon = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/transfer_ooz.svg";
+        }
+        if (transfer.origin == Origin.LEARNING_TRACK) {
+            transfer.photoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/compass.png";
+            if (!transfer.otherUsername) {
+                transfer.otherUsername = "Ootopia";
+            }
+        }
+        if (transfer.origin == Origin.MARKET_PLACE_TRANSFER) {
+            let marketPlaceData = JSON.parse(transfer.marketPlaceData);
+            transfer.icon = marketPlaceData.imageUrl;
+            transfer.photoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
+            transfer.otherUsername = marketPlaceData.userName;
+
         }
         return transfer;
     }

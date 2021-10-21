@@ -24,6 +24,7 @@ export class StrapiController {
             if (!headers || !headers['authorization'] || headers['authorization'] != process.env.STRAPI_WEBHOOK_AUTH) {
                 throw new HttpException("Permission denied", 403);
             }
+            
             return await this.strapiService.webhook(data);
         } catch (error) {
             new ErrorHandling(error);

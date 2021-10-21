@@ -8,6 +8,7 @@ import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.mod
 import { WalletsModule } from 'src/wallets/wallets.module';
 import { StrapiWebhookHandlerService } from './strapi-webhook-handler/strapi-webhook-handler.service';
 import { LearningTracksModule } from 'src/learning-tracks/learning-tracks.module';
+import { MarketPlaceModule } from 'src/market-place/market-place.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LearningTracksModule } from 'src/learning-tracks/learning-tracks.module
     GeneralConfigModule,
     forwardRef(() => UsersModule),
     forwardRef(() => LearningTracksModule),
+    forwardRef(() => MarketPlaceModule),
   ],
   providers: [SqsWorkerService, DailyGoalDistributionHandlerService, StrapiWebhookHandlerService],
   exports: [SqsWorkerService, DailyGoalDistributionHandlerService]
