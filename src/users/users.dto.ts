@@ -20,6 +20,42 @@ export class CreateUserDto {
     @ApiProperty({ required: true})
     acceptedTerms : boolean;
 
+    @ApiProperty()
+    countryCode: string;
+
+    @ApiProperty()
+    phone: string;
+
+    @ApiProperty()
+    bio: string;
+
+    @ApiProperty({ required: true, type: "file", description: "User photo" })
+    file : object;
+
+    @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
+    birthdate : Date;
+
+    @ApiProperty({type: "number", minimum: 10, maximum: 60})
+    dailyLearningGoalInMinutes : number;
+
+    @ApiProperty()
+    addressCountryCode : string;
+
+    @ApiProperty()
+    addressState : string;
+    
+    @ApiProperty()
+    addressCity : string;
+
+    @ApiProperty()
+    addressLatitude : number;
+
+    @ApiProperty()
+    addressLongitude : number;
+
+    @ApiProperty({description: "IDs of selected tags separated by commas"})
+    tagsIds : string;
+    
     @ApiProperty({ required: false})
     invitationCode : string;
 
