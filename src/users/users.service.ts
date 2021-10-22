@@ -144,13 +144,13 @@ export class UsersService {
 
             if (invitation?.type == 'sower') {
                 let badge = await this.badgesService.findByType('sower');
-                user.badges = badge;
-                
-                await queryRunner.manager.save(
-                    user
-                );
+                user.badges = badge;                
             }
-
+            
+            await queryRunner.manager.save(
+                user
+            );
+            
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
