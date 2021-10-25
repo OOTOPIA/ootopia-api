@@ -31,14 +31,18 @@ export class UsersController {
     @ApiTags('users')
     @ApiOperation({ summary: 'Create a new user account' })
     @ApiBody({ type: CreateUserDto })
-    @ApiResponse({ status: 200, description: 'Successfully registered', type: CreatedUserDto })
+    @ApiResponse({ status: 201, description: 'Successfully registered', type: CreatedUserDto })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage(),
+    }))
     @Post()
-    async createUser(@Request() req: Request, @Body() user : CreateUserDto) {
+    async createUser( @UploadedFile() file, @Body() user : CreateUserDto) {
         try {
-            return await this.usersService.createUser(user);
+            return await this.usersService.createUser(user, file);
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -307,6 +311,23 @@ export class UsersController {
     async validateInvitationCode(@Param('code') code) {
         try {
             return await this.invitationsCodesService.validateInvitationCode(code);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'Validate if email code exists' })
+    @ApiParam({name : "email", type: "string", description: "email to validate" })
+    @ApiResponse({ status: 200, type: InvitationCodeValidateDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Get('/email-exist/:email')
+    async validateEmailExists(@Param('email') email) {
+        try {
+            return await this.usersService.validationEmail(email);
         } catch (error) {
             new ErrorHandling(error);
         }

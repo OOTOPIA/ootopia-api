@@ -19,7 +19,7 @@ import { BadgesService } from 'src/badges/badges.service';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { TrophyType } from './entities/users-trophies.entity';
 
-import { UserProfileUpdateDto } from './users.dto';
+import { CreateUserDto, UserProfileUpdateDto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -40,7 +40,7 @@ export class UsersService {
         ) {
     }
 
-    async createUser(userData) {
+    async createUser(userData : CreateUserDto, photoFile = null) {
 
         if (!userData.acceptedTerms) {
             throw new HttpException("You must accept the terms to register", 401);
@@ -58,14 +58,59 @@ export class UsersService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        let user;
+        userData.invitationCode = !!userData.invitationCode ? userData.invitationCode : null;
+        userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
+
+        let user = {
+            id: null,
+            photoUrl: null,
+            invitationCodeAccepted: userData.invitationCode,
+            addressId: null,
+            badges: null,
+            password: null,
+        };
+
         let wallet;
 		let invitation;
 
         try {
-            userData.invitationCodeAccepted = userData.invitationCode || null;
+
             user = await this.usersRepository.createOrUpdateUser(userData);
             wallet = await this.walletsService.createOrUpdateWallet({userId : user.id});
+            
+            if (photoFile != null) {
+                let fileUrl = await this.filesUploadService.uploadFileToS3(photoFile.buffer, photoFile.originalname, user.id);
+                user.photoUrl = fileUrl;
+            }
+            
+            if (userData.tagsIds && userData.tagsIds.length > 0) {
+                let tagsIds = userData.tagsIds.split(",");
+                await this.interestsTagsService.updateUserTags(user.id, tagsIds, queryRunner);
+            }
+    
+            if (userData.addressCountryCode && userData.addressState && userData.addressCity) {
+    
+                let city = await this.citiesService.getCity(userData.addressCity, userData.addressState, userData.addressCountryCode);
+                if (!city) {
+                    city = await this.citiesService.createCity({
+                        city : userData.addressCity,
+                        state : userData.addressState,
+                        country : userData.addressCountryCode,
+                    });
+                }
+    
+                let addressData : any = {
+                    city : city,
+                    lat : userData.addressLatitude,
+                    lng : userData.addressLongitude,
+                }
+
+    
+                let userAddress = await this.addressesRepository.createOrUpdateAddress(addressData);
+                user.addressId = userAddress.id;
+                
+                await queryRunner.manager.save(userAddress);
+            }
 
             if(userData.invitationCode) {
                 invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCode);
@@ -99,13 +144,13 @@ export class UsersService {
 
             if (invitation?.type == 'sower') {
                 let badge = await this.badgesService.findByType('sower');
-                user.badges = badge;
-                
-                await queryRunner.manager.save(
-                    user
-                );
+                user.badges = badge;                
             }
-
+            
+            await queryRunner.manager.save(
+                user
+            );
+            
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
@@ -366,6 +411,10 @@ export class UsersService {
             ),
         );
 
+    }
+
+    async validationEmail(email) {
+        return !!(await this.usersRepository.getUserByEmail(email));
     }
 
 }
