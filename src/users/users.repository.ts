@@ -76,8 +76,13 @@ export class UsersRepository extends Repository<Users>{
                     from user_badges
                     inner join badges b ON b.id = user_badges.badges_id
                     where user_badges.user_id = u.id
-                ) as badges
+                ) as badges ,
+                c.city,
+                c.state,
+                c.country
             FROM users u
+            left join addresses a on a.id = u.address_id
+            left join cities c on c.id = a.city_id
             WHERE u.id = $1
         `, [id]), { deep : true });
 

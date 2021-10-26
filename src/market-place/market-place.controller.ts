@@ -70,7 +70,7 @@ export class MarketPlaceProductsController {
   @HttpCode(201)
   async purchase(@Req() { user }, @Param('id') id : string,  @Body() data : MarketPlacePurchaseCreateDto) {
     try {
-      return await this.marketPlaceService.purchase(id, user.id);
+      return await this.marketPlaceService.purchase(id, user);
     }
     catch (error) {
       new ErrorHandling(error);

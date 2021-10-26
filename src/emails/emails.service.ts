@@ -58,4 +58,16 @@ export class EmailsService {
     return fs.readFileSync(path.resolve(`public/templates/${filename}.html`), 'utf8');
   }
 
+  async sendConfirmMarketPlace (marketPlace, user) {
+    let template = await this.loadTemplate("marketplace-en");
+    console.log("eae tem algo?", !!template);
+    
+    let oi = Handlebars.compile(template)({marketPlace, user})
+    console.log("eae tem algo?", !!template, oi);
+
+    await fs.writeFileSync("opa.html",oi);
+
+    // return await this.sendEmail("leandro-pereira2011@hotmail.com", null, template, {user , marketPlace});
+  }
+
 }

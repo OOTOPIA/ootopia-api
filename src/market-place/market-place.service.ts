@@ -5,6 +5,9 @@ import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import { EmailsService } from 'src/emails/emails.service';
+import { UsersService } from 'src/users/users.service';
+import { AddressesRepository } from 'src/addresses/addresses.repository';
 
 const axios = Axios.default;
 
@@ -15,6 +18,8 @@ export class MarketPlaceService {
     private marketPlaceRepository: MarketPlaceRepository,
     private filesUploadService : FilesUploadService,
     private walletTransfersService : WalletTransfersService,
+    private emailsService: EmailsService,
+    private usersService: UsersService,
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
@@ -102,15 +107,22 @@ export class MarketPlaceService {
     return this.mapper(marketPlaceProduct);
   }
 
-  async purchase(marketPlaceProductId : string, userId : string) {
-
+  async purchase(marketPlaceProductId : string, user) {
+    console.log("opa epa ");
+    
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
 
     if (!marketPlaceProduct) {
       throw new HttpException("PRODUCT_NOT_FOUND", 400);
     }
-
-    await this.walletTransfersService.transferMarketPlacePurchase(userId, marketPlaceProduct);
+    user = await this.usersService.getUserById(user.id);
+    // user.address = await this.addressesRepository.find({id: user.addressId});
+    console.log(user,'a1quiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+    
+    // await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
+    
+    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user);
+    
 
   }
 

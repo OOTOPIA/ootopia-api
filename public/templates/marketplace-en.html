@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900' rel='stylesheet' type='text/css'>
+<style>
+    .text-main {
+        text-align: left;
+        font: normal normal bold 24px Roboto;
+        letter-spacing: 0px;
+        color: #707070;
+        text-transform: uppercase;
+        opacity: 1;
+    }
+
+    .text-bold {
+        text-align: left;
+        font: normal normal bold 14px Roboto;
+        letter-spacing: 0px;
+        color: #000000;
+    }
+
+    .text-medium {
+        text-align: left;
+        font: normal normal 500 14px Roboto;
+        letter-spacing: 0px;
+        color: #000000;
+        opacity: 1;
+    }
+
+    .text-normal {
+        text-align: left;
+        font: normal normal normal 12px Roboto;
+        letter-spacing: 0px;
+        color: #000000;
+        opacity: 1;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid rgba(112, 112, 112, 0.2);
+    }
+
+    .padding {
+        margin: 16px 26px;
+        padding-bottom: 20px;
+    }
+
+    .background-color {
+        background-color: rgba(112, 112, 112, 0.05);
+    }
+
+    .photo-profile {
+        border-radius: 50px;
+    }
+
+    .photo-marketplace {
+        border-radius: 14px;
+    }
+
+    .margin-right {
+        margin-right: 16px;
+    }
+
+    .margin-top {
+        margin-top: 10px;
+    }
+
+    .font-ozz {
+        text-align: left;
+        font: normal normal bold 16px/19px Roboto;
+        letter-spacing: 0px;
+        color: #707070;
+        opacity: 1;
+    }
+
+    .link-support {
+        text-align: left;
+        text-decoration: underline;
+        font: normal normal normal 12px/14px Roboto;
+        letter-spacing: 0px;
+        color: #003694;
+        margin-top: 18px;
+    }
+
+    .link-suggestion {
+        width: 128px;
+        height: 32px;
+        text-decoration: none;
+        border: 1px solid #003694;
+        border-radius: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: normal normal bold 12px Roboto;
+        letter-spacing: 0px;
+        color: #003694;
+        opacity: 1;
+        margin-top: 24px;
+    }
+
+    .image-footer {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOTOPIA</title>
+</head>
+<body style="width: 557px;">
+
+    <img src="../templates/Grupo 1442@2x.png" width="557" height="271">
+
+    <div class="border-bottom padding column">
+        <span class="text-main">CONGRATULATIONS ON YOUR SALE</span>
+        <span class="text-normal">Send an email to ({{user.fullname}})</span>
+        <span class="text-normal">to arrange delivery of his/her purchase.</span>
+    </div>
+
+    <div class="border-bottom padding column">
+        <span class="text-medium">Purchase</span>
+        <div class="row margin-top">
+
+            <img class="photo-profile margin-right" src="https://i.pinimg.com/280x280_RS/7a/c1/18/7ac1187d296172bc47a2ea17c0f123c8.jpg" width="36" height="36">
+
+            <div class="column">
+                <span class="text-medium">{{user.fullname}}</span>
+                <span class="text-normal">{{user.city}}, {{user.state}}</span>
+
+                <span class="text-medium margin-top">Contact</span>
+                <span class="text-normal">Mobile Phone: {{user.phone}}</span>
+                <span class="text-normal">E-mail: {{user.email}}</span>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="column padding">
+        <div>
+            <span class="text-medium">Purchased Item</span>
+
+            <div class="row margin-top">
+                <img class="color-grey photo-marketplace margin-right" src="{{marketPlace.imageUrl}}" width="91" height="91">
+                
+                <div class="column">
+                    <span class="text-medium">{{marketPlace.title}}</span>
+
+                    <div class="margin-top">
+                        <img src="../templates/ooz-coin-black-small.svg" width="26" height="14">
+                        <span class="font-ozz">{{marketPlace.price}}</span>
+                    </div>
+
+                    <span class="text-normal margin-top">{{marketPlace.description}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="background-color">
+        <div class="border-bottom padding column">
+            <span class="text-medium">All the best,</span>
+            <span class="text-bold margin-top">{{marketPlace.userName}}</span>
+
+            <span class="text-normal">OOTOPIA Ethical Marketplace Steward</span>
+            <span class="text-normal">luize@ootopia.org</span>
+            <span class="text-normal">+55 21 97261-3293</span>
+    
+            <a class="link-support" href="mailto: support@ootopia.org" target="_blank">Do you have any questions?</a>
+            <span class="text-normal">Get in contact! I'll be happy to help you.</span>
+    
+        </div>
+    
+        <div class="padding column">
+            <span class="text-bold">COMING SOON</span>
+            <span class="text-normal margin-top">In the next application update, the creation of offers on the Ethical Marketplace will be available to everyone. Until then, how about telling us what you would like to offer or purchase? Your suggestions and questions are very welcome!</span>
+    
+            <a class="link-suggestion" href="https://docs.google.com/forms/d/e/1FAIpQLScGB6JQf4-YQn7aZQ5fmJTYxhM1W3qXuW87ycYrlayiesN92A/viewform" target="_blank">Give a suggestion</a>
+        </div>
+    </div>
+
+
+    <div class="image-footer">
+        <img src="../templates/Grupo 1315@2x.png" width="502" height="198">
+    </div>
+
+</body>
+</html>
