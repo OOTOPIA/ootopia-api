@@ -16,6 +16,10 @@ import { InvitationsCodesService } from '../invitations-codes/invitations-codes.
 import * as moment from 'moment-timezone';
 import { Origin, WalletTransferAction } from 'src/wallet-transfers/wallet-transfers.entity';
 import { BadgesService } from 'src/badges/badges.service';
+import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
+import { TrophyType } from './entities/users-trophies.entity';
+
+import { CreateUserDto, UserProfileUpdateDto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,10 +36,11 @@ export class UsersService {
         private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
         private readonly invitationsCodesService : InvitationsCodesService,
         private readonly badgesService : BadgesService,
+        private readonly usersTrophiesService : UsersTrophiesService,
         ) {
     }
 
-    async createUser(userData) {
+    async createUser(userData : CreateUserDto, photoFile = null) {
 
         if (!userData.acceptedTerms) {
             throw new HttpException("You must accept the terms to register", 401);
@@ -53,29 +58,78 @@ export class UsersService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        let user;
+        userData.invitationCode = !!userData.invitationCode ? userData.invitationCode : null;
+        userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
+
+        let user = {
+            id: null,
+            photoUrl: null,
+            invitationCodeAccepted: userData.invitationCode,
+            addressId: null,
+            badges: null,
+            password: null,
+        };
+
         let wallet;
 		let invitation;
 
         try {
-            userData.invitationCodeAccepted = userData.invitationCode || null;
+
             user = await this.usersRepository.createOrUpdateUser(userData);
             wallet = await this.walletsService.createOrUpdateWallet({userId : user.id});
+            
+            if (photoFile != null) {
+                let fileUrl = await this.filesUploadService.uploadFileToS3(photoFile.buffer, photoFile.originalname, user.id);
+                user.photoUrl = fileUrl;
+            }
+            
+            if (userData.tagsIds && userData.tagsIds.length > 0) {
+                let tagsIds = userData.tagsIds.split(",");
+                await this.interestsTagsService.updateUserTags(user.id, tagsIds, queryRunner);
+            }
+    
+            if (userData.addressCountryCode && userData.addressState && userData.addressCity) {
+    
+                let city = await this.citiesService.getCity(userData.addressCity, userData.addressState, userData.addressCountryCode);
+                if (!city) {
+                    city = await this.citiesService.createCity({
+                        city : userData.addressCity,
+                        state : userData.addressState,
+                        country : userData.addressCountryCode,
+                    });
+                }
+    
+                let addressData : any = {
+                    city : city,
+                    lat : userData.addressLatitude,
+                    lng : userData.addressLongitude,
+                }
+
+    
+                let userAddress = await this.addressesRepository.createOrUpdateAddress(addressData);
+                user.addressId = userAddress.id;
+                
+                await queryRunner.manager.save(userAddress);
+            }
 
             if(userData.invitationCode) {
                 invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCode);
                 if (!invitation) {
                     throw new HttpException("Invitation Code invalid", 401);
                 }
-				
+
+                let oozToRewardSent, oozToRewardReceived;
+			
                 switch (invitation.type) {
                     case "sower":
-                        await this.sendInvitationCodeReward( invitation.userId, null, ConfigName.USER_SENT_SOWER_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_SENT, queryRunner);
-                        await this.sendInvitationCodeReward (user.id, wallet.id, ConfigName.USER_RECEIVED_SOWER_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
+                        oozToRewardSent = +(await this.generalConfigService.getConfig(ConfigName.USER_SENT_SOWER_INVITATION_CODE_OOZ)).value;
+                        oozToRewardReceived = +(await this.generalConfigService.getConfig(ConfigName.USER_RECEIVED_SOWER_INVITATION_CODE_OOZ)).value;
+                        await this.sendInvitationCodeReward(invitation.userId, user.id, oozToRewardSent, oozToRewardReceived, Origin.INVITATION_CODE_SENT, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
 					break;
                     case "default":
-                        await this.sendInvitationCodeReward( invitation.userId, null, ConfigName.USER_SENT_DEFAULT_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_SENT, queryRunner);
-                        await this.sendInvitationCodeReward( user.id, wallet.id, ConfigName.USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
+                        oozToRewardSent = +(await this.generalConfigService.getConfig(ConfigName.USER_SENT_DEFAULT_INVITATION_CODE_OOZ)).value;
+                        oozToRewardReceived = +(await this.generalConfigService.getConfig(ConfigName.USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ)).value;
+                        await this.sendInvitationCodeReward(invitation.userId, user.id, oozToRewardSent, oozToRewardReceived, Origin.INVITATION_CODE_SENT, Origin.INVITATION_CODE_ACCEPTED, queryRunner);
                     break;
                 }
             }
@@ -90,13 +144,13 @@ export class UsersService {
 
             if (invitation?.type == 'sower') {
                 let badge = await this.badgesService.findByType('sower');
-                user.badges = badge;
-                
-                await queryRunner.manager.save(
-                    user
-                );
+                user.badges = badge;                
             }
-
+            
+            await queryRunner.manager.save(
+                user
+            );
+            
             await queryRunner.commitTransaction();
         } catch (err) {
             await queryRunner.rollbackTransaction();
@@ -111,7 +165,7 @@ export class UsersService {
        
     }
 
-    async updateUser(userData, photoFile = null) {
+    async updateUser(userData: UserProfileUpdateDto, photoFile = null) {
 
         let queryRunner = getConnection().createQueryRunner();
 
@@ -120,11 +174,15 @@ export class UsersService {
 
         let currentUser = await this.getUserById(userData.id);
 
-        let _userData : any = {
-            id : userData.id,
-            birthdate : userData.birthdate,
+        let _userData: any = {
+            id: userData.id,
+            fullname: userData.fullname,
+            phone: userData.phone,
+            countryCode: userData.countryCode,
+            bio: userData.bio,
+            birthdate : userData.birthdate || null,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
-        };
+        };  
 
         if (photoFile != null) {
             let fileUrl = await this.filesUploadService.uploadFileToS3(photoFile.buffer, photoFile.originalname, currentUser.id);
@@ -170,7 +228,7 @@ export class UsersService {
 
         await queryRunner.manager.save(await this.usersRepository.create(_userData));
         await queryRunner.commitTransaction();
-        
+
         return Object.assign(currentUser, _userData);
 
     }
@@ -206,6 +264,13 @@ export class UsersService {
 
     async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
         return await this.usersRepository.updateDontAskToConfirmGratitudeReward(id, value);
+    }
+
+    async recordAppUsageTime(data) {
+
+        await this.usersAppUsageTimeService.recordAppUsageTime(data);
+        await this.getUserDailyGoalStats(data.userId);
+        
     }
 
     async getUserDailyGoalStats(id : string, dailyGoalStartTime? : Date, dailyGoalEndTime? : Date) {
@@ -247,11 +312,15 @@ export class UsersService {
         if (user.dailyGoalAchieved != dailyGoalAchieved) {
             let result = await this.updateDailyGoalAchieved(user.id, dailyGoalAchieved);
             if (dailyGoalAchieved && result.status == 'ok') {
+                await this.usersTrophiesService.createOrUpdateTrophy({
+                    userId : user.id,
+                    trophyType : TrophyType.PERSONAL,
+                });
                 await this.walletTransfersService.transferPersonalGoalAchieved(user.id);
             }
         }
 
-        return {
+        var dailyGoalStats = {
             id,
             dailyGoalInMinutes : +user.dailyLearningGoalInMinutes,
             dailyGoalEndsAt : dailyGoalEndTime,
@@ -263,6 +332,10 @@ export class UsersService {
             remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
             percentageOfDailyGoalAchieved : percentageOfDailyGoalAchieved >= 100 ? 100 : percentageOfDailyGoalAchieved
         };
+
+
+
+        return dailyGoalStats;
 
     }
 
@@ -283,27 +356,37 @@ export class UsersService {
         return (+hours ? hours + "h " : "") + minutes + "m " + seconds + "s";
     }
 
-    private async sendInvitationCodeReward(userId, walletId: string, configName : string, origin : string, queryRunner) {
-        const oozToReward = +(
-          await this.generalConfigService.getConfig(
-              configName,
-          )
-        ).value;
-        
-        if (!walletId) {
-            walletId = (
-              await this.walletsService.getWalletByUserId(userId)
-            ).id;
-        } 
+    private async sendInvitationCodeReward(fromUserId: string, toUserId: string, oozToRewardSent : number, oozToRewardReceived : number, originSent : string, originReceived : string, queryRunner) {
+
+        const fromUserWalletId = (await this.walletsService.getWalletByUserId(fromUserId)).id;
+        const toUserWalletId = (await this.walletsService.getWalletByUserId(toUserId)).id;
+
+        await queryRunner.manager.save(
+            await this.walletTransfersService.createTransfer(
+                fromUserId,
+                {
+                userId: fromUserId,
+                walletId: fromUserWalletId,
+                otherUserId : toUserId,
+                balance: oozToRewardSent,
+                origin: originSent,
+                action: WalletTransferAction.SENT,
+                fromPlatform: true,
+                processed: true,
+                },
+                true,
+            ),
+        );
   
         await queryRunner.manager.save(
           await this.walletTransfersService.createTransfer(
-            userId,
+            toUserId,
             {
-              userId: userId,
-              walletId: walletId,
-              balance: oozToReward,
-              origin: origin,
+              userId: toUserId,
+              walletId: toUserWalletId,
+              otherUserId : fromUserId,
+              balance: oozToRewardReceived,
+              origin: originReceived,
               action: WalletTransferAction.RECEIVED,
               fromPlatform: true,
               processed: true,
@@ -313,14 +396,25 @@ export class UsersService {
         );
 		
         await queryRunner.manager.save(
-			
-          await this.walletsService.increaseTotalBalance(
-            walletId,
-            userId,
-            oozToReward,
-          ),
+            await this.walletsService.increaseTotalBalance(
+                fromUserWalletId,
+                fromUserId,
+                oozToRewardReceived,
+            ),
         );
 
-  }
+        await queryRunner.manager.save(
+            await this.walletsService.increaseTotalBalance(
+                toUserWalletId,
+                toUserId,
+                oozToRewardReceived,
+            ),
+        );
+
+    }
+
+    async validationEmail(email) {
+        return !!(await this.usersRepository.getUserByEmail(email));
+    }
 
 }

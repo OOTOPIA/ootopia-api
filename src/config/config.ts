@@ -17,6 +17,10 @@ import { PostsTimelineViewTime } from 'src/posts/entities/posts-timeline-view-ti
 import { UsersAppUsageTime } from 'src/users/entities/users-app-usage-time.entity';
 import { Badges } from 'src/badges/entities/badges.entity';
 import { InvitationsCode } from 'src/invitations-codes/entities/invitations-code.entity';
+import { UsersTrophies } from 'src/users/entities/users-trophies.entity';
+import { LearningTracks } from 'src/learning-tracks/learning-tracks.entity';
+import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
+import { LearningTrackCompletedChapters } from 'src/learning-tracks/entities/learning-track-completed-chapters.entity';
 
 require('dotenv').config();
 
@@ -55,7 +59,7 @@ class ConfigService {
         password: this.getValue('POSTGRES_PASSWORD'),
         database: this.getValue('POSTGRES_DATABASE'),
         extra: {
-          max: 200, // set pool max size to 20
+          max: 100, // set pool max size to 20
           idleTimeoutMillis: 1000 * 60, // close idle clients after 1 second
           connectionTimeoutMillis: 15000, // return an error after 1 second if connection could not be established
         },
@@ -80,6 +84,10 @@ class ConfigService {
           UsersAppUsageTime,
           Badges,
           InvitationsCode,
+          UsersTrophies,
+          LearningTracks,
+          MarketPlaceProducts,
+          LearningTrackCompletedChapters
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],

@@ -13,15 +13,23 @@ export class EmailsService {
     this.ses = new AWS.SES({
       accessKeyId: process.env.SES_ACCESS_KEY_ID,
       secretAccessKey: process.env.SES_SECRET_ACCESS_KEY,
-      region: process.env.REGION,
+      region: process.env.SES_REGION,
       apiVersion: '2012-11-05'
     });
   }
   
-  async sendRecoverPasswordEmail(email : string, payload : { url_recover_password : string }) {
+  async sendRecoverPasswordEmail(email : string, language : string, payload : { url_recover_password : string }) {
 
-    const body = this.loadTemplate("recover-password");
-    return this.sendEmail(email, "Recuperar senha", body, payload);
+    let templateName = "recover-password-en";
+    let subject = "Recover password";
+
+    if (language == "ptbr") {
+      templateName = "recover-password-ptbr";
+      subject = "Recuperar senha";
+    }
+
+    const body = this.loadTemplate(templateName);
+    return this.sendEmail(email, subject, body, payload);
 
   }
 

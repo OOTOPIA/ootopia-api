@@ -165,8 +165,6 @@ export class PostsController {
     @Post('/video/webhook')
     async webhook(@Headers() headers, @Body() data: WebhookDto, @Request() req : Request) {
         try {
-            console.log("headers", headers);
-            //console.log("body", typeof raw, raw);
             const webhookSignature = headers['webhook-signature'];
 
             if (!webhookSignature) {

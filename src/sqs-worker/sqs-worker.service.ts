@@ -17,4 +17,12 @@ export class SqsWorkerService {
         });
     }
 
+    public async sendStrapiWebhookMessage(data : any) {
+        return await this.sqsService.send('strapi_webhook', {
+            id: uuidv4(),
+            body: data,
+            delaySeconds: 0,
+        });
+    }
+
 }

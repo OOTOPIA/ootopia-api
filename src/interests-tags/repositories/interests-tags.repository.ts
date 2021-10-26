@@ -7,12 +7,18 @@ import { InterestsTagsUsers } from '../entities/interests-tags-users.entity';
 @EntityRepository(InterestsTags)
 export class InterestsTagsRepository extends Repository<InterestsTags>{
 
-    getTags(language : string) {
-        if (!language) {
-            language = "pt-BR";
+    async getTags(language : string) {
+        let exclusiveInterestTagsByLanguage = await getConnection().query('select language from interests_tags group by language');
+
+        let isLanguage = exclusiveInterestTagsByLanguage.find( tag => tag.language.indexOf(language) == 0 && !!language);
+
+        if (!isLanguage) {
+            isLanguage = {};
+            isLanguage.language = 'en-US';
         }
+
         return this.find({
-            where: { active: true, language }
+            where: { active: true, language: isLanguage.language }
         });
     }
 

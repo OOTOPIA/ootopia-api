@@ -39,7 +39,7 @@ export class GeneralConfigService {
             hour:   time.get('hour'),
             minute: time.get('minute'),
             second: time.get('second')
-        }).subtract(1, 'day')).toDate();
+        })).toDate();
     }
 
     getDailyGoalEndTime(_time : string) {

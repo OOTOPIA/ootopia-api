@@ -6,6 +6,7 @@ import { getConnection, In, QueryRunner } from 'typeorm';
 import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
+import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
 
 @Injectable()
 export class WalletTransfersService {
@@ -34,6 +35,10 @@ export class WalletTransfersService {
             fromPlatform : data.fromPlatform || false,
             processed : data.processed || false,
             postId : data.postId,
+            marketPlaceData : data.marketPlaceData,
+            description : data.description,
+            marketPlaceId : data.marketPlaceId,
+            learningTrackId : data.learningTrackId,
         }, isTransaction);
 
         if (!isTransaction) {
@@ -42,6 +47,10 @@ export class WalletTransfersService {
 
         return walletTransfer;
 
+    }
+
+    updateTransfer(walletTransferId : string, walletTransferData, isTransaction? : boolean) {
+        return this.walletTransfersRepository.updateTransfer(walletTransferId, walletTransferData, isTransaction);
     }
 
     private async transferOOZBetweenUsers(senderUserId : string, receiverUserId : string, balance : number, origin : Origin, postId? : string, queryRunner? : QueryRunner) {
@@ -214,8 +223,20 @@ export class WalletTransfersService {
     }
 
     async getTransfers(filters) {
+        if (filters.userId) {
+            filters.walletId = (await this.walletsService.getWalletByUserId(filters.userId)).id
+        }
         return (await this.walletTransfersRepository.getTransfers(filters)).map((transfer) => {
             transfer.balance = ((+transfer.balance).toFixed(2));
+            if (transfer.marketPlaceData) {
+                transfer.marketPlaceData = JSON.parse(transfer.marketPlaceData);
+                transfer.photoUrl = transfer.marketPlaceData.imageUrl;
+            }
+            if (transfer.lImageUrl) {
+                transfer.icon = transfer.lImageUrl;
+            }
+            
+            delete transfer.lImageUrl;
             return transfer;
         });
     }
@@ -245,6 +266,105 @@ export class WalletTransfersService {
 
     async getTransfersNotProcessedInThisPeriod(userId : string, startDateTime : Date) {
         return await this.walletTransfersRepository.getTransfersNotProcessedInThisPeriod(userId, startDateTime);
+    }
+
+    async transferMarketPlacePurchase(userId : string, marketPlaceProduct : MarketPlaceProducts) {
+
+        let userWallet = await this.walletsService.getWalletByUserId(userId);
+
+        if ((+userWallet.totalBalance - +marketPlaceProduct.price) < 0) {
+            throw new HttpException("INSUFFICIENT_BALANCE", 400);
+        }
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(await this.createTransfer(userId, {
+                userId : userId,
+                walletId : userWallet.id,
+                balance : +(+marketPlaceProduct.price).toFixed(2),
+                origin : Origin.MARKET_PLACE_TRANSFER,
+                action : WalletTransferAction.SENT,
+                marketPlaceData : marketPlaceProduct,
+                description : marketPlaceProduct.title,
+                fromPlatform : true,
+                processed : true
+            }, true));
+
+            await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(userWallet.id, userId, +marketPlaceProduct.price));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
+    }
+
+    async transferLearningTrack(chapterOOZ : number, learningTrack, userId : string, userWallet?) {
+
+        if (!userWallet) {
+            userWallet = await this.walletsService.getWalletByUserId(userId);
+        }
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(await this.createTransfer(userId, {
+                userId : userId,
+                walletId : userWallet.id,
+                balance : +(+chapterOOZ).toFixed(2),
+                origin : Origin.LEARNING_TRACK,
+                action : WalletTransferAction.RECEIVED,
+                learningTrackId : learningTrack.id,
+                description : learningTrack.title,
+                fromPlatform : true,
+                processed : true
+            }, true));
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(userWallet.id, userId, +chapterOOZ));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
+    }
+
+    async updateLearningTrackTransfer(chapterOOZ : number, walletTransfer, userId : string,  userWallet?) {
+
+        if (!userWallet) {
+            userWallet = await this.walletsService.getWalletByUserId(userId);
+        }
+
+        let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(await this.updateTransfer(walletTransfer.id, {
+                balance : +(+chapterOOZ + +walletTransfer.balance).toFixed(2),
+            }, true));
+
+            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(userWallet.id, userId, +chapterOOZ));
+
+            await queryRunner.commitTransaction();
+
+        }catch(err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+
     }
 
 }

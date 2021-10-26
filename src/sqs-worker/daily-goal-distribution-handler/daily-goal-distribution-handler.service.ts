@@ -51,31 +51,6 @@ export class DailyGoalDistributionHandlerService {
             if (userDailyGoalStats.dailyGoalAchieved) {
 
                 await this.walletTransfersService.transferTodaysGameCompleted(userId);
-
-                //Old code
-
-                // let notProcessedTransfers = await this.walletTransfersService.getTransfersNotProcessedInThisPeriod(id, dailyGoalStartTime);
-
-                // if (!notProcessedTransfers.length) {
-                //     continue;
-                // }
-
-                // let transfersGroupedByOrigin = {};
-
-                // notProcessedTransfers.forEach((transfer) => {
-                //     if (!transfersGroupedByOrigin[transfer.origin]) {
-                //         transfersGroupedByOrigin[transfer.origin] = {totalOOZToTransfer : 0, transfers: []};
-                //     }
-                //     transfersGroupedByOrigin[transfer.origin]['transfers'].push(transfer);
-                // });
-
-                // for (let i = 0; i < Object.keys(transfersGroupedByOrigin).length; i++) {
-                //     let origin = Object.keys(transfersGroupedByOrigin)[i];
-                //     let transfersGroup = transfersGroupedByOrigin[origin];
-                //     transfersGroup['totalOOZToTransfer'] = (+notProcessedTransfers.filter((transfer) => transfer.origin == origin).map((transfer) => +transfer.balance).reduce((total, value) => total + value)).toFixed(2)
-                // }
-
-                // await this.performUserTransfers(id, transfersGroupedByOrigin, notProcessedTransfers.map((transfer) => transfer.id));
                 
             }else{
                 console.log("not daily goal achieved >>>", userDailyGoalStats);
@@ -84,56 +59,4 @@ export class DailyGoalDistributionHandlerService {
         }
 
     }
-
-    private async performUserTransfers(userId, transfersGroupedByOrigin, notProcessedTransfersIds) {
-
-        let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-
-        let totalOOZToTransfer = 0;
-
-        try {
-
-            let receiverUserWalletId = (await this.walletsService.getWalletByUserId(userId)).id;
-
-            for (let i = 0; i < Object.keys(transfersGroupedByOrigin).length; i++) {
-                let origin = Object.keys(transfersGroupedByOrigin)[i];
-                let transfersGroup = transfersGroupedByOrigin[origin];
-                
-                if (transfersGroup.totalOOZToTransfer > 0) {
-
-                    await queryRunner.manager.save(await this.walletTransfersService.createTransfer(userId, {
-                        userId : userId,
-                        walletId : receiverUserWalletId,
-                        balance : +transfersGroup.totalOOZToTransfer,
-                        origin : origin,
-                        action : WalletTransferAction.RECEIVED,
-                        fromPlatform : true,
-                        processed : true
-                    }, true));
-
-                    totalOOZToTransfer = totalOOZToTransfer + +transfersGroup.totalOOZToTransfer;
-
-                }
-
-            }
-
-            await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(receiverUserWalletId, userId, +totalOOZToTransfer));
-
-            for (let i = 0; i < notProcessedTransfersIds.length; i++) {
-                let transferId = notProcessedTransfersIds[i];
-                await queryRunner.manager.update(WalletTransfers, transferId, { removed : true });
-            }
-
-            await queryRunner.commitTransaction();
-
-        }catch(err) {
-            console.log("Error when transfer to user", err);
-            await queryRunner.rollbackTransaction();
-            throw err;
-        }
-
-    }
-
 }

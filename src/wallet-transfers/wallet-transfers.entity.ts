@@ -1,4 +1,6 @@
 
+import { LearningTracks } from 'src/learning-tracks/learning-tracks.entity';
+import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
 import { Posts } from 'src/posts/posts.entity';
 import { Wallets } from 'src/wallets/wallets.entity';
 import {
@@ -31,6 +33,8 @@ export enum Origin {
   INVITATION_CODE = "invitation_code",
   INVITATION_CODE_SENT = "invitation_code_sent",
   INVITATION_CODE_ACCEPTED = "invitation_code_accepted",
+  MARKET_PLACE_TRANSFER = "market_place_transfer",
+  LEARNING_TRACK = "learning_track",
 };
 
 export enum WalletTransferAction {
@@ -59,6 +63,20 @@ export class WalletTransfers extends BaseEntity {
   @ManyToOne(type => Posts, post => post.id, { nullable : true })
   @JoinColumn({ name: "post_id" })
   postId? : string;
+
+  @ManyToOne(type => MarketPlaceProducts, marketPlace => marketPlace.id, { nullable : true })
+  @JoinColumn({ name: "market_place_id" })
+  marketPlaceId? : string;
+
+  @Column({ nullable : true, type: 'simple-json', name : 'market_place_data'})
+  marketPlaceData : any;
+
+  @ManyToOne(type => LearningTracks, learningTrack => learningTrack.id, { nullable : true })
+  @JoinColumn({ name: "learning_track_id" })
+  learningTrackId? : string;
+
+  @Column({ nullable: true, type: 'varchar' })
+  description : string;
 
   @Column({ 
     nullable: true, 

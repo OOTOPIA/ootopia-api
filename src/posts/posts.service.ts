@@ -120,7 +120,7 @@ export class PostsService {
         postResult.oozGenerated = transfer.balance;
       }else{
         const totalOOZ = await this.calcOOZToTransferForPostVideos(+(postData.durationInSecs).toFixed(1));
-        postResult.oozGenerated = totalOOZ.toFixed(2);
+        postResult.oozGenerated = totalOOZ;
       }
 
       return postResult;
@@ -216,15 +216,14 @@ export class PostsService {
     return result;
   }
 
-  private async calcOOZToTransferForPostVideos(durationInSecs : number) {
-    console.log("uai so", durationInSecs);
+  async calcOOZToTransferForPostVideos(durationInSecs : number) {
     const oozToReward = +(
       await this.generalConfigService.getConfig(
         ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO,
       )
     ).value;
     const duration = +(durationInSecs).toFixed(0);
-    return oozToReward * (duration / 60);
+    return (oozToReward * (duration / 60)).toFixed(2);
   }
 
   async sendRewardToCreatorForPost(postId: string) {
