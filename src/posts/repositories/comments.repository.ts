@@ -85,7 +85,6 @@ export class CommentsRepository extends Repository<PostsComments>{
 
         let queryRunner = getConnection().createQueryRunner();
     
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {

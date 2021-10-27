@@ -32,7 +32,6 @@ export class InterestsTagsService {
 
             if (!originQueryRunner) {
                 queryRunner = getConnection().createQueryRunner();
-                await queryRunner.connect();
                 await queryRunner.startTransaction();
             }else{
                 queryRunner = originQueryRunner;
@@ -68,7 +67,6 @@ export class InterestsTagsService {
 
             if (!originQueryRunner) {
                 queryRunner = getConnection().createQueryRunner();
-                await queryRunner.connect();
                 await queryRunner.startTransaction();
             }else{
                 queryRunner = originQueryRunner;
