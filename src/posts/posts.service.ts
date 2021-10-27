@@ -35,8 +35,6 @@ export class PostsService {
     postData.id = uuidv4();
 
     const queryRunner = getConnection().createQueryRunner();
-
-    await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
@@ -149,7 +147,6 @@ export class PostsService {
     }
 
     const queryRunner = getConnection().createQueryRunner();
-    await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
