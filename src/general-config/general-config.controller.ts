@@ -7,13 +7,33 @@ import { GeneralConfigService } from './general-config.service';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { GeneralConfig } from './general-config.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { GeneralConfigDto } from './general-config.dto';
+import { GeneralConfigDto, GeneralConfigIosHasNotchDto } from './general-config.dto';
 
 @Controller('general-config')
 export class GeneralConfigController {
 
     constructor(
         private readonly generalConfigService : GeneralConfigService) {}
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('general-config')
+    @ApiOperation({ summary: 'Check if ios version has notch' })
+    @ApiResponse({ status: 200, type: GeneralConfigDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+    @Get('/check-ios-has-notch')
+    async getIosHasNotch(@Query() query : GeneralConfigIosHasNotchDto) {
+        try {
+
+            return {
+                hasNotch : this.generalConfigService.getIosHasNotch(query.iosScreenSize),
+            };
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('general-config')

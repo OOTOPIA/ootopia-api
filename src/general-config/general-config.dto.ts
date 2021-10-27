@@ -9,3 +9,10 @@ export class GeneralConfigDto {
     value : any;
 
 }
+
+export class GeneralConfigIosHasNotchDto {
+
+    @ApiProperty()
+    iosScreenSize : number;
+
+}
