@@ -57,7 +57,6 @@ export class WalletTransfersService {
 
         if (!queryRunner) {
             queryRunner = getConnection().createQueryRunner();
-            await queryRunner.connect();
             await queryRunner.startTransaction();
         }
 
@@ -123,7 +122,6 @@ export class WalletTransfersService {
     async transferPersonalGoalAchieved(userId : string) {
 
         let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -174,7 +172,6 @@ export class WalletTransfersService {
     async transferTodaysGameCompleted(userId : string) {
 
         let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -243,7 +240,6 @@ export class WalletTransfersService {
 
     async createTransferTest(userId : string) {
         let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -277,7 +273,6 @@ export class WalletTransfersService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -312,7 +307,6 @@ export class WalletTransfersService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -347,7 +341,6 @@ export class WalletTransfersService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
-        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
