@@ -59,10 +59,10 @@ export class UsersRepository extends Repository<Users>{
     }
 
     async getUserByEmail(email: string) {
-        const user = await this.find({
+        const user = await this.findOne({
           where: { email },
         });
-        return (user && user.length ? user[0] : null);
+        return user;
     }
 
     //I use the manual query because the typeOrm does not return related tables without the join, in this case, it would not return the address_id column
