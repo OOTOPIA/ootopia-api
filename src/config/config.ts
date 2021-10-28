@@ -59,8 +59,8 @@ class ConfigService {
         password: this.getValue('POSTGRES_PASSWORD'),
         database: this.getValue('POSTGRES_DATABASE'),
         extra: {
-          max: 20, // set pool max size to 20
-          idleTimeoutMillis: 10000 * 60, // close idle clients after 1 second
+          // max: 20, // set pool max size to 20
+          // idleTimeoutMillis: 10000 * 60, // close idle clients after 1 second
           connectionTimeoutMillis: 15000, // return an error after 1 second if connection could not be established
         },
         synchronize: true,
