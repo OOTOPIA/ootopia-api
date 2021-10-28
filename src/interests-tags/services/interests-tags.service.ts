@@ -86,12 +86,16 @@ export class InterestsTagsService {
             }
 
             if (!originQueryRunner) {
+                console.log("não tem originQueryRunner");
                 await queryRunner.commitTransaction();
+            }else{
+                console.log("tem originQueryRunner");
             }
 
             return queryRunner;
 
         }catch(err) {
+            console.log("error here", err);
             await queryRunner.rollbackTransaction();
             throw err;
         } finally {

@@ -41,6 +41,7 @@ export class PostsService {
     console.log("debug upload 1");
 
     try {
+      var postResult : any = null;
       console.log("debug upload 2");
       if (postData.type === 'image') {
         console.log("debug upload 3");
@@ -73,7 +74,7 @@ export class PostsService {
       }
       postData.userId = userId;
       console.log("debug upload 9");
-      const postResult: any = await this.postsRepository.createOrUpdatePost(
+      postResult = await this.postsRepository.createOrUpdatePost(
         postData,
       );
 
@@ -138,6 +139,15 @@ export class PostsService {
       await queryRunner.commitTransaction();
       console.log("debug upload 21");
 
+    } catch (err) {
+      console.log("debug upload 26");
+      await queryRunner.rollbackTransaction();
+      console.log("debug upload 27");
+      await this.postsRepository.deletePost(postData.id);
+      console.log("debug upload 28");
+      throw err;
+    } finally {
+      await queryRunner.release();
       if(postResult.type === 'image'){
         console.log("debug upload 22");
         let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
@@ -151,15 +161,6 @@ export class PostsService {
       }
 
       return postResult;
-    } catch (err) {
-      console.log("debug upload 26");
-      await this.postsRepository.deletePost(postData.id);
-      console.log("debug upload 27");
-      await queryRunner.rollbackTransaction();
-      console.log("debug upload 28");
-      throw err;
-    } finally {
-      await queryRunner.release();
     }
   }
 
