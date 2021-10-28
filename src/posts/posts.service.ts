@@ -37,22 +37,30 @@ export class PostsService {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.startTransaction();
 
+    console.log("debug upload 1");
+
     try {
+      console.log("debug upload 2");
       if (postData.type === 'image') {
+        console.log("debug upload 3");
         const imagesAcceptTypes = ['image/png', 'image/jpeg'];
         if (imagesAcceptTypes.includes(file.mimetype)) {
+          console.log("debug upload 4");
           postData.thumbnailUrl = postData.imageUrl = await this.filesUploadService.uploadFileToS3Minio(
             file.buffer,
             file.originalname,
             userId,
           );
+          console.log("debug upload 8");
         } else {
+          console.log("debug upload 5");
           throw new HttpException(
             'When image type is set only .png or .jpeg extensions is accept',
             400,
           );
         }
       } else {
+        console.log("debug upload 6");
         const video: any = await this.videoService.uploadVideo(
           file.buffer,
           postData.description,
@@ -60,29 +68,36 @@ export class PostsService {
         postData.videoUrl = video.playback.hls;
         postData.thumbnailUrl = video.thumbnail;
         postData.streamMediaId = video.uid;
+        console.log("debug upload 7");
       }
       postData.userId = userId;
-
+      console.log("debug upload 9");
       const postResult: any = await this.postsRepository.createOrUpdatePost(
         postData,
       );
+
+      console.log("debug upload 10");
 
       if (
         postData.addressCountryCode &&
         postData.addressState &&
         postData.addressCity
       ) {
+        console.log("debug upload 11");
         let city = await this.citiesService.getCity(
           postData.addressCity,
           postData.addressState,
           postData.addressCountryCode,
         );
+        console.log("debug upload 12");
         if (!city) {
+          console.log("debug upload 13");
           city = await this.citiesService.createCity({
             city: postData.addressCity,
             state: postData.addressState,
             country: postData.addressCountryCode,
           });
+          console.log("debug upload 14");
         }
 
         const addressData: any = {
@@ -92,9 +107,13 @@ export class PostsService {
           number: postData.addressNumber,
         };
 
+        console.log("debug upload 15");
+
         const address = await this.addressesRepository.createOrUpdateAddress(
           addressData,
         );
+
+        console.log("debug upload 16");
 
         postResult.addressId = address.id;
 
@@ -103,28 +122,40 @@ export class PostsService {
 
       if (postData.tagsIds && postData.tagsIds.length > 0) {
         const tagsIds = postData.tagsIds.split(',');
+        console.log("debug upload 17");
         await this.interestsTagsService.updatePostTags(
           postResult.id,
           tagsIds,
           queryRunner,
         );
+        console.log("debug upload 18");
       }
 
+      console.log("debug upload 19");
       await queryRunner.manager.save(postResult);
+      console.log("debug upload 20");
       await queryRunner.commitTransaction();
+      console.log("debug upload 21");
 
       if(postResult.type === 'image'){
+        console.log("debug upload 22");
         let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
+        console.log("debug upload 23");
         postResult.oozGenerated = transfer.balance;
       }else{
+        console.log("debug upload 24");
         const totalOOZ = await this.calcOOZToTransferForPostVideos(+(postData.durationInSecs).toFixed(1));
+        console.log("debug upload 25");
         postResult.oozGenerated = totalOOZ;
       }
 
       return postResult;
     } catch (err) {
+      console.log("debug upload 26");
       await this.postsRepository.deletePost(postData.id);
+      console.log("debug upload 27");
       await queryRunner.rollbackTransaction();
+      console.log("debug upload 28");
       throw err;
     }
   }
