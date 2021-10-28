@@ -55,6 +55,7 @@ export class UsersService {
         }
 
         const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         userData.invitationCode = !!userData.invitationCode ? userData.invitationCode : null;
@@ -156,6 +157,8 @@ export class UsersService {
 			if (wallet && wallet.id)	await this.walletsService.delete(wallet.id);
 			if (user && user.id)	await this.usersRepository.delete(user.id);
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
         delete user.password;
@@ -167,7 +170,7 @@ export class UsersService {
     async updateUser(userData: UserProfileUpdateDto, photoFile = null) {
 
         let queryRunner = getConnection().createQueryRunner();
-
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         let currentUser = await this.getUserById(userData.id);
@@ -226,6 +229,7 @@ export class UsersService {
 
         await queryRunner.manager.save(await this.usersRepository.create(_userData));
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         return Object.assign(currentUser, _userData);
 

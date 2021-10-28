@@ -57,6 +57,7 @@ export class WalletTransfersService {
 
         if (!queryRunner) {
             queryRunner = getConnection().createQueryRunner();
+            await queryRunner.connect();
             await queryRunner.startTransaction();
         }
 
@@ -103,6 +104,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
     }
 
@@ -122,6 +125,7 @@ export class WalletTransfersService {
     async transferPersonalGoalAchieved(userId : string) {
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -165,6 +169,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -172,6 +178,7 @@ export class WalletTransfersService {
     async transferTodaysGameCompleted(userId : string) {
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -215,6 +222,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -240,6 +249,7 @@ export class WalletTransfersService {
 
     async createTransferTest(userId : string) {
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -252,6 +262,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
     }
 
@@ -273,6 +285,7 @@ export class WalletTransfersService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -296,6 +309,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -307,6 +322,7 @@ export class WalletTransfersService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -330,6 +346,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -341,6 +359,7 @@ export class WalletTransfersService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -356,6 +375,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }

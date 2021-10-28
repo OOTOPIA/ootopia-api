@@ -116,6 +116,8 @@ export class CommentsRepository extends Repository<PostsComments>{
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
