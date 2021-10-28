@@ -8,35 +8,17 @@ import { ValidationPipe } from '@nestjs/common';
 import { urlencoded, json } from 'express';
 import { AllExceptionsFilter } from './config/all-exception-filter';
 import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
 
 async function bootstrap() {
   const expressApp = express();
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
-    new ExpressAdapter(expressApp),
-    { logger : true, }
+    new ExpressAdapter(expressApp)
   );
 
   Sentry.init({
     dsn: 'https://85374b7ba3a94b00bd99bb44f014acd0@o566687.ingest.sentry.io/5709807',
-    integrations: [
-      // enable HTTP calls tracing
-      new Sentry.Integrations.Http({ tracing: true }),
-      // enable Express.js middleware tracing
-      new Tracing.Integrations.Express({ app : expressApp }),
-    ],
-
-    // We recommend adjusting this value in production, or using tracesSampler
-    // for finer control
-    tracesSampleRate: 1.0,
   });
-
-    // RequestHandler creates a separate execution context using domains, so that every
-  // transaction/span/breadcrumb is attached to its own Hub instance
-  expressApp.use(Sentry.Handlers.requestHandler());
-  // TracingHandler creates a trace for every incoming request
-  expressApp.use(Sentry.Handlers.tracingHandler());
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useStaticAssets(join(__dirname, '..', 'public'));
