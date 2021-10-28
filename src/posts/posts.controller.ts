@@ -275,7 +275,7 @@ export class PostsController {
     async recordWatchedVideoTime(@Req() { user }, @Body() body) {
         try {
 
-            this.postsWatchedVideotimeService.recordWatchedVideotime(user.id, JSON.parse(body.data));
+            await this.postsWatchedVideotimeService.recordWatchedVideotime(user.id, JSON.parse(body.data));
             return;
             
         } catch (error) {
