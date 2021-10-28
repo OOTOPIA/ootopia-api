@@ -55,6 +55,7 @@ export class UsersService {
         }
 
         const queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         userData.invitationCode = !!userData.invitationCode ? userData.invitationCode : null;
@@ -169,7 +170,7 @@ export class UsersService {
     async updateUser(userData: UserProfileUpdateDto, photoFile = null) {
 
         let queryRunner = getConnection().createQueryRunner();
-
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         let currentUser = await this.getUserById(userData.id);
