@@ -157,6 +157,8 @@ export class PostsService {
       await queryRunner.rollbackTransaction();
       console.log("debug upload 28");
       throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -219,6 +221,8 @@ export class PostsService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 

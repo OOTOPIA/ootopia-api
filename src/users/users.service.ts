@@ -156,6 +156,8 @@ export class UsersService {
 			if (wallet && wallet.id)	await this.walletsService.delete(wallet.id);
 			if (user && user.id)	await this.usersRepository.delete(user.id);
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
         delete user.password;
@@ -226,6 +228,7 @@ export class UsersService {
 
         await queryRunner.manager.save(await this.usersRepository.create(_userData));
         await queryRunner.commitTransaction();
+        await queryRunner.release();
 
         return Object.assign(currentUser, _userData);
 

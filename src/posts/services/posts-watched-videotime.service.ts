@@ -106,6 +106,8 @@ export class PostsWatchedVideotimeService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
         
     }
