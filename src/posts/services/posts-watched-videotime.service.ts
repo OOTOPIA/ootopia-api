@@ -44,6 +44,7 @@ export class PostsWatchedVideotimeService {
         });
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -106,6 +107,8 @@ export class PostsWatchedVideotimeService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
         
     }

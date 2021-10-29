@@ -28,6 +28,7 @@ export class PostsTimelineViewTimeService {
         }
 
         let queryRunner = getConnection().createQueryRunner();
+        await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
@@ -56,6 +57,8 @@ export class PostsTimelineViewTimeService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
         
     }

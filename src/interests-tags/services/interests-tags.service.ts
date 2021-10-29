@@ -32,6 +32,7 @@ export class InterestsTagsService {
 
             if (!originQueryRunner) {
                 queryRunner = getConnection().createQueryRunner();
+                await queryRunner.connect();
                 await queryRunner.startTransaction();
             }else{
                 queryRunner = originQueryRunner;
@@ -55,6 +56,10 @@ export class InterestsTagsService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            if (!originQueryRunner) {
+                await queryRunner.release();
+            }
         }
 
     }
@@ -67,6 +72,7 @@ export class InterestsTagsService {
 
             if (!originQueryRunner) {
                 queryRunner = getConnection().createQueryRunner();
+                await queryRunner.connect();
                 await queryRunner.startTransaction();
             }else{
                 queryRunner = originQueryRunner;
@@ -90,6 +96,8 @@ export class InterestsTagsService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
