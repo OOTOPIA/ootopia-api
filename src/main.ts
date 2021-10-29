@@ -13,7 +13,7 @@ async function bootstrap() {
   const expressApp = express();
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
-    new ExpressAdapter(expressApp),
+    new ExpressAdapter(expressApp)
   );
 
   Sentry.init({

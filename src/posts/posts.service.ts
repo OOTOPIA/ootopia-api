@@ -35,11 +35,11 @@ export class PostsService {
     postData.id = uuidv4();
 
     const queryRunner = getConnection().createQueryRunner();
-
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      var postResult : any = null;
       if (postData.type === 'image') {
         const imagesAcceptTypes = ['image/png', 'image/jpeg'];
         if (imagesAcceptTypes.includes(file.mimetype)) {
@@ -64,8 +64,7 @@ export class PostsService {
         postData.streamMediaId = video.uid;
       }
       postData.userId = userId;
-
-      const postResult: any = await this.postsRepository.createOrUpdatePost(
+      postResult = await this.postsRepository.createOrUpdatePost(
         postData,
       );
 
@@ -115,6 +114,12 @@ export class PostsService {
       await queryRunner.manager.save(postResult);
       await queryRunner.commitTransaction();
 
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      await this.postsRepository.deletePost(postData.id);
+      throw err;
+    } finally {
+      await queryRunner.release();
       if(postResult.type === 'image'){
         let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
         postResult.oozGenerated = transfer.balance;
@@ -124,10 +129,6 @@ export class PostsService {
       }
 
       return postResult;
-    } catch (err) {
-      await this.postsRepository.deletePost(postData.id);
-      await queryRunner.rollbackTransaction();
-      throw err;
     }
   }
 
@@ -149,7 +150,6 @@ export class PostsService {
     }
 
     const queryRunner = getConnection().createQueryRunner();
-    await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
@@ -191,6 +191,8 @@ export class PostsService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 

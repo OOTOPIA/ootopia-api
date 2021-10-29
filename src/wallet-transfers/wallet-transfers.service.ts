@@ -104,6 +104,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
     }
 
@@ -167,6 +169,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -218,6 +222,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -256,6 +262,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
     }
 
@@ -301,6 +309,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -336,6 +346,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }
@@ -363,6 +375,8 @@ export class WalletTransfersService {
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
+        } finally {
+            await queryRunner.release();
         }
 
     }

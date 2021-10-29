@@ -8,8 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
 import { WalletsModule } from 'src/wallets/wallets.module';
 import { EmailsModule } from 'src/emails/emails.module';
-import { UsersModule } from 'src/users/users.module';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [

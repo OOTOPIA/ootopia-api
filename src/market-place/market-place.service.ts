@@ -8,6 +8,7 @@ import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.se
 import { EmailsService } from 'src/emails/emails.service';
 import { UsersService } from 'src/users/users.service';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
+import * as Sentry from '@sentry/node';
 
 const axios = Axios.default;
 
@@ -74,6 +75,14 @@ export class MarketPlaceService {
       createdAt : marketPlaceData.created_at,
       updatedAt : marketPlaceData.updated_at,
     };
+
+    if (marketPlaceData.seller) {
+
+      let user = await this.usersService.getUserByEmail(marketPlaceData.seller);
+
+      //se der ruim
+      Sentry.captureMessage("There is no seller with this email: " + marketPlaceData.seller);
+    }
 
     return await this.marketPlaceRepository.createOrUpdate(marketPlace);
   }
