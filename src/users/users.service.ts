@@ -182,6 +182,7 @@ export class UsersService {
             bio: userData.bio,
             birthdate : userData.birthdate || null,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
+            dialCode : userData.dialCode,
         };  
 
         if (photoFile != null) {

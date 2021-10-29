@@ -48,7 +48,14 @@
                         color: #707070;
                         text-transform: uppercase;
                         opacity: 1;
-                        src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);" >CONGRATULATIONS ON YOUR SALE</span>
+                        src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
+                        >
+                        {{#if seller}}
+                            PARABÉNS PELA VENDA
+                        {{else}}
+                            OBRIGADO POR SUA COMPRA
+                        {{/if}}
+                        </span>
                     </td>
                 </tr>
 
@@ -67,7 +74,13 @@
                             color: #000000;
                             opacity: 1;
                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                        >Send an email to ({{user.fullname}})</span>
+                        >
+                        {{#if seller}}
+                            Envie um e-mail para ({{user.email}})
+                        {{else}}
+                            O fornecedor entrará em contato com você em breve por e-mail
+                        {{/if}}
+                        </span>
                     </td>
                 </tr>
 
@@ -86,7 +99,8 @@
                             color: #000000;
                             opacity: 1;
                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                        >to arrange delivery of his/her purchase.</span>
+                        >para providenciar a entrega de sua compra.
+                    </span>
                     </td>
                 </tr>
             </tbody>
@@ -119,14 +133,21 @@
                 <tr>
                     <td>
                         <span style="
-                                text-align: left;
-                                font-family: 'Roboto';
-                                font-size: 14px;
-                                font-weight: 500;
-                                letter-spacing: 0px;
-                                color: #000000;
-                                opacity: 1;
-                                src: local('Roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);" >Purchase</span>
+                            text-align: left;
+                            font-family: 'Roboto';
+                            font-size: 14px;
+                            font-weight: 500;
+                            letter-spacing: 0px;
+                            color: #000000;
+                            opacity: 1;
+                            src: local('Roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
+                        >
+                        {{#if seller}}
+                            Comprador
+                        {{else}}
+                            Fornecedor
+                        {{/if}}
+                        </span>
 
                     </td>                   
                 </tr>
@@ -151,6 +172,7 @@
                                     <td>
                                         <table cellspacing="0" cellpadding="0" >
                                             <tbody>
+
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -168,6 +190,8 @@
                                                             src: local('roboto') url(http://fonts.googleapis.comcss?family=Roboto:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)" >{{user.fullname}}</span>
                                                     </td>
                                                 </tr>
+
+                                                {{#ifCond user.city '||' user.state}}
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -186,6 +210,10 @@
                                                         >{{user.city}}, {{user.state}}</span>
                                                     </td>
                                                 </tr>
+                                                {{/ifCond}}
+
+
+                                                {{#ifCond user.email '||' user.phone}}
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -200,9 +228,33 @@
                                                             letter-spacing: 0px;
                                                             color: #000000;
                                                             opacity: 1;
-                                                            src: local('roboto') url(http://fonts.googleapis.comcss?family=Roboto:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)">Contact</span>
+                                                            src: local('roboto') url(http://fonts.googleapis.comcss?family=Roboto:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)">Contato</span>
                                                     </td>
                                                 </tr>
+                                                {{/ifCond}}
+
+                                                {{#if user.phone}}
+                                                <tr>
+                                                    <td style="
+                                                        display: flex;
+                                                        margin: 0px 0px 0px 0px;
+                                                        padding: 0px 0px 0px 0px;
+                                                        border: 0;"
+                                                    >
+                                                        <span style="
+                                                            font-family: 'roboto';
+                                                            text-align: left;
+                                                            font: normal normal normal 12px Roboto;
+                                                            letter-spacing: 0px;
+                                                            color: #000000;
+                                                            opacity: 1;
+                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
+                                                        >Telefone Celular: {{user.dialCode}} {{user.phone}}</span>
+                                                    </td>
+                                                </tr>
+                                                {{/if}}
+
+                                                {{#if user.email}}
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -221,24 +273,7 @@
                                                         >E-mail: {{user.email}}</span>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td style="
-                                                        display: flex;
-                                                        margin: 0px 0px 0px 0px;
-                                                        padding: 0px 0px 0px 0px;
-                                                        border: 0;"
-                                                    >
-                                                        <span style="
-                                                            font-family: 'roboto';
-                                                            text-align: left;
-                                                            font: normal normal normal 12px Roboto;
-                                                            letter-spacing: 0px;
-                                                            color: #000000;
-                                                            opacity: 1;
-                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                                                        >Mobile Phone: {{user.phone}}</span>
-                                                    </td>
-                                                </tr>
+                                                {{/if}}
                                                         
                                             </tbody>
                                         </table>
@@ -292,7 +327,7 @@
                             color: #000000;
                             opacity: 1;
                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                        >Purchased Item</span>
+                        >Artigo Comprado</span>
                     </td>
                 </tr>
                 
@@ -332,6 +367,7 @@
                                                             font: normal normal 500 14px Roboto;
                                                             letter-spacing: 0px;
                                                             color: #000000;
+                                                            width: 398px;
                                                             opacity: 1;
                                                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
                                                         >{{marketPlace.title}}</span>
@@ -379,11 +415,55 @@
                                                             letter-spacing: 0px;
                                                             color: #000000;
                                                             opacity: 1;
+                                                            width: 398px;
                                                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
                                                             margin-top: 10px;"
                                                         >{{marketPlace.description}}</span>
                                                     </td>
                                                 </tr>
+
+                                                {{#ifCond marketPlace.message '&&' seller}}
+                                                <tr>
+                                                    <td style="
+                                                    display: flex;
+                                                    margin: 0px 0px 0px 0px;
+                                                    padding: 0px 0px 0px 0px;
+                                                    border: 0;"
+                                                    >
+                                                        <span style="
+                                                            font-family: 'roboto';
+                                                            text-align: left;
+                                                            font: normal normal 500 14px Roboto;
+                                                            letter-spacing: 0px;
+                                                            color: #000000;
+                                                            opacity: 1;
+                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
+                                                            margin-top: 10px;"
+                                                        >Mensagem do Comprador</span>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="
+                                                    display: flex;
+                                                    margin: 0px 0px 0px 0px;
+                                                    padding: 0px 0px 0px 0px;
+                                                    border: 0;"
+                                                    >
+                                                        <span style="
+                                                            font-family: 'roboto';
+                                                            text-align: left;
+                                                            font: normal normal normal 12px Roboto;
+                                                            letter-spacing: 0px;
+                                                            color: #000000;
+                                                            opacity: 1;
+                                                            width: 398px;
+                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
+                                                            margin-top: 10px;"
+                                                        >{{marketPlace.message}}</span>
+                                                    </td>
+                                                </tr>
+                                                {{/ifCond}}
                                             </tbody>
                                         </table>
                                     </td>
@@ -434,7 +514,7 @@
                                 color: #000000;
                                 opacity: 1;
                                 src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                            >All the best,</span>
+                            >Tudo de bom,</span>
                         </td>
                     </tr>
 
@@ -461,7 +541,7 @@
                                 color: #000000;
                                 margin-top: 10px;
                                 src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                            >{{marketPlace.userName}}</span>
+                            >Luize Sehn</span>
                         </td>
                     </tr>
     
@@ -532,7 +612,7 @@
                                 margin-top: 18px;"
                                 href="mailto: support@ootopia.org"
                                 target="_blank"
-                            >Do you have any questions?</a>
+                            >Você tem alguma pergunta?</a>
                         </td>
                     </tr>
     
@@ -545,7 +625,7 @@
                             letter-spacing: 0px;
                             color: #000000;
                             opacity: 1;
-                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);">Get in contact! I'll be happy to help you.</span>
+                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);">Entre em contato! Terei todo o gosto em ajudá-lo.</span>
                         </td>
                     </tr>
                 </tbody>
@@ -582,7 +662,7 @@
                             font: normal normal bold 14px Roboto;
                             letter-spacing: 0px;
                             color: #000000;
-                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);" >COMING SOON</span>
+                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);" >EM BREVE</span>
                         </td>
                     </tr>
 
@@ -612,7 +692,7 @@
                                     src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
                                     white-space: pre-wrap;
                                     margin-top: 10px;"
-                                >In the next application update, the creation of offers on the Ethical Marketplace will be available to everyone. Until then, how about telling us what you would like to offer or purchase? Your suggestions and questions are very welcome!</span>
+                                >Na próxima atualização do aplicativo, a criação de ofertas no Mercado Ético estará à disposição de todos.<br> Até lá, que tal nos dizer o que você gostaria de oferecer ou comprar?<br>Suas sugestões são muito bem vindas!</span>
                             </div>
                         </td>
                     </tr>
@@ -634,7 +714,7 @@
                             align-items: center;
                             opacity: 1;
                             margin: 16px 0 16px 0;
-                            padding: 10px 24px 10px 24px;" href="https://docs.google.com/forms/d/e/1FAIpQLScGB6JQf4-YQn7aZQ5fmJTYxhM1W3qXuW87ycYrlayiesN92A/viewform" target="_blank">Give a suggestion</a>
+                            padding: 10px 24px 10px 24px;" href="https://docs.google.com/forms/d/e/1FAIpQLScGB6JQf4-YQn7aZQ5fmJTYxhM1W3qXuW87ycYrlayiesN92A/viewform" target="_blank">Dê sua gugestão</a>
                         </td>
                     </tr>
                 </tbody>
@@ -643,71 +723,116 @@
     </div>
 
 
-
     <div style="
-        display: flex;
-        justify-content: center;"
+        background-image: url(https://ootopia-files.s3.amazonaws.com/assets/email/market_place_footer_us.png);
+        background-repeat: no-repeat;
+        width: 558px;
+        background-size: 100%;
+        height: 222px;"
     >
-        <img src="https://ootopia-files.s3.amazonaws.com/assets/email/market_place_footer_pt.png" width="502" height="198">
-
+    
         <table>
             <tbody>
                 <tr>
-                    <td style="
-                    margin: 0px 0px 0px 0px;
-                    padding: 0px 0px 0px 0px;
-                    border: 0;"
-                    >
-                        <a href="">
-                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/ootopia_link.png"  width="131" height="21">
-                        </a>
+                    <td>
+                        <div style="
+                            margin: 101px 114px 0px 148px;
+                            padding: 0;
+                            border: 0;"
+                        >
+                            <span style="
+                                white-space: initial;
+                                flex-wrap: inherit;
+                                font-size: 12px;
+                                color: #000000;"
+                            >
+                                O aplicativo que dá acesso a experimentar na prática o novo mundo que está surgindo por meio do movimento regenerativo.
+                            </span>
+                            
+                        </div>
                     </td>
+                </tr>
+
+                <tr>
 
                     <td style="
-                    margin: 0px 0px 0px 132px;
-                    padding: 0px 0px 0px 0px;
-                    border: 0;"
+                        margin: 26px 0px 0px 0px;
+                        padding: 23px 0px 0px 148px;
+                        border: 0;"
                     >
-                        <a href="">
-                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/ootopia_email.png"  width="164" height="21">
-                        </a>
-                    </td>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td style="
+                                        padding: 0px 8px 0px 0px;
+                                        border: 0;"
+                                    >
+                                        <a 
+                                        style="cursor: pointer;" 
+                                        href="https://www.ootopia.org/" 
+                                        target="_blank">
+                                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/ootopia_link.png"  width="131" height="21">
+                                        </a>
+                                    </td>
 
-                    <td style="
-                    margin: 0px 0px 0px 296px;
-                    padding: 0px 0px 0px 0px;
-                    border: 0;"
-                    >
-                        <a href="">
-                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/facebook_icon.png"  width="9" height="16">
-                        </a>
+                                    <td style="
+                                        padding: 0px 8px 0px 0px;
+                                        border: 0;"
+                                    >
+                                        <a 
+                                        style="cursor: pointer;" 
+                                        href="mailto: support@ootopia.org"
+                                        target="_blank">
+                                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/ootopia_email.png"  width="164" height="21">
+                                        </a>
+                                    </td>
+                
+                                    <td style="
+                                        padding: 0px 8px 0px 0px;
+                                        border: 0;"
+                                    >
+                                        <a 
+                                        style="cursor: pointer;" 
+                                        href="https://www.facebook.com/ootopia.br"
+                                        target="_blank"
+                                        >
+                                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/facebook_icon.png"  width="9" height="16">
+                                        </a>
+                                    </td>
+                
+                                    <td style="
+                                        padding: 0px 8px 0px 0px;
+                                        border: 0;"
+                                    >
+                                        <a 
+                                        style="cursor: pointer;" 
+                                        href="https://www.instagram.com/ootopia.br/"
+                                        target="_blank"
+                                        >
+                                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/instagram_icon.png"  width="16" height="16">
+                                        </a>
+                                    </td>
+                
+                                    <td style="
+                                        padding: 0px 8px 0px 0px;
+                                        border: 0;"
+                                    >
+                                        <a 
+                                        style="cursor: pointer;" 
+                                        href="https://www.youtube.com/channel/UCZvZHNM2OK0Tdce2MFsNaPQ/featured"
+                                        target="_blank"
+                                        >
+                                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/youtube_icon.png"  width="18" height="16">
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </td>
-
-                    <td style="
-                    margin: 0px 0px 0px 321px;
-                    padding: 0px 0px 0px 0px;
-                    border: 0;"
-                    >
-                        <a href="">
-                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/instagram_icon.png"  width="16" height="16">
-                        </a>
-                    </td>
-
-                    <td style="
-                    margin: 0px 0px 0px 328px;
-                    padding: 0px 0px 0px 0px;
-                    border: 0;"
-                    >
-                        <a href="">
-                            <img src="https://ootopia-files.s3.amazonaws.com/assets/email/youtube_icon.png"  width="18" height="16">
-                        </a>
-                    </td>
-
                 </tr>
             </tbody>
         </table>
-
-</div>
+    </div>
 
 </body>
 </html>

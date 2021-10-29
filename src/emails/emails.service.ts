@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as Handlebars from 'handlebars';
+import * as Handlebars from './handlebars';
 
 @Injectable()
 export class EmailsService {
@@ -37,7 +37,7 @@ export class EmailsService {
     const result = await this.ses.sendEmail({
       Source: "Ootopia app<" + process.env.SENDER_USER_EMAIL + ">",
       Destination: {
-        ToAddresses: [emailTo, "virtualhacker008@gmail.com"]
+        ToAddresses: [emailTo]
       },
       Message: {
         Subject: {
@@ -58,15 +58,21 @@ export class EmailsService {
     return fs.readFileSync(path.resolve(`public/templates/${filename}.html`), 'utf8');
   }
 
-  async sendConfirmMarketPlace (marketPlace, user) {
-    let template = await this.loadTemplate("marketplace-en");
-    console.log("eae tem algo?", !!user, marketPlace);
-    
-    let oi = Handlebars.compile(template)({marketPlace, user})
+  async sendConfirmMarketPlace (marketPlace, user, seller :boolean = false) {
+    let linguage = marketPlace.locale.slice(0,2);
+    let title = linguage == 'pt' ? "MERCADO ÉTICO OOTOPIA" : "ETHICAL MARKETPLACE OOTOPIA";
+    let destination = seller ? marketPlace.user.email : user.email;
 
-    // await fs.writeFileSync("opa.html",oi);
+    if (destination == 'luize@ootopia.org') {
+      return
+    }
 
-    return await this.sendEmail("leandro-pereira2011@hotmail.com", "OOTOPIA MARKETPLACE", oi);
+    let template = await this.loadTemplate(`marketplace-${linguage}`);
+    let contemplated = seller ? user : marketPlace.user;
+
+    let page = Handlebars.compile(template)({marketPlace, user: contemplated, seller : seller});
+
+    return await this.sendEmail(destination, title, page);
   }
 
 }

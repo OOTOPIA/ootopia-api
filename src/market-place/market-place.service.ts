@@ -107,9 +107,7 @@ export class MarketPlaceService {
     return this.mapper(marketPlaceProduct);
   }
 
-  async purchase(marketPlaceProductId : string, user) {
-    
-    console.log("opa epa ");
+  async purchase(marketPlaceProductId : string, user, message) {
     
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
 
@@ -118,10 +116,26 @@ export class MarketPlaceService {
     }
     user = await this.usersService.getUserById(user.id);
     if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
+
+    marketPlaceProduct.user = marketPlaceProduct.userId && marketPlaceProduct.userId != 'ootopia'? 
+    await this.usersService.getUserById(marketPlaceProduct.userId) 
+    : {
+      fullname: "OOTOPIA",
+      email: "luize@ootopia.org",
+      phone: "21 97261-3293",
+      dialCode: "+55",
+      photoUrl: 'https://ootopia-files.s3.amazonaws.com/assets/email/ooz_blue_circle.png',
+      city: null,
+      state: null,
+    };
     
-    // await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
+    marketPlaceProduct.message = message;
+
+    await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
     
-    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user);
+    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , true);
+    
+    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , false);
     
 
   }

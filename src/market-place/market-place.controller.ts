@@ -68,9 +68,9 @@ export class MarketPlaceProductsController {
   @UseGuards(JwtAuthGuard)
   @Post('/:id/purchase')
   @HttpCode(201)
-  async purchase(@Req() { user }, @Param('id') id : string,  @Body() data : MarketPlacePurchaseCreateDto) {
+  async purchase(@Req() { user }, @Param('id') id : string,  @Body() { message } : MarketPlacePurchaseCreateDto) {
     try {
-      return await this.marketPlaceService.purchase(id, user);
+      return await this.marketPlaceService.purchase(id, user, message);
     }
     catch (error) {
       new ErrorHandling(error);

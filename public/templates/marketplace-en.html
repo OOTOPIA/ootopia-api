@@ -48,7 +48,14 @@
                         color: #707070;
                         text-transform: uppercase;
                         opacity: 1;
-                        src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);" >CONGRATULATIONS ON YOUR SALE</span>
+                        src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
+                        >
+                            {{#if seller}}
+                                CONGRATULATIONS ON YOUR SALE
+                            {{else}}
+                                THANK YOU FOR YOUR PURCHASE
+                            {{/if}}
+                        </span>
                     </td>
                 </tr>
 
@@ -67,7 +74,13 @@
                             color: #000000;
                             opacity: 1;
                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                        >Send an email to ({{user.fullname}})</span>
+                        >
+                        {{#if seller}}
+                            Send an email to ({{user.email}})
+                        {{else}}
+                            The vendor will soon contact you by email
+                        {{/if}}
+                        </span>
                     </td>
                 </tr>
 
@@ -86,7 +99,13 @@
                             color: #000000;
                             opacity: 1;
                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                        >to arrange delivery of his/her purchase.</span>
+                        >
+                        {{#if seller}}
+                            to arrange delivery of his/her purchase.
+                        {{else}}
+                            to arrange the delivery of your purchase.
+                        {{/if}}
+                    </span>
                     </td>
                 </tr>
             </tbody>
@@ -119,14 +138,21 @@
                 <tr>
                     <td>
                         <span style="
-                                text-align: left;
-                                font-family: 'Roboto';
-                                font-size: 14px;
-                                font-weight: 500;
-                                letter-spacing: 0px;
-                                color: #000000;
-                                opacity: 1;
-                                src: local('Roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);" >Purchase</span>
+                            text-align: left;
+                            font-family: 'Roboto';
+                            font-size: 14px;
+                            font-weight: 500;
+                            letter-spacing: 0px;
+                            color: #000000;
+                            opacity: 1;
+                            src: local('Roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
+                        >
+                        {{#if seller}}
+                            Purchase
+                        {{else}}
+                            Vendor
+                        {{/if}}
+                        </span>
 
                     </td>                   
                 </tr>
@@ -168,6 +194,8 @@
                                                             src: local('roboto') url(http://fonts.googleapis.comcss?family=Roboto:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)" >{{user.fullname}}</span>
                                                     </td>
                                                 </tr>
+
+                                                {{#ifCond user.city '||' user.state}}
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -186,6 +214,9 @@
                                                         >{{user.city}}, {{user.state}}</span>
                                                     </td>
                                                 </tr>
+                                                {{/ifCond}}
+
+                                                {{#ifCond user.email '||' user.phone}}
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -203,6 +234,30 @@
                                                             src: local('roboto') url(http://fonts.googleapis.comcss?family=Roboto:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)">Contact</span>
                                                     </td>
                                                 </tr>
+                                                {{/ifCond}}
+
+                                                {{#if user.phone}}
+                                                <tr>
+                                                    <td style="
+                                                        display: flex;
+                                                        margin: 0px 0px 0px 0px;
+                                                        padding: 0px 0px 0px 0px;
+                                                        border: 0;"
+                                                    >
+                                                        <span style="
+                                                            font-family: 'roboto';
+                                                            text-align: left;
+                                                            font: normal normal normal 12px Roboto;
+                                                            letter-spacing: 0px;
+                                                            color: #000000;
+                                                            opacity: 1;
+                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
+                                                        >Mobile Phone: {{user.dialCode}} {{user.phone}}</span>
+                                                    </td>
+                                                </tr>
+                                                {{/if}}
+
+                                                {{#if user.email}}
                                                 <tr>
                                                     <td style="
                                                         display: flex;
@@ -221,25 +276,8 @@
                                                         >E-mail: {{user.email}}</span>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td style="
-                                                        display: flex;
-                                                        margin: 0px 0px 0px 0px;
-                                                        padding: 0px 0px 0px 0px;
-                                                        border: 0;"
-                                                    >
-                                                        <span style="
-                                                            font-family: 'roboto';
-                                                            text-align: left;
-                                                            font: normal normal normal 12px Roboto;
-                                                            letter-spacing: 0px;
-                                                            color: #000000;
-                                                            opacity: 1;
-                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                                                        >Mobile Phone: {{user.phone}}</span>
-                                                    </td>
-                                                </tr>
-                                                        
+                                                {{/if}}
+
                                             </tbody>
                                         </table>
     
@@ -333,6 +371,7 @@
                                                             letter-spacing: 0px;
                                                             color: #000000;
                                                             opacity: 1;
+                                                            width: 398px;
                                                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
                                                         >{{marketPlace.title}}</span>
 
@@ -379,11 +418,55 @@
                                                             letter-spacing: 0px;
                                                             color: #000000;
                                                             opacity: 1;
+                                                            width: 398px;
                                                             src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
                                                             margin-top: 10px;"
                                                         >{{marketPlace.description}}</span>
                                                     </td>
                                                 </tr>
+
+                                                {{#ifCond marketPlace.message '&&' seller}}
+                                                <tr>
+                                                    <td style="
+                                                    display: flex;
+                                                    margin: 0px 0px 0px 0px;
+                                                    padding: 0px 0px 0px 0px;
+                                                    border: 0;"
+                                                    >
+                                                        <span style="
+                                                            font-family: 'roboto';
+                                                            text-align: left;
+                                                            font: normal normal 500 14px Roboto;
+                                                            letter-spacing: 0px;
+                                                            color: #000000;
+                                                            opacity: 1;
+                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
+                                                            margin-top: 10px;"
+                                                        >Message from Purchaser</span>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="
+                                                    display: flex;
+                                                    margin: 0px 0px 0px 0px;
+                                                    padding: 0px 0px 0px 0px;
+                                                    border: 0;"
+                                                    >
+                                                        <span style="
+                                                            font-family: 'roboto';
+                                                            text-align: left;
+                                                            font: normal normal normal 12px Roboto;
+                                                            letter-spacing: 0px;
+                                                            color: #000000;
+                                                            width: 398px;
+                                                            opacity: 1;
+                                                            src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
+                                                            margin-top: 10px;"
+                                                        >{{marketPlace.message}}</span>
+                                                    </td>
+                                                </tr>
+                                                {{/ifCond}}
                                             </tbody>
                                         </table>
                                     </td>
@@ -461,7 +544,7 @@
                                 color: #000000;
                                 margin-top: 10px;
                                 src: local('roboto') url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);"
-                            >{{marketPlace.userName}}</span>
+                            >Luize Sehn</span>
                         </td>
                     </tr>
     
@@ -656,12 +739,16 @@
                 <tr>
                     <td>
                         <div style="
-                            margin: 106px 0px 0px 131px;
+                            margin: 101px 114px 0px 148px;
                             padding: 0;
                             border: 0;"
                         >
-                            <span style="white-space: initial;
-                            flex-wrap: inherit;">
+                            <span style="
+                                white-space: initial;
+                                flex-wrap: inherit;
+                                font-size: 12px;
+                                color: #000000;"
+                            >
                                 The app that gives you access to experience in practice the new world that is emerging through the regenerative movement.
                             </span>
                             
@@ -673,7 +760,7 @@
 
                     <td style="
                         margin: 26px 0px 0px 0px;
-                        padding: 40px 0px 0px 131px;
+                        padding: 23px 0px 0px 148px;
                         border: 0;"
                     >
                         <table>
