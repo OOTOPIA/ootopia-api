@@ -5,6 +5,8 @@ import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import * as Sentry from '@sentry/node';
+import { UsersService } from 'src/users/users.service';
 
 const axios = Axios.default;
 
@@ -15,6 +17,7 @@ export class MarketPlaceService {
     private marketPlaceRepository: MarketPlaceRepository,
     private filesUploadService : FilesUploadService,
     private walletTransfersService : WalletTransfersService,
+    private usersService : UsersService,
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
@@ -69,6 +72,14 @@ export class MarketPlaceService {
       createdAt : marketPlaceData.created_at,
       updatedAt : marketPlaceData.updated_at,
     };
+
+    if (marketPlaceData.seller) {
+
+      let user = await this.usersService.getUserByEmail(marketPlaceData.seller);
+
+      //se der ruim
+      Sentry.captureMessage("There is no seller with this email: " + marketPlaceData.seller);
+    }
 
     return await this.marketPlaceRepository.createOrUpdate(marketPlace);
   }
