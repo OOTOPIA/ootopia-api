@@ -109,16 +109,16 @@ export class CommentsRepository extends Repository<PostsComments>{
             await queryRunner.commitTransaction();
             await this.recalculateCommentCount(post.id);
 
-            return {
-                status: 200,
-            };
-
         }catch(err) {
             await queryRunner.rollbackTransaction();
             throw err;
         } finally {
             await queryRunner.release();
         }
+
+        return {
+            status: 200,
+        };
 
     }
 
