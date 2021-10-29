@@ -57,7 +57,9 @@ export class InterestsTagsService {
             await queryRunner.rollbackTransaction();
             throw err;
         } finally {
-            await queryRunner.release();
+            if (!originQueryRunner) {
+                await queryRunner.release();
+            }
         }
 
     }
