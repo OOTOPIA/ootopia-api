@@ -20,34 +20,43 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
 
     async getLearningTracks(filters : LearningTracksFilterDto) {
 
-        let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
+        let limit = 50, 
+            offset = 0, 
+            where = 'deleted_at IS NULL AND ', 
+            locale = "en",
+            params = [];
 
-        
-        if (filters.id) {
-            where.id = filters.id;
-        } else {
+        let columns = [
+            'l.*', 
+            'u.fullname as user_name', 
+            'u.photo_url as user_photo_url',
+        ];
 
-            if (filters.limit) {
-                if (filters.limit > 50) {
-                    filters.limit = 50;
-                }
-                limit = filters.limit;
-                offset = filters.offset || 0;
+        if (filters.limit) {
+            if (filters.limit > 50) {
+                filters.limit = 50;
             }
-    
-            if (filters.locale) {
-                where.locale = filters.locale;
-            }else{
-                where.locale = locale;
-            }
+            limit = filters.limit;
+            offset = filters.offset || 0;
         }
 
-        return this.createQueryBuilder("learning-tracks")
-            .where(where)
-            .orderBy("strapi_id", "DESC")
-            .limit(limit)
-            .offset(offset)
-            .getMany();
+        if (filters.locale) {
+            params.push(filters.locale);
+            where += `locale = $${params.length} AND `;
+        }else{
+            params.push(locale);
+            where += `locale = $${params.length} AND `;
+        }
+
+        where = where.substring(0, where.length - 5);
+
+        return camelcaseKeys(await getConnection().query(`
+            SELECT ${columns} FROM learning_tracks l
+            LEFT JOIN users u ON u.id = l.user_id
+            WHERE ${where}
+            ORDER BY l.strapi_id DESC
+            LIMIT ${limit} OFFSET ${offset}
+        `, params), { deep : true }).map(this.mapper);
 
     }
 
@@ -92,6 +101,13 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             `${chapterId}`,
             userId
         ]);
+    }
+
+    mapper(learningTrack) {
+        if (learningTrack.chapters) {
+            learningTrack.chapters = JSON.parse(learningTrack.chapters);
+        }
+        return camelcaseKeys(learningTrack);
     }
 
 }

@@ -21,7 +21,17 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
 
     async getMarketPlaceProducts(filters : MarketPlaceFilterDto) {
 
-        let limit = 50, offset = 0, where : any = {deletedAt : IsNull(), }, locale = "en";
+        let limit = 50, 
+            offset = 0, 
+            where = 'deleted_at IS NULL AND ', 
+            locale = "en",
+            params = [];
+
+        let columns = [
+            'm.*', 
+            'u.fullname as user_name', 
+            'u.photo_url as user_photo_url',
+        ];
 
         if (filters.limit) {
             if (filters.limit > 50) {
@@ -32,17 +42,22 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
         }
 
         if (filters.locale) {
-            where.locale = filters.locale;
+            params.push(filters.locale);
+            where += `locale = $${params.length} AND `;
         }else{
-            where.locale = locale;
+            params.push(locale);
+            where += `locale = $${params.length} AND `;
         }
-        
-        return await this.createQueryBuilder()
-            .where(where)
-            .orderBy("strapi_id", "DESC")
-            .limit(limit)
-            .offset(offset)
-            .getMany();
+
+        where = where.substring(0, where.length - 5);
+
+        return camelcaseKeys(await getConnection().query(`
+            SELECT ${columns} FROM market_place_products m
+            LEFT JOIN users u ON u.id = m.user_id
+            WHERE ${where}
+            ORDER BY m.strapi_id DESC
+            LIMIT ${limit} OFFSET ${offset}
+        `, params), { deep : true });
 
     }
 
