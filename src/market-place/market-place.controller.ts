@@ -47,7 +47,6 @@ export class MarketPlaceProductsController {
   @HttpCode(200)
   async getMarketPlaceProductById(@Param('id') id : string) {
     try {
-
       return this.marketPlaceService.getMarketPlaceProductById(id);
     }
     catch (error) {

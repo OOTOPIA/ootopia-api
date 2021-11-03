@@ -11,6 +11,7 @@ import { GeneralConfigModule } from 'src/general-config/general-config.module';
 import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
 import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
 import { WalletsModule } from 'src/wallets/wallets.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WalletsModule } from 'src/wallets/wallets.module';
     FilesUploadModule,
     VideoModule,
     GeneralConfigModule,
+    forwardRef(() => UsersModule),
     forwardRef(() => PostsModule),
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
