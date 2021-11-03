@@ -17,7 +17,7 @@ async function bootstrap() {
   );
 
   Sentry.init({
-    dsn: "https://6f4f6d205da345dd943c6364172aa739@o1059297.ingest.sentry.io/6047741",
+    dsn: process.env.SENTRY_DSN,
 
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
