@@ -54,7 +54,7 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
 
         if (filters.learningTrackId) {
             params.push(filters.learningTrackId);
-            where = where + `w.learning_track_id = $${params.length} AND `;
+            where = where + `w.learning_track_id = $${params.length} AND ((w.created_at::date) = (now()::date)) AND `;
         }
 
         if (filters.limit && filters.offset) {
