@@ -76,12 +76,20 @@ export class MarketPlaceService {
       updatedAt : marketPlaceData.updated_at,
     };
 
-    if (marketPlaceData.seller) {
+    try {
 
-      let user = await this.usersService.getUserByEmail(marketPlaceData.seller);
+      if (marketPlaceData.seller) {
 
-      //se der ruim
-      Sentry.captureMessage("There is no seller with this email: " + marketPlaceData.seller);
+        let user = await this.usersService.getUserByEmail(marketPlaceData.seller);
+
+        if (user) {
+          marketPlace.userId = user.id;
+        }else{
+          Sentry.captureMessage("There is no seller with this email: " + marketPlaceData.seller);
+        }
+      }
+    }catch(e) {
+      Sentry.captureException(e);
     }
 
     return await this.marketPlaceRepository.createOrUpdate(marketPlace);

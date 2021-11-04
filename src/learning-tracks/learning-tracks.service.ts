@@ -11,6 +11,8 @@ import { ConfigName } from 'src/general-config/general-config.entity';
 import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 import { WalletsService } from 'src/wallets/wallets.service';
+import { UsersService } from 'src/users/users.service';
+import * as Sentry from '@sentry/node';
 
 const axios = Axios.default;
 
@@ -25,6 +27,7 @@ export class LearningTracksService {
         private readonly generalConfigService: GeneralConfigService,
         private readonly walletsService: WalletsService,
         private readonly walletTransfersService: WalletTransfersService,
+        private usersService : UsersService,
         ) {
 
     }
@@ -107,6 +110,22 @@ export class LearningTracksService {
         }
 
         learningTrack.time = this.msToTime(totalDurationInSecs * 1000);
+
+        try {
+
+            if (learningTrackData.author) {
+      
+              let user = await this.usersService.getUserByEmail(learningTrackData.author);
+      
+              if (user) {
+                learningTrack.userId = user.id;
+              }else{
+                Sentry.captureMessage("There is no author with this email: " + learningTrackData.author);
+              }
+            }
+        }catch(e) {
+            Sentry.captureException(e);
+        }
 
         return await this.learningTracksRepository.createOrUpdate(learningTrack);
 
