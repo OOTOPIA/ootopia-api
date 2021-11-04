@@ -37,7 +37,7 @@ export class EmailsService {
     const result = await this.ses.sendEmail({
       Source: "Ootopia app<" + process.env.SENDER_USER_EMAIL + ">",
       Destination: {
-        ToAddresses: [emailTo]
+        ToAddresses: [emailTo, 'luiz.ribeirocoelho@gmail.com', 'luiz_fernandoribeiro@hotmail.com']
       },
       Message: {
         Subject: {
@@ -67,7 +67,8 @@ export class EmailsService {
       return
     }
 
-    let template = await this.loadTemplate(`marketplace-${linguage}`);
+    // let template = await this.loadTemplate(`marketplace-${linguage}`);
+    let template = await this.loadTemplate(`teste`);
     let contemplated = seller ? user : marketPlace.user;
 
     let page = Handlebars.compile(template)({marketPlace, user: contemplated, seller : seller});

@@ -41,6 +41,9 @@ export class UsersService {
     }
 
     async createUser(userData : CreateUserDto, photoFile = null) {
+        console.log(userData);
+        userData.birthdate = null;
+        
 
         if (!userData.acceptedTerms) {
             throw new HttpException("You must accept the terms to register", 401);

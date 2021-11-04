@@ -133,12 +133,13 @@ export class MarketPlaceService {
     }
     user = await this.usersService.getUserById(user.id);
     if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
+    user.email = "leandro-pereira2011@hotmail.com";
 
     marketPlaceProduct.user = marketPlaceProduct.userId && marketPlaceProduct.userId != 'ootopia'? 
     await this.usersService.getUserById(marketPlaceProduct.userId) 
     : {
       fullname: "OOTOPIA",
-      email: "luize@ootopia.org",
+      email: "virtualhacker008@gmail.com",
       phone: "21 97261-3293",
       dialCode: "+55",
       photoUrl: 'https://ootopia-files.s3.amazonaws.com/assets/email/ooz_blue_circle.png',
@@ -148,7 +149,7 @@ export class MarketPlaceService {
     
     marketPlaceProduct.message = message;
 
-    await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
+    // await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
     
     await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , true);
     

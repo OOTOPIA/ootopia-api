@@ -41,12 +41,17 @@
                         border: 0;"
                     >
                         <span style="
-                        text-align: left;
-                        font: normal normal bold 24px sans-serif;
-                        letter-spacing: 0px;
-                        color: #707070;
-                        text-transform: uppercase;
-                        opacity: 1;"
+                            text-align: left;
+                            font: normal normal bold 24px revert;
+                            font-family: 'revert';
+                            letter-spacing: 0px;
+                            color: #707070;
+                            text-transform: uppercase;
+                            opacity: 1;
+                            font-family: 'Roboto';
+                            font-style: normal;
+                            font-weight: 400;
+                            src: url(https://fonts.gstatic.com/s/roboto/v27KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2) format('woff2');"
                         >
                             {{#if seller}}
                                 CONGRATULATIONS ON YOUR SALE
@@ -66,7 +71,8 @@
                     >
                         <span style="
                             text-align: left;
-                            font: normal normal normal 12px sans-serif;
+                            font: normal normal normal 12px revert;
+                            font-family: 'revert';
                             letter-spacing: 0px;
                             color: #000000;
                             opacity: 1;"
@@ -89,7 +95,8 @@
                     >
                         <span style="
                             text-align: left;
-                            font: normal normal normal 12px sans-serif;
+                            font: normal normal normal 12px revert;
+                            font-family: 'revert';
                             letter-spacing: 0px;
                             color: #000000;
                             opacity: 1;"
@@ -146,7 +153,7 @@
                         {{/if}}
                         </span>
 
-                    </td>                   
+                    </td>
                 </tr>
 
                 <tr>
@@ -178,11 +185,11 @@
                                                     >
                                                         <span style="
                                                             text-align: left;
-                                                            font: normal normal 500 14px sans-serif;
+                                                            font: normal normal 500 14px revert;
+                                                            font-family: 'revert';
                                                             letter-spacing: 0px;
                                                             color: #000000;
-                                                            opacity: 1;
-                                                            src: local('sans-serif') url(http://fonts.googleapis.comcss?family=sans-serif:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)" >{{user.fullname}}</span>
+                                                            opacity: 1;" >{{user.fullname}}</span>
                                                     </td>
                                                 </tr>
 
@@ -196,7 +203,8 @@
                                                     >
                                                         <span style="
                                                         text-align: left;
-                                                        font: normal normal normal 12px sans-serif;
+                                                        font: normal normal normal 12px revert;
+                                                        font-family: 'revert';
                                                         letter-spacing: 0px;
                                                         color: #000000;
                                                         opacity: 1;
@@ -216,11 +224,11 @@
                                                     >
                                                         <span style="
                                                             text-align: left;
-                                                            font: normal normal 500 14px sans-serif;
+                                                            font: normal normal 500 14px revert;
+                                                            font-family: 'revert';
                                                             letter-spacing: 0px;
                                                             color: #000000;
-                                                            opacity: 1;
-                                                            src: local('sans-serif') url(http://fonts.googleapis.comcss?family=sans-serif:400,100,100italic,300,300italic400italic,500,500italic,700,700italic,900italic,900)">Contact</span>
+                                                            opacity: 1;">Contact</span>
                                                     </td>
                                                 </tr>
                                                 {{/ifCond}}
@@ -235,11 +243,13 @@
                                                     >
                                                         <span style="
                                                             text-align: left;
-                                                            font: normal normal normal 12px sans-serif;
+                                                            font: normal normal normal 12px revert;
+                                                            font-family: 'revert';
                                                             letter-spacing: 0px;
                                                             color: #000000;
                                                             opacity: 1;"
-                                                        >Mobile Phone: {{user.dialCode}} {{user.phone}}</span>
+                                                        >Mobile Phone: <a href="tel:+{{user.dialCode}} {{user.phone}}">{{user.dialCode}} {{user.phone}}</a>
+                                                        </span>
                                                     </td>
                                                 </tr>
                                                 {{/if}}
@@ -254,7 +264,8 @@
                                                     >
                                                         <span style="
                                                             text-align: left;
-                                                            font: normal normal normal 12px sans-serif;
+                                                            font: normal normal normal 12px revert;
+                                                            font-family: 'revert';
                                                             letter-spacing: 0px;
                                                             color: #000000;
                                                             opacity: 1;"
@@ -298,7 +309,7 @@
         -webkit-font-smoothing: revert;
         margin: 16px 26px;"
     >
-        <table cellpadding="0" cellspacing="0">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
             <tbody>
                 <tr>
                     <td style="
@@ -319,26 +330,34 @@
                 
                 <tr>
                     <td>
-                        <table cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
                             <tbody>
                                 <tr>
                                     <td style="
                                     display: flex;
                                     margin: 0px 0px 0px 0px;
                                     padding: 0px 0px 0px 0px;
-                                    border: 0;"
+                                    border: 0;
+                                    background-position:center;background-repeat:no-repeat;background-size:cover;margin-bottom:24px" class="mceColumn" valign="center" colspan="6" width="50%"
                                     >
-                                        <img style="
-                                            border-radius: 14px;
-                                            margin-right: 16px;"
-                                        src="{{marketPlace.imageUrl}}" width="91" height="91">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
+                                        <tbody>
+                                            <tr>
+                                                <td valign="top">
+                                                    <img style="
+                                                        border-radius: 14px;
+                                                        margin-right: 16px;"
+                                                    src="{{marketPlace.imageUrl}}" width="91" height="91">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
                                     </td>
 
-                                    <td style="
-                                        vertical-align: top;"
+                                    <td style="background-position:center;background-repeat:no-repeat;background-size:cover" class="mceColumn" valign="center" colspan="6" width="50%"
                                     >
-                                        <table cellpadding="0" cellspacing="0">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
                                             <tbody>
                                                 <tr>
                                                     <td style="
@@ -485,7 +504,8 @@
                         <td>
                             <span style="
                                 text-align: left;
-                                font: normal normal 500 14px sans-serif;
+                                font: normal normal 500 14px revert;
+                                font-family: 'revert';
                                 letter-spacing: 0px;
                                 color: #000000;
                                 opacity: 1;"
@@ -510,7 +530,8 @@
                         <td>
                             <span style="
                                 text-align: left;
-                                font: normal normal bold 14px sans-serif;
+                                font: normal normal bold 14px revert;
+                                font-family: 'revert';
                                 letter-spacing: 0px;
                                 color: #000000;
                                 margin-top: 10px;"
@@ -522,7 +543,8 @@
                         <td>
                             <span style="
                             text-align: left;
-                            font: normal normal normal 12px sans-serif;
+                            font: normal normal normal 12px revert;
+                            font-family: 'revert';
                             letter-spacing: 0px;
                             color: #000000;
                             opacity: 1;"
@@ -534,7 +556,8 @@
                         <td>
                             <span style="
                             text-align: left;
-                            font: normal normal normal 12px sans-serif;
+                            font: normal normal normal 12px revert;
+                            font-family: 'revert';
                             letter-spacing: 0px;
                             color: #000000;
                             opacity: 1;"
@@ -546,11 +569,14 @@
                         <td>
                             <span style="
                                 text-align: left;
-                                font: normal normal normal 12px sans-serif;
+                                font: normal normal normal 12px revert;
+                                font-family: 'revert';
                                 letter-spacing: 0px;
                                 color: #000000;
                                 opacity: 1;"
-                            >+55 21 97261-3293</span>
+                            >
+                                <a href="tel:+55 21 97261-3293">+55 21 97261-3293</a>
+                            </span>
                         </td>
                     </tr>
 
@@ -572,7 +598,8 @@
                             <a style="
                                 text-align: left;
                                 text-decoration: underline;
-                                font: normal normal normal 12px/14px sans-serif;
+                                font: normal normal normal 12px/14px revert;
+                                font-family: 'revert';
                                 letter-spacing: 0px;
                                 color: #003694;
                                 margin-top: 18px;"
@@ -586,7 +613,8 @@
                         <td>
                             <span style="
                             text-align: left;
-                            font: normal normal normal 12px sans-serif;
+                            font: normal normal normal 12px revert;
+                            font-family: 'revert';
                             letter-spacing: 0px;
                             color: #000000;
                             opacity: 1;
@@ -617,13 +645,14 @@
         -webkit-font-smoothing: revert;
         margin: 16px 26px;"
         >
-            <table  cellpadding="0" cellspacing="0">
+            <table  cellpadding="0" cellspacing="0" style="transform: none !important;">
                 <tbody>
                     <tr>
                         <td>
                             <span style="
                             text-align: left;
-                            font: normal normal bold 14px sans-serif;
+                            font: normal normal bold 14px revert;
+                            font-family: 'revert';
                             letter-spacing: 0px;
                             color: #000000;"
                             >COMING SOON</span>
@@ -646,15 +675,16 @@
                     <tr>
                         <td>
                             <div>
-                                <span style="
+                                <p style="
                                     text-align: left;
-                                    font: normal normal normal 12px sans-serif;
+                                    font: normal normal normal 12px revert;
+                                    font-family: 'revert';
                                     letter-spacing: 0px;
                                     color: #000000;
                                     opacity: 1;
                                     white-space: pre-wrap;
                                     margin-top: 10px;"
-                                >In the next application update, the creation of offers on the Ethical Marketplace will be available to everyone. Until then, how about telling us what you would like to offer or purchase? Your suggestions and questions are very welcome!</span>
+                                >In the next application update, the creation of offers on the Ethical Marketplace will be available to everyone. Until then, how about telling us what you would like to offer or purchase? Your suggestions and questions are very welcome!</p>
                             </div>
                         </td>
                     </tr>
@@ -670,11 +700,12 @@
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            font: normal normal bold 12px sans-serif;
+                            font: normal normal bold 12px revert;
                             letter-spacing: 0px;
                             color: #003694;
                             align-items: center;
                             opacity: 1;
+                            font-family: 'revert';
                             margin: 16px 0 16px 0;
                             padding: 10px 24px 10px 24px;" href="https://docs.google.com/forms/d/e/1FAIpQLScGB6JQf4-YQn7aZQ5fmJTYxhM1W3qXuW87ycYrlayiesN92A/viewform" target="_blank">Give a suggestion</a>
                         </td>
@@ -685,44 +716,23 @@
     </div>
 
 
-    <div style="
-        background-image: url(https://ootopia-files.s3.amazonaws.com/assets/email/market_place_footer_us.png);
-        background-repeat: no-repeat;
-        width: 558px;
-        background-size: 100%;
-        height: 222px;"
-    >
+    <div>
     
-        <table>
+        <table style="transform: none !important;">
             <tbody>
                 <tr>
                     <td>
-                        <div style="
-                            margin: 101px 114px 0px 148px;
-                            padding: 0;
-                            border: 0;"
-                        >
-                            <span style="
-                                white-space: initial;
-                                flex-wrap: inherit;
-                                font-size: 12px;
-                                color: #000000;"
-                            >
-                                The app that gives you access to experience in practice the new world that is emerging through the regenerative movement.
-                            </span>
-                            
-                        </div>
+                        <img src="https://ootopia-files.s3.amazonaws.com/assets/email/market_place_footer_us.png" width="558" alt="222">
                     </td>
                 </tr>
 
                 <tr>
-
                     <td style="
-                        margin: 26px 0px 0px 0px;
-                        padding: 23px 0px 0px 148px;
+                        margin: 0px 0px 0px 0px;
+                        padding: 0px 0px 0px 0px;
                         border: 0;"
                     >
-                        <table>
+                        <table style="transform: none !important;">
                             <tbody>
                                 <tr>
                                     <td style="
