@@ -175,7 +175,7 @@ export class WalletTransfersService {
 
     }
 
-    async transferTodaysGameCompleted(userId : string) {
+    async transferTodaysGameCompleted(userId : string, transferPartially? : boolean) {
 
         let queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
@@ -204,12 +204,14 @@ export class WalletTransfersService {
             await queryRunner.manager.save(await this.createTransfer(userId, {
                 userId : userId,
                 walletId : receiverUserWalletId,
-                balance : +balance,
+                balance : transferPartially ? +balance/2 : +balance,
                 origin : Origin.TOTAL_GAME_COMPLETED,
                 action : WalletTransferAction.RECEIVED,
                 fromPlatform : true,
                 processed : true
             }, true));
+
+            //TODO: Quando houver a meta da cidade e transferPartially for true, metade do balance vai para a meta da cidade
 
             await queryRunner.manager.update(WalletTransfers, {
                 id: In(notProcessedTransfers.map((transfer) => transfer.id))
@@ -284,6 +286,12 @@ export class WalletTransfersService {
             throw new HttpException("INSUFFICIENT_BALANCE", 400);
         }
 
+        let sellerUserWallet = null;
+        
+        if (marketPlaceProduct.userId && marketPlaceProduct.userId != 'ootopia') {
+            sellerUserWallet = await this.walletsService.getWalletByUserId(marketPlaceProduct.userId);
+        }
+
         let queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -303,6 +311,24 @@ export class WalletTransfersService {
             }, true));
 
             await queryRunner.manager.save(await this.walletsService.decreaseTotalBalance(userWallet.id, userId, +marketPlaceProduct.price));
+
+            if (sellerUserWallet) {
+
+                await queryRunner.manager.save(await this.createTransfer(marketPlaceProduct.userId, {
+                    userId : marketPlaceProduct.userId,
+                    walletId : sellerUserWallet.id,
+                    balance : +(+marketPlaceProduct.price).toFixed(2),
+                    origin : Origin.MARKET_PLACE_TRANSFER,
+                    action : WalletTransferAction.RECEIVED,
+                    marketPlaceData : marketPlaceProduct,
+                    description : marketPlaceProduct.title,
+                    fromPlatform : true,
+                    processed : true
+                }, true));
+
+                await queryRunner.manager.save(await this.walletsService.increaseTotalBalance(sellerUserWallet.id, marketPlaceProduct.userId, +marketPlaceProduct.price));
+
+            }
 
             await queryRunner.commitTransaction();
 

@@ -1,10 +1,13 @@
+import { Users } from 'src/users/users.entity';
 import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    BaseEntity
+    BaseEntity,
+    JoinColumn,
+    ManyToOne
 } from 'typeorm';
 
 @Entity()
@@ -16,7 +19,8 @@ export class MarketPlaceProducts extends BaseEntity {
     @Column({ nullable: false, type: 'numeric', name : "strapi_id" })
     strapiId : number;
 
-    @Column({ nullable: true, type: 'varchar', name: "user_id", })
+    @ManyToOne(type => Users, user => user.id, { nullable : true })
+    @JoinColumn({ name: "user_id" })
     userId? : string;
 
     @Column({ nullable: true, type: 'varchar' })
