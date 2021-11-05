@@ -48,13 +48,7 @@ export class DailyGoalDistributionHandlerService {
             let userId = usersIds[i];
             let userDailyGoalStats = await this.usersService.getUserDailyGoalStats(userId, dailyGoalStartTime, dailyGoalEndTime);
 
-            if (userDailyGoalStats.dailyGoalAchieved) {
-
-                await this.walletTransfersService.transferTodaysGameCompleted(userId);
-                
-            }else{
-                console.log("not daily goal achieved >>>", userDailyGoalStats);
-            }
+            await this.walletTransfersService.transferTodaysGameCompleted(userId, userDailyGoalStats.dailyGoalAchieved == false);
 
         }
 
