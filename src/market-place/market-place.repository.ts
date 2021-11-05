@@ -62,9 +62,10 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
     }
 
     async getById(id : string) {
-        return await this.findOne({
-            where : { id, deletedAt : IsNull() }
-        });
+        return camelcaseKeys(await getConnection().query(`
+            SELECT m.* FROM market_place_products m
+            WHERE m.id = $1 and m.deleted_at is null
+        `, [id]))[0];
     }
 
     async getByStrapiId(strapiId? :number) {

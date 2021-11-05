@@ -63,12 +63,12 @@ export class EmailsService {
     let title = linguage == 'pt' ? "MERCADO ÉTICO OOTOPIA" : "ETHICAL MARKETPLACE OOTOPIA";
     let destination = seller ? marketPlace.user.email : user.email;
 
-    if (destination == 'luize@ootopia.org') {
+    if (!destination) {
       return
     }
 
-    // let template = await this.loadTemplate(`marketplace-${linguage}`);
-    let template = await this.loadTemplate(`teste`);
+    let template = await this.loadTemplate(`marketplace-${linguage}`);
+
     let contemplated = seller ? user : marketPlace.user;
 
     let page = Handlebars.compile(template)({marketPlace, user: contemplated, seller : seller});

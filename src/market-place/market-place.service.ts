@@ -139,17 +139,17 @@ export class MarketPlaceService {
     await this.usersService.getUserById(marketPlaceProduct.userId) 
     : {
       fullname: "OOTOPIA",
-      email: "virtualhacker008@gmail.com",
-      phone: "21 97261-3293",
-      dialCode: "+55",
-      photoUrl: 'https://ootopia-files.s3.amazonaws.com/assets/email/ooz_blue_circle.png',
+      email: process.env.DEFAULT_MARKET_PLACE_SELLER_EMAIL || null,
+      phone: process.env.DEFAULT_MARKET_PLACE_SELLER_PHONE || null,
+      dialCode: process.env.DEFAULT_MARKET_PLACE_SELLER_DIALCODE || null,
+      photoUrl: process.env.DEFAULT_MARKET_PLACE_SELLER_PHOTO || null,
       city: null,
       state: null,
     };
     
     marketPlaceProduct.message = message;
 
-    // await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
+    await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
     
     await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , true);
     
