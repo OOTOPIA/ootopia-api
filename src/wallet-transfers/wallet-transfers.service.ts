@@ -175,7 +175,7 @@ export class WalletTransfersService {
 
     }
 
-    async transferTodaysGameCompleted(userId : string) {
+    async transferTodaysGameCompleted(userId : string, transferPartially? : boolean) {
 
         let queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
@@ -204,12 +204,14 @@ export class WalletTransfersService {
             await queryRunner.manager.save(await this.createTransfer(userId, {
                 userId : userId,
                 walletId : receiverUserWalletId,
-                balance : +balance,
+                balance : transferPartially ? +balance/2 : +balance,
                 origin : Origin.TOTAL_GAME_COMPLETED,
                 action : WalletTransferAction.RECEIVED,
                 fromPlatform : true,
                 processed : true
             }, true));
+
+            //TODO: Quando houver a meta da cidade e transferPartially for true, metade do balance vai para a meta da cidade
 
             await queryRunner.manager.update(WalletTransfers, {
                 id: In(notProcessedTransfers.map((transfer) => transfer.id))
