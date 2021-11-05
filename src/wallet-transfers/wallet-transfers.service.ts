@@ -286,7 +286,7 @@ export class WalletTransfersService {
 
         let sellerUserWallet = null;
         
-        if (marketPlaceProduct.userId) {
+        if (marketPlaceProduct.userId && marketPlaceProduct.userId != 'ootopia') {
             sellerUserWallet = await this.walletsService.getWalletByUserId(marketPlaceProduct.userId);
         }
 

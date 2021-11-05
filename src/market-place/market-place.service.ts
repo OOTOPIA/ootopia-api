@@ -133,8 +133,8 @@ export class MarketPlaceService {
     }
     let user = await this.usersService.getUserById(userId);
     if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
-
-    marketPlaceProduct.user = marketPlaceProduct.userId && marketPlaceProduct.userId != 'ootopia'? 
+    
+    marketPlaceProduct.user = marketPlaceProduct && marketPlaceProduct.userId != 'ootopia'?
     await this.usersService.getUserById(marketPlaceProduct.userId) 
     : {
       fullname: "OOTOPIA",
