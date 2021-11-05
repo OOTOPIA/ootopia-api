@@ -59,15 +59,15 @@ export class EmailsService {
   }
 
   async sendConfirmMarketPlace (marketPlace, user, seller :boolean = false) {
-    let linguage = marketPlace.locale.slice(0,2);
-    let title = linguage == 'pt' ? "MERCADO ÉTICO OOTOPIA" : "ETHICAL MARKETPLACE OOTOPIA";
+    let language = marketPlace.locale.slice(0,2);
+    let title = language == 'pt' ? "MERCADO ÉTICO OOTOPIA" : "ETHICAL MARKETPLACE OOTOPIA";
     let destination = seller ? marketPlace.user.email : user.email;
 
     if (!destination) {
       return
     }
 
-    let template = await this.loadTemplate(`marketplace-${linguage}`);
+    let template = await this.loadTemplate(`marketplace-${language}`);
 
     let contemplated = seller ? user : marketPlace.user;
 
