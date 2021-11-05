@@ -37,7 +37,7 @@ export class EmailsService {
     const result = await this.ses.sendEmail({
       Source: "Ootopia app<" + process.env.SENDER_USER_EMAIL + ">",
       Destination: {
-        ToAddresses: [emailTo, 'luiz.ribeirocoelho@gmail.com', 'luiz_fernandoribeiro@hotmail.com']
+        ToAddresses: [emailTo]
       },
       Message: {
         Subject: {

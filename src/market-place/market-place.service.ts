@@ -124,16 +124,15 @@ export class MarketPlaceService {
     return this.mapper(marketPlaceProduct);
   }
 
-  async purchase(marketPlaceProductId : string, user, message) {
+  async purchase(marketPlaceProductId : string, userId : string, message) {
     
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
 
     if (!marketPlaceProduct) {
       throw new HttpException("PRODUCT_NOT_FOUND", 400);
     }
-    user = await this.usersService.getUserById(user.id);
+    let user = await this.usersService.getUserById(userId);
     if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
-    user.email = "leandro-pereira2011@hotmail.com";
 
     marketPlaceProduct.user = marketPlaceProduct.userId && marketPlaceProduct.userId != 'ootopia'? 
     await this.usersService.getUserById(marketPlaceProduct.userId) 
