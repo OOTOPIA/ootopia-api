@@ -127,13 +127,14 @@ export class MarketPlaceService {
   async purchase(marketPlaceProductId : string, userId : string, message) {
     
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
+    if(marketPlaceProduct && ~+marketPlaceProduct.price) marketPlaceProduct.price = marketPlaceProduct.price.toFixed(2);
 
     if (!marketPlaceProduct) {
       throw new HttpException("PRODUCT_NOT_FOUND", 400);
     }
     let user = await this.usersService.getUserById(userId);
     if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
-    
+
     marketPlaceProduct.user = marketPlaceProduct && marketPlaceProduct.userId != 'ootopia'?
     await this.usersService.getUserById(marketPlaceProduct.userId) 
     : {
