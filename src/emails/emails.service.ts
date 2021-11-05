@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as Handlebars from 'handlebars';
+import * as Handlebars from './handlebars';
 
 @Injectable()
 export class EmailsService {
@@ -56,6 +56,24 @@ export class EmailsService {
 
   private loadTemplate(filename : string) {
     return fs.readFileSync(path.resolve(`public/templates/${filename}.html`), 'utf8');
+  }
+
+  async sendConfirmMarketPlace (marketPlace, user, seller :boolean = false) {
+    let language = marketPlace.locale.slice(0,2);
+    let title = language == 'pt' ? "MERCADO ÉTICO OOTOPIA" : "ETHICAL MARKETPLACE OOTOPIA";
+    let destination = seller ? marketPlace.user.email : user.email;
+
+    if (!destination) {
+      return
+    }
+
+    let template = await this.loadTemplate(`marketplace-${language}`);
+
+    let contemplated = seller ? user : marketPlace.user;
+
+    let page = Handlebars.compile(template)({marketPlace, user: contemplated, seller : seller});
+
+    return await this.sendEmail(destination, title, page);
   }
 
 }

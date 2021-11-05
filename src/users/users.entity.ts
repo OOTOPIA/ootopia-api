@@ -31,6 +31,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: true, type: 'varchar' })
     phone : string;
 
+    @Column({ nullable: true, type: 'varchar', name: "dial_code" })
+    dialCode : string;
+
     @Column({ nullable: true, type: 'varchar', name: "country_code" })
     countryCode : string;
 
