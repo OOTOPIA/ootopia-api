@@ -13,6 +13,20 @@ export class UsersRepository extends Repository<Users>{
 
     async createOrUpdateUser(userData) {
         const user = this.create();
+        if (userData.birthdate) {
+            var birthdateSplit : any = userData.birthdate;
+            birthdateSplit = birthdateSplit.split("/");
+            var year = birthdateSplit[0].split(" ").join("");
+            var month = birthdateSplit[1].split(" ").join("");
+            var day = birthdateSplit[2].split(" ").join("");
+            if (month.length < 2) {
+                month = "0" + month;
+            }
+            if (day.length < 2) {
+                day = "0" + day;
+            }
+            userData.birthdate = `${year}-${month}-${day}`;
+        }
         Object.assign(user, userData);
         return await this.save(user);
     }
