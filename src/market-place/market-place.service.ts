@@ -4,6 +4,7 @@ import { MarketPlaceRepository } from './market-place.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
+import * as _ from 'lodash';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 import { EmailsService } from 'src/emails/emails.service';
 import { UsersService } from 'src/users/users.service';
@@ -127,7 +128,6 @@ export class MarketPlaceService {
   async purchase(marketPlaceProductId : string, userId : string, message) {
     
     let marketPlaceProduct = await this.getMarketPlaceProductById(marketPlaceProductId);
-    if(marketPlaceProduct && ~+marketPlaceProduct.price) marketPlaceProduct.price = marketPlaceProduct.price.toFixed(2);
 
     if (!marketPlaceProduct) {
       throw new HttpException("PRODUCT_NOT_FOUND", 400);
@@ -151,9 +151,9 @@ export class MarketPlaceService {
 
     await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
     
-    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , true);
+    await this.emailsService.sendConfirmMarketPlace(_.cloneDeep(marketPlaceProduct), _.cloneDeep(user) , true);
     
-    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , false);
+    await this.emailsService.sendConfirmMarketPlace(_.cloneDeep(marketPlaceProduct), _.cloneDeep(user) , false);
     
 
   }
