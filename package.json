@@ -41,6 +41,7 @@
     "class-validator": "^0.13.1",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
+    "full-icu": "^1.4.0",
     "handlebars": "^4.7.7",
     "minio": "^7.0.18",
     "multer": "^1.4.2",
