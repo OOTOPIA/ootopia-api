@@ -46,7 +46,7 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td valign="top" class="x_mcnTextContent"
-                                                                    style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:16px; line-height:150%; text-align:left">
+                                                                    style="padding-top:0; padding-right:18px; padding-bottom:0px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:24px; line-height:150%; text-align:left">
                                                                     <table cellpadding="0" cellspacing="0"
                                                                         style="border-collapse:collapse">
                                                                         <tbody>
@@ -88,10 +88,11 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td valign="top" class="x_mcnTextContent"
-                                                                    style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:16px; line-height:150%; text-align:left">
-                                                                    <span style="font-size:14px"><span
+                                                                    style="padding-top:0; padding-right:0x; padding-bottom:0px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:12px; line-height:14px; text-align:left">
+                                                                    <span style="font-size:12px"><span
                                                                             style="font-family:verdana,geneva,sans-serif"><span
-                                                                                style="color:#000000"> {{#if seller}}
+                                                                                style="color:#000000"> 
+                                                                            {{#if seller}}
                                                                                 Send an email to ({{user.email}})
                                                                             {{else}}
                                                                                 The vendor will soon contact you by email
@@ -107,17 +108,17 @@
                                         class="x_mcnTextBlock" style="min-width:100%; border-collapse:collapse">
                                         <tbody class="x_mcnTextBlockOuter">
                                             <tr>
-                                                <td valign="top" class="x_mcnTextBlockInner" style="padding-top:9px">
+                                                <td valign="top" class="x_mcnTextBlockInner" style="padding-top:0px">
                                                     <table align="left" border="0" cellpadding="0" cellspacing="0"
                                                         width="100%" class="x_mcnTextContentContainer"
                                                         style="max-width:100%; min-width:100%; border-collapse:collapse">
                                                         <tbody>
                                                             <tr>
                                                                 <td valign="top" class="x_mcnTextContent"
-                                                                    style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:16px; line-height:150%; text-align:left">
+                                                                    style="padding-top:0; padding-right:0px; padding-bottom:0px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:12px; line-height:14px; text-align:left">
                                                                     <span
                                                                         style="font-family:verdana,geneva,sans-serif"><span
-                                                                            style="font-size:14px">  {{#if seller}}
+                                                                            style="font-size:12px">  {{#if seller}}
                                                                             to arrange delivery of his/her purchase.
                                                                         {{else}}
                                                                             to arrange the delivery of your purchase.
@@ -153,7 +154,7 @@
                                         class="x_mcnTextBlock" style="min-width:100%; border-collapse:collapse">
                                         <tbody class="x_mcnTextBlockOuter">
                                             <tr>
-                                                <td valign="top" class="x_mcnTextBlockInner" style="padding-top:9px">
+                                                <td valign="top" class="x_mcnTextBlockInner" style="padding-top:0px">
                                                     <table align="left" border="0" cellpadding="0" cellspacing="0"
                                                         width="100%" class="x_mcnTextContentContainer"
                                                         style="max-width:100%; min-width:100%; border-collapse:collapse">
@@ -191,35 +192,49 @@
                                                                     <table align="left" border="0" cellpadding="0"
                                                                         cellspacing="0"
                                                                         class="x_mcnCaptionRightImageContentContainer"
-                                                                        width="132" style="border-collapse:collapse">
+                                                                        width="50" 
+                                                                        style="border-collapse:collapse">
                                                                         <tbody>
                                                                             <tr>
                                                                                 <td class="x_mcnCaptionRightImageContent"
                                                                                     align="left" valign="top" style="">
-                                                                                    <img
-                                                                                        src="{{user.photoUrl}}"
-                                                                                        alt="" width="50" height="50"
-                                                                                        style="max-width:50px; min-height: 50px; max-height:50px; border-radius:50%; border:0; height:auto; outline:none; text-decoration:none; vertical-align:bottom">
+                                                                                    <div style="
+                                                                                        min-height: 50px;
+                                                                                        max-height: 50px;
+                                                                                        max-width: 50px;
+                                                                                        min-width: 50px;
+                                                                                        border-radius: 50%;
+                                                                                        border:0; height:auto;
+                                                                                        outline:none;
+                                                                                        background-size: cover;
+                                                                                        background-repeat: no-repeat;
+                                                                                        background-position: center;
+                                                                                        background-image: url({{user.photoUrl}});
+                                                                                        text-decoration:none;
+                                                                                        vertical-align:bottom">
+                                                                                    </div>
                                                                                 </td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
                                                                     <table class="x_mcnCaptionRightTextContentContainer"
                                                                         align="right" border="0" cellpadding="0"
-                                                                        cellspacing="0" width="396"
+                                                                        cellspacing="0" width="468"
                                                                         style="border-collapse:collapse">
                                                                         <tbody>
                                                                             <tr>
                                                                                 <td valign="top"
                                                                                     class="x_mcnTextContent"
-                                                                                    style="font-family:Verdana,Geneva,sans-serif; word-break:break-word; color:#202020; font-size:16px; line-height:150%; text-align:left">
+                                                                                    style="font-family:Verdana,Geneva,sans-serif; word-break:break-word; color:#202020; font-size:14px; line-height:130%; text-align:left">
                                                                                     <strong>{{user.fullname}}</strong>
                                                                                     <br aria-hidden="true">
                                                                                     
                                                                                     <span style="font-size:14px">
 
                                                                                         {{#ifCond user.city '||' user.state}}
-                                                                                            {{user.city}}, {{user.state}}
+                                                                                            <span style="font-family:Verdana,Geneva,sans-serif; word-break:break-word; color:#202020; font-size:12px; line-height:130%; text-align:left">
+                                                                                                {{user.city}}, {{user.state}}
+                                                                                            </span>
                                                                                             <br aria-hidden="true">
                                                                                         {{/ifCond}}
 
@@ -234,7 +249,7 @@
                                                                                             Mobile Phone: <a 
                                                                                             href="tel:{{user.dialCode}} {{user.phone}}"
                                                                                             target="_blank"
-                                                                                            style="color:#007C89; font-weight:normal; text-decoration:underline"
+                                                                                            style="color:#007C89; font-weight:normal; text-decoration:underline; font-size: 12px;"
                                                                                             data-linkindex="0">{{user.dialCode}} {{user.phone}}</a>
                                                                                             <br aria-hidden="true">
                                                                                         {{/if}}
@@ -243,7 +258,7 @@
                                                                                             E-mail: <a 
                                                                                             href="mailto:{{user.email}}"
                                                                                             target="_blank"
-                                                                                            style="color:#007C89; font-weight:normal; text-decoration:underline">{{user.email}}</a>
+                                                                                            style="color:#007C89; font-weight:normal; text-decoration:underline; font-size: 12px;">{{user.email}}</a>
                                                                                         {{/if}}
 
 
@@ -290,9 +305,8 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td valign="top" class="x_mcnTextContent"
-                                                                    style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:16px; line-height:150%; text-align:left">
-                                                                    <strong><span style="font-size:14px"><span
-                                                                                style="font-family:verdana,geneva,sans-serif">Purchased Item</span></span></strong>
+                                                                    style="padding-top:0; padding-right:18px; padding-bottom:8px; padding-left:18px; word-break:break-word; color:#202020; font-family:Helvetica; font-size:16px; line-height:150%; text-align:left">
+                                                                    <strong><span style="font-size:14px"><span style="font-family:verdana,geneva,sans-serif">Purchased Item</span></span></strong>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -305,7 +319,7 @@
                                         class="x_mcnCaptionBlock" style="border-collapse:collapse">
                                         <tbody class="x_mcnCaptionBlockOuter">
                                             <tr>
-                                                <td class="x_mcnCaptionBlockInner" valign="top" style="padding:9px">
+                                                <td class="x_mcnCaptionBlockInner" valign="top" style="padding:9px;padding-top: 0px;">
                                                     <table border="0" cellpadding="0" cellspacing="0"
                                                         class="x_mcnCaptionRightContentOuter" width="100%"
                                                         style="border-collapse:collapse">
@@ -316,22 +330,33 @@
                                                                     <table align="left" border="0" cellpadding="0"
                                                                     cellspacing="0"
                                                                     class="x_mcnCaptionRightImageContentContainer"
-                                                                    width="132" style="border-collapse:collapse">
+                                                                    width="76" style="border-collapse:collapse">
                                                                         <tbody>
                                                                             <tr>
                                                                                 <td class="x_mcnCaptionRightImageContent"
-                                                                                    align="left" valign="top" style="">
-                                                                                    <img 
-                                                                                        src="{{marketPlace.imageUrl}}"
-                                                                                        alt="" width="76"
-                                                                                        style="max-width:76px; border-radius:15%; border:0; height:auto; outline:none; text-decoration:none; vertical-align:bottom">
+                                                                                    align="left" valign="top">
+                                                                                <div style="
+                                                                                    min-height: 76px;
+                                                                                    max-height: 76px;
+                                                                                    max-width:76px;
+                                                                                    min-width:76px;
+                                                                                    border-radius:15%;
+                                                                                    border:0; height:auto;
+                                                                                    outline:none;
+                                                                                    background-size: cover;
+                                                                                    background-repeat: no-repeat;
+                                                                                    background-position: center;
+                                                                                    background-image: url({{marketPlace.imageUrl}});
+                                                                                    text-decoration:none;
+                                                                                    vertical-align:bottom">
+                                                                                </div>
                                                                                 </td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
                                                                     <table class="x_mcnCaptionRightTextContentContainer"
                                                                     align="right" border="0" cellpadding="0"
-                                                                    cellspacing="0" width="396"
+                                                                    cellspacing="0" width="440"
                                                                     style="border-collapse:collapse">
                                                                         <tbody>
                                                                             <tr>
@@ -341,26 +366,31 @@
                                                                                     <span
                                                                                         style="font-family:verdana,geneva,sans-serif">
 
-                                                                                        <strong>
+                                                                                        <strong style="font-size: 14px;">
                                                                                             {{marketPlace.title}}
-                                                                                            <br aria-hidden="true">
+                                                                                        </strong>
 
-                                                                                            <br aria-hidden="true">
-                                                                                            <img style="vertical-align: bottom;" src="https://ootopia-files.s3.amazonaws.com/assets/email/ozz_coin_grey.png" width="34" height="24">
+                                                                                        <br>
+                                                                                        
+                                                                                        <strong style="font-size: 16px;color: #707070;">
+                                                                                            <img style="vertical-align: bottom; padding-bottom: 4px;" src="https://ootopia-files.s3.amazonaws.com/assets/email/ozz_coin_grey.png" width="34" height="19">
                                                                                             {{marketPlace.price}}
                                                                                         </strong>
 
-                                                                                        <br aria-hidden="true">
-                                                                                        <br aria-hidden="true">
-                                                                                        {{marketPlace.description}}
-                                                                                        <br aria-hidden="true">
+                                                                                        <br>
 
-                                                                                        {{#ifCond marketPlace.message '&&' seller}}                                                                                        
-                                                                                            <br aria-hidden="true">
-                                                                                            <strong>Message from Purchaser</strong>
-                                                                                            <br aria-hidden="true">
-                                                                                            <br aria-hidden="true">
+                                                                                        <span style="font-size: 12px;">
+                                                                                            {{marketPlace.description}}
+                                                                                        </span>
+
+                                                                                        <br>
+
+                                                                                        {{#ifCond marketPlace.message '&&' seller}}     
+                                                                                        <span style="font-size: 12px;">
+                                                                                            <strong style="font-size: 14px;">Message from Purchaser</strong>
+                                                                                            <br>
                                                                                             {{marketPlace.message}}
+                                                                                        </span>
                                                                                         {{/ifCond}}
                                                                                     </span>
                                                                                 </td>
@@ -394,15 +424,17 @@
                                                                             <tr>
                                                                                 <td valign="top"
                                                                                     class="x_mcnTextContent"
-                                                                                    style="padding:18px; color:#2e0909; font-family:Helvetica; font-size:14px; font-weight:normal; text-align:center; word-break:break-word; line-height:150%">
+                                                                                    style="padding:18px; padding-bottom: 0px; color:#2e0909; font-family:Helvetica; font-size:14px; font-weight:normal; text-align:center; word-break:break-word; line-height:150%">
                                                                                     <div style="text-align:left"><span
                                                                                             style="font-family:verdana,geneva,sans-serif"><span
-                                                                                                style="font-size:14px">All
-                                                                                                the best,<br
-                                                                                                    aria-hidden="true"><br
-                                                                                                    aria-hidden="true"><strong>Luize
-                                                                                                    Sehn</strong></span><br
-                                                                                                aria-hidden="true"><span
+                                                                                                style="font-size:14px">
+                                                                                                <span style="padding-bottom: 12px;font-size: 14px;font-family:verdana,geneva,sans-serif">All the best,</span>
+                                                                                                <br> 
+                                                                                                <strong>Luize
+                                                                                                    Sehn</strong>
+                                                                                                </span>
+                                                                                                <br aria-hidden="true">
+                                                                                                <span
                                                                                                 style="font-size:12px">OOTOPIA
                                                                                                 Ethical Marketplace
                                                                                                 Steward<br
@@ -435,11 +467,10 @@
                                                                                                     aria-hidden="true">Get
                                                                                                 in contact! I'll be
                                                                                                 happy to help
-                                                                                                you.</span></span><br
-                                                                                            aria-hidden="true">&nbsp;
+                                                                                                you.</span></span>
                                                                                             <table class="x_mcnDividerContent" border="0" cellpadding="0"
                                                                                             cellspacing="0" width="100%"
-                                                                                            style="min-width:100%; border-top:1px solid rgba(112, 112, 112, 0.2); border-collapse:collapse; margin-bottom: 10px;">
+                                                                                            style="min-width:100%; border-top:1px solid rgba(112, 112, 112, 0.2); border-collapse:collapse; margin-bottom: 10px; margin-top: 10px;">
                                                                                             <tbody>
                                                                                                 <tr>
                                                                                                     <td><span></span></td>
@@ -449,7 +480,6 @@
                                                                                         <strong>
                                                                                             <span style="font-size:14px">
                                                                                                 <span style="font-family:verdana,geneva,sans-serif;padding-top: 10px;">
-
                                                                                                     COMING SOON
                                                                                                 </span>
                                                                                             </span>
@@ -470,13 +500,12 @@
                                                                                                 welcome!
                                                                                             </span>
                                                                                         </span>
-                                                                                        <br aria-hidden="true">&nbsp;
                                                                                     </div><a
                                                                                         href="https://docs.google.com/forms/d/e/1FAIpQLScGB6JQf4-YQn7aZQ5fmJTYxhM1W3qXuW87ycYrlayiesN92A/viewform"
                                                                                         target="_blank"
                                                                                         rel="noopener noreferrer"
                                                                                         data-auth="NotApplicable"
-                                                                                        style="padding-left:24px; width:max-content; text-decoration:none; border:1px solid #003694; border-radius:45px; display:flex; align-items:center; font:normal normal bold 12px sans-serif; letter-spacing:0px; color:#003694; opacity:1; margin:16px 0 16px 0; padding:10px 24px 10px 24px; font-weight:normal"
+                                                                                        style="padding-left:24px; padding-bottom: 0px; width:max-content; text-decoration:none; border:1px solid #003694; border-radius:45px; display:flex; align-items:center; font:normal normal bold 12px sans-serif; letter-spacing:0px; color:#003694; opacity:1; margin:16px 0 16px 0; padding:10px 24px 10px 24px; font-weight:normal"
                                                                                         data-linkindex="2">Give a
                                                                                         suggestion</a>
                                                                                 </td>
@@ -495,7 +524,7 @@
                                         class="x_mcnImageBlock" style="min-width:100%; border-collapse:collapse">
                                         <tbody class="x_mcnImageBlockOuter">
                                             <tr>
-                                                <td valign="top" class="x_mcnImageBlockInner" style="padding:9px">
+                                                <td valign="top" class="x_mcnImageBlockInner" style="padding:9px; padding-bottom: 0px;">
                                                     <table align="left" width="100%" border="0" cellpadding="0"
                                                         cellspacing="0" class="x_mcnImageContentContainer"
                                                         style="min-width:100%; border-collapse:collapse">
@@ -520,14 +549,14 @@
                                         class="x_mcnImageGroupBlock" style="border-collapse:collapse">
                                         <tbody class="x_mcnImageGroupBlockOuter">
                                             <tr>
-                                                <td valign="top" class="x_mcnImageGroupBlockInner" style="padding:9px">
-                                                    <table align="right" width="564" border="0" cellpadding="0"
+                                                <td valign="top" class="x_mcnImageGroupBlockInner" style="padding:9px; padding-top: 0px;">
+                                                    <table align="left" width="564" border="0" cellpadding="0"
                                                         cellspacing="0" class="x_mcnImageGroupContentContainer"
                                                         style="border-collapse:collapse">
                                                         <tbody>
                                                             <tr>
                                                                 <td>
-                                                                    <table align="right" width="564" border="0" cellpadding="0"
+                                                                    <table align="left" width="564" border="0" cellpadding="0"
                                                                     cellspacing="0" class="x_mcnImageGroupContentContainer"
                                                                     style="border-collapse:collapse">
                                                                         <tbody>
@@ -537,10 +566,10 @@
                                                                                     padding: 0px 8px 0px 0px;
                                                                                     border: 0;"
                                                                                 >
-                                                                                <center>
 
                                                                                     <a 
                                                                                     style="cursor: pointer;
+                                                                                    margin-right: 8px;
                                                                                     text-decoration: unset;" 
                                                                                     href="https://www.ootopia.org/" 
                                                                                     target="_blank">
@@ -549,6 +578,7 @@
 
                                                                                     <a 
                                                                                     style="cursor: pointer;
+                                                                                    margin-right: 8px;
                                                                                     text-decoration: unset;" 
                                                                                     href="mailto: support@ootopia.org"
                                                                                     target="_blank">
@@ -557,6 +587,7 @@
 
                                                                                     <a 
                                                                                     style="cursor: pointer;
+                                                                                    margin-right: 8px;
                                                                                     text-decoration: unset;" 
                                                                                     href="https://www.facebook.com/ootopia.br"
                                                                                     target="_blank"
@@ -566,6 +597,7 @@
 
                                                                                     <a 
                                                                                     style="cursor: pointer;
+                                                                                    margin-right: 8px;
                                                                                     text-decoration: unset;" 
                                                                                     href="https://www.instagram.com/ootopia.br/"
                                                                                     target="_blank"
@@ -575,13 +607,13 @@
 
                                                                                     <a 
                                                                                     style="cursor: pointer;
+                                                                                    margin-right: 8px;
                                                                                     text-decoration: unset;" 
                                                                                     href="https://www.youtube.com/channel/UCZvZHNM2OK0Tdce2MFsNaPQ/featured"
                                                                                     target="_blank"
                                                                                     >
                                                                                         <img src="https://ootopia-files.s3.amazonaws.com/assets/email/youtube_icon.png"  width="18" height="16">
                                                                                     </a>
-                                                                                </center>
                                                                                 </td>
                                                             
                                                                             </tr>
