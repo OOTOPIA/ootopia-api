@@ -4,6 +4,7 @@ import { MarketPlaceRepository } from './market-place.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
+import * as _ from 'lodash';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
 import { EmailsService } from 'src/emails/emails.service';
 import { UsersService } from 'src/users/users.service';
@@ -133,7 +134,7 @@ export class MarketPlaceService {
     }
     let user = await this.usersService.getUserById(userId);
     if (!user.photoUrl) user.photoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
-    
+
     marketPlaceProduct.user = marketPlaceProduct && marketPlaceProduct.userId != 'ootopia'?
     await this.usersService.getUserById(marketPlaceProduct.userId) 
     : {
@@ -150,9 +151,9 @@ export class MarketPlaceService {
 
     await this.walletTransfersService.transferMarketPlacePurchase(user.id, marketPlaceProduct);
     
-    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , true);
+    await this.emailsService.sendConfirmMarketPlace(_.cloneDeep(marketPlaceProduct), _.cloneDeep(user) , true);
     
-    await this.emailsService.sendConfirmMarketPlace(marketPlaceProduct, user , false);
+    await this.emailsService.sendConfirmMarketPlace(_.cloneDeep(marketPlaceProduct), _.cloneDeep(user) , false);
     
 
   }

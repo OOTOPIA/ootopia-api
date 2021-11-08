@@ -67,6 +67,8 @@ export class EmailsService {
       return
     }
 
+    if(marketPlace && ~+marketPlace.price) marketPlace.price = new Intl.NumberFormat(language,{ maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(+marketPlace.price);
+
     let template = await this.loadTemplate(`marketplace-${language}`);
 
     let contemplated = seller ? user : marketPlace.user;
