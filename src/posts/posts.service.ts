@@ -96,11 +96,13 @@ export class PostsService {
         const address = await this.addressesRepository.createOrUpdateAddress(
           addressData,
         );
-
+        
         postResult.addressId = address.id;
 
         await queryRunner.manager.save(address);
       }
+
+      await queryRunner.manager.save(postResult);
 
       if (postData.tagsIds && postData.tagsIds.length > 0) {
         const tagsIds = postData.tagsIds.split(',');
@@ -111,7 +113,6 @@ export class PostsService {
         );
       }
 
-      await queryRunner.manager.save(postResult);
       await queryRunner.commitTransaction();
 
     } catch (err) {
