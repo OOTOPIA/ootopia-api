@@ -10,3 +10,11 @@ INSERT INTO general_config (name, value) VALUES ('user_received_sower_invitation
 INSERT INTO general_config (name, value) VALUES ('user_sent_default_invitation_code_ooz', '15');
 INSERT INTO general_config (name, value) VALUES ('user_received_default_invitation_code_ooz', '25');
 INSERT INTO general_config (name, value) VALUES ('learning_track_per_minute_of_watched_video', '1');
+
+--update after Marcelo send new values
+
+UPDATE general_config SET value = '0' where name = 'creator_reward_per_minute_of_posted_video'; --disable reward to creator for user watched video
+UPDATE general_config SET value = '10' where name = 'creator_reward_for_posted_photo';
+UPDATE general_config SET value = '15' where name = 'creator_reward_for_posted_photo';
+UPDATE general_config SET value = '0.05' where name = 'user_reward_per_minute_of_timeline_view_time';
+UPDATE general_config SET value = '0.10' where name = 'user_reward_per_minute_of_watched_video';
