@@ -90,9 +90,11 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         }
         if (transfer.origin == Origin.MARKET_PLACE_TRANSFER) {
             let marketPlaceData = JSON.parse(transfer.marketPlaceData);
-            transfer.icon = marketPlaceData.imageUrl;
-            transfer.photoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
-            transfer.otherUsername = marketPlaceData.userName;
+            if (marketPlaceData) {
+                transfer.icon = marketPlaceData.imageUrl;
+                transfer.photoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
+                transfer.otherUsername = marketPlaceData.userName;
+            }
 
         }
         return transfer;
