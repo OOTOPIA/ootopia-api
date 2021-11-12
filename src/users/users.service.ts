@@ -146,7 +146,7 @@ export class UsersService {
                 let badge = await this.badgesService.findByType('sower');
                 user.badges = badge;                
             }
-            
+
             await queryRunner.manager.save(
                 user
             );
@@ -361,6 +361,8 @@ export class UsersService {
 
     private async sendInvitationCodeReward(fromUserId: string, toUserId: string, oozToRewardSent : number, oozToRewardReceived : number, originSent : string, originReceived : string, queryRunner) {
 
+        console.log("CHECK PARAMS!!", fromUserId, toUserId, oozToRewardSent, oozToRewardReceived, originSent, originReceived);
+
         const fromUserWalletId = (await this.walletsService.getWalletByUserId(fromUserId)).id;
         const toUserWalletId = (await this.walletsService.getWalletByUserId(toUserId)).id;
 
@@ -368,34 +370,34 @@ export class UsersService {
             await this.walletTransfersService.createTransfer(
                 fromUserId,
                 {
-                userId: fromUserId,
-                walletId: fromUserWalletId,
-                otherUserId : toUserId,
-                balance: oozToRewardSent,
-                origin: originSent,
-                action: WalletTransferAction.SENT,
-                fromPlatform: true,
-                processed: true,
+                    userId: fromUserId,
+                    walletId: fromUserWalletId,
+                    //otherUserId : toUserId,
+                    balance: oozToRewardSent,
+                    origin: originSent,
+                    action: WalletTransferAction.RECEIVED,
+                    fromPlatform: true,
+                    processed: true,
                 },
                 true,
             ),
         );
   
         await queryRunner.manager.save(
-          await this.walletTransfersService.createTransfer(
-            toUserId,
-            {
-              userId: toUserId,
-              walletId: toUserWalletId,
-              otherUserId : fromUserId,
-              balance: oozToRewardReceived,
-              origin: originReceived,
-              action: WalletTransferAction.RECEIVED,
-              fromPlatform: true,
-              processed: true,
-            },
-            true,
-          ),
+            await this.walletTransfersService.createTransfer(
+                toUserId,
+                {
+                    userId: toUserId,
+                    walletId: toUserWalletId,
+                    otherUserId : fromUserId,
+                    balance: oozToRewardReceived,
+                    origin: originReceived,
+                    action: WalletTransferAction.RECEIVED,
+                    fromPlatform: true,
+                    processed: true,
+                },
+                true,
+            ),
         );
 		
         await queryRunner.manager.save(
