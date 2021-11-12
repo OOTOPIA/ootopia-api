@@ -17,7 +17,6 @@ UPDATE general_config SET value = '10' where name = 'creator_reward_per_minute_o
 UPDATE general_config SET value = '5' where name = 'creator_reward_for_posted_photo';
 UPDATE general_config SET value = '0.05' where name = 'user_reward_per_minute_of_timeline_view_time';
 UPDATE general_config SET value = '0.10' where name = 'user_reward_per_minute_of_watched_video';
-UPDATE general_config SET value = '0' where name = 'user_reward_per_minute_of_watched_video'; --disable reward to creator for user watched video
 
 UPDATE general_config SET value = '2.50' where name = 'user_sent_sower_invitation_code_ooz';
 UPDATE general_config SET value = '10' where name = 'user_received_sower_invitation_code_ooz';
