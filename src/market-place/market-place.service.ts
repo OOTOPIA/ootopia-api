@@ -161,7 +161,11 @@ export class MarketPlaceService {
   private mapper(marketPlaceProduct) {
     if (!marketPlaceProduct.userId) {
       marketPlaceProduct.userId = "ootopia";
+    }
+    if (!marketPlaceProduct.userName) {
       marketPlaceProduct.userName = "OOTOPIA";
+    }
+    if (!marketPlaceProduct.userPhotoUrl) {
       marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
     }
     marketPlaceProduct.price = +marketPlaceProduct.price;
