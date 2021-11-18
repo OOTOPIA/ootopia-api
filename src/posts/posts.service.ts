@@ -125,7 +125,7 @@ export class PostsService {
         let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
         postResult.oozGenerated = transfer.balance;
       }else{
-        const totalOOZ = await this.calcOOZToTransferForPostVideos(+(postData.durationInSecs).toFixed(1));
+        const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
         postResult.oozGenerated = totalOOZ;
       }
 
@@ -219,19 +219,18 @@ export class PostsService {
     return result;
   }
 
-  async calcOOZToTransferForPostVideos(durationInSecs : number) {
+  async calcOOZToTransferForPostVideos() {
     const oozToReward = +(
       await this.generalConfigService.getConfig(
         ConfigName.CREATOR_REWARD_PER_MINUTE_OF_POSTED_VIDEO,
       )
     ).value;
-    const duration = +(durationInSecs).toFixed(0);
-    return (oozToReward * (duration / 60)).toFixed(2);
+    return oozToReward;
   }
 
   async sendRewardToCreatorForPost(postId: string) {
     const post = await this.getPostById(postId);
-    const totalOOZ = this.calcOOZToTransferForPostVideos(+post.durationInSecs);
+    const totalOOZ = this.calcOOZToTransferForPostVideos();
 
     const receiverUserWalletId = (
       await this.walletsService.getWalletByUserId(post.userId)

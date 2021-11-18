@@ -21,6 +21,7 @@ export enum ConfigName {
     USER_SENT_DEFAULT_INVITATION_CODE_OOZ = "user_sent_default_invitation_code_ooz",
     USER_RECEIVED_DEFAULT_INVITATION_CODE_OOZ = "user_received_default_invitation_code_ooz",
     LEARNING_TRACK_PER_MINUTE_OF_WATCHED_VIDEO = "learning_track_per_minute_of_watched_video",
+    USER_REWARD_WHEN_GUEST_SIGNUP_WITH_CODE = "user_reward_when_guest_signup_with_code",
 };
   
 @Entity()

@@ -83,22 +83,22 @@ export class PostsWatchedVideotimeService {
                 }
 
                 //Reward to creator of post
-                let totalCreatorOOZ = oozToCreatorReward * (duration / 60);
-                let receiverCreatorWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
+                // let totalCreatorOOZ = oozToCreatorReward * (duration / 60);
+                // let receiverCreatorWalletId = (await this.walletsService.getWalletByUserId(post.userId)).id;
 
-                if (totalCreatorOOZ > 0) {
+                // if (totalCreatorOOZ > 0) {
 
-                    await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
-                        userId : post.userId,
-                        walletId : receiverCreatorWalletId,
-                        balance : totalCreatorOOZ,
-                        origin : Origin.TRANSFER,
-                        action : WalletTransferAction.RECEIVED,
-                        fromPlatform : true,
-                        processed : false
-                    }, true));
+                //     await queryRunner.manager.save(await this.walletTransfersService.createTransfer(post.userId, {
+                //         userId : post.userId,
+                //         walletId : receiverCreatorWalletId,
+                //         balance : totalCreatorOOZ,
+                //         origin : Origin.TRANSFER,
+                //         action : WalletTransferAction.RECEIVED,
+                //         fromPlatform : true,
+                //         processed : false
+                //     }, true));
 
-                }
+                // }
 
             }
 
