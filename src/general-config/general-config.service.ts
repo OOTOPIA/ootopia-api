@@ -22,14 +22,7 @@ export class GeneralConfigService {
     }
 
     async getAllConfigs() {
-        let configs = await this.generalConfigRepository.getAllConfigs();
-        let config : any = {};
-        
-        configs.forEach((c) => {
-            config[c.name] = c.value;
-        })
-
-        return config;
+        return await this.generalConfigRepository.getAllConfigs();
     }
 
     getDailyGoalStartTime(_time : string) {
