@@ -70,7 +70,7 @@ export class GeneralConfigController {
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
     @Get()
-    async getAllConfigs(@Param('name') name) {
+    async getAllConfigs() {
         try {
 
             return await this.generalConfigService.getAllConfigs();
