@@ -41,7 +41,7 @@ export class PostsService {
     try {
       var postResult : any = null;
       if (postData.type === 'image') {
-        const imagesAcceptTypes = ['image/png', 'image/jpeg'];
+        const imagesAcceptTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/octet-stream'];
         if (imagesAcceptTypes.includes(file.mimetype)) {
           postData.thumbnailUrl = postData.imageUrl = await this.filesUploadService.uploadFileToS3Minio(
             file.buffer,
@@ -118,15 +118,18 @@ export class PostsService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       await this.postsRepository.deletePost(postData.id);
-      throw err;
     } finally {
       await queryRunner.release();
-      if(postResult.type === 'image'){
-        let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
-        postResult.oozGenerated = transfer.balance;
+      if (postResult) {
+        if(postResult.type === 'image'){
+          let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
+          postResult.oozGenerated = transfer.balance;
+        }else{
+          const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
+          postResult.oozGenerated = totalOOZ;
+        }
       }else{
-        const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
-        postResult.oozGenerated = totalOOZ;
+        throw new HttpException("Error when create post", 400);
       }
 
       return postResult;

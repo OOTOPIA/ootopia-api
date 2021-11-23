@@ -18,8 +18,8 @@ export class GeneralConfigRepository extends Repository<GeneralConfig>{
         });
     }
 
-    getAllConfigs() {
-        return this.find();
+    async getAllConfigs() {
+        return await getConnection().query("select name, value from general_config where name != $1", ['global_goal_limit_time_in_utc']);
     }
 
 }
