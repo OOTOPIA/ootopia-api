@@ -50,7 +50,6 @@ export class MarketPlaceService {
         uploadNewImage = marketPlaceData.photo && moment(marketPlaceData.photo.updated_at) > moment(findMarketPlace.imageUpdatedAt);
         marketPlaceData.id = findMarketPlace.id;
         marketPlaceData.strapiId = strapiId;
-        imageUrl = findMarketPlace.imageUrl;
     } else {
       marketPlaceData.strapiId = marketPlaceData.id;
       delete marketPlaceData.id;

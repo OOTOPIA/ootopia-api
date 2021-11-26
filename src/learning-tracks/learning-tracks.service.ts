@@ -36,7 +36,7 @@ export class LearningTracksService {
 
         let findLearningTrack = await this.learningTracksRepository.getByStrapiId(learningTrackData.id);
 
-        if (strapiEvent == "entry.update" && (!findLearningTrack || !learningTrackData.published_at)) { 
+        if (strapiEvent == "entry.update" && (!findLearningTrack || !learningTrackData.published_at)) {
             //Não vamos fazer nada se houver atualização sem que o dado esteja registrado no banco e publicado no strapi
             return;
         }
@@ -57,7 +57,6 @@ export class LearningTracksService {
             uploadNewImage = learningTrackData.photo && moment(learningTrackData.photo.updated_at) > moment(findLearningTrack.imageUpdatedAt);
             learningTrackData.id = findLearningTrack.id;
             learningTrackData.strapiId = strapiId;
-            imageUrl = learningTrackData.imageUrl;
         }else{
             learningTrackData.strapiId = learningTrackData.id;
             delete learningTrackData.id;
