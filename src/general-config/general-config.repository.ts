@@ -19,7 +19,10 @@ export class GeneralConfigRepository extends Repository<GeneralConfig>{
     }
 
     async getAllConfigs() {
-        return await getConnection().query("select name, value from general_config where name != $1", ['global_goal_limit_time_in_utc']);
+        return (await getConnection().query("select name, value from general_config where name != $1", ['global_goal_limit_time_in_utc'])).map((config) => {
+            config.value = +config.value;
+            return config;
+        });
     }
 
 }
