@@ -40,7 +40,7 @@ export class UsersService {
         ) {
     }
 
-    async createUser(userData : CreateUserDto, photoFile = null) {
+    async createUser(userData, photoFile = null) {
 
         if (!userData.acceptedTerms) {
             throw new HttpException("You must accept the terms to register", 401);
@@ -58,13 +58,13 @@ export class UsersService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        userData.invitationCode = !!userData.invitationCode ? userData.invitationCode : null;
+        userData.invitationCodeAccepted = !!userData.invitationCode ? userData.invitationCode : null;
         userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
 
         let user = {
             id: null,
             photoUrl: null,
-            invitationCodeAccepted: userData.invitationCode,
+            invitationCodeAccepted: userData.invitationCodeAccepted,
             addressId: null,
             badges: null,
             password: null,
@@ -112,8 +112,8 @@ export class UsersService {
                 await queryRunner.manager.save(userAddress);
             }
 
-            if(userData.invitationCode) {
-                invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCode);
+            if(userData.invitationCodeAccepted) {
+                invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCodeAccepted);
                 if (!invitation) {
                     throw new HttpException("Invitation Code invalid", 401);
                 }
@@ -360,9 +360,7 @@ export class UsersService {
     }
 
     private async sendInvitationCodeReward(fromUserId: string, toUserId: string, oozToRewardSent : number, oozToRewardReceived : number, originSent : string, originReceived : string, queryRunner) {
-
-        console.log("CHECK PARAMS!!", fromUserId, toUserId, oozToRewardSent, oozToRewardReceived, originSent, originReceived);
-
+        
         const fromUserWalletId = (await this.walletsService.getWalletByUserId(fromUserId)).id;
         const toUserWalletId = (await this.walletsService.getWalletByUserId(toUserId)).id;
 
