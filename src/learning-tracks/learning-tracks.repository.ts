@@ -107,6 +107,9 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         if (learningTrack.chapters) {
             learningTrack.chapters = JSON.parse(learningTrack.chapters);
         }
+        if (!learningTrack.userPhotoUrl) {
+            learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/profile.png";
+        }
         return camelcaseKeys(learningTrack);
     }
 
