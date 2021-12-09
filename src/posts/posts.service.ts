@@ -213,6 +213,10 @@ export class PostsService {
     const post = await this.postsRepository.getPostByStreamMediaId(
       streamMediaId,
     );
+    if (!post) {
+      console.log("failed to get post update status >>> ", streamMediaId);
+      return null;
+    }
     post.videoStatus = status;
     post.durationInSecs = +videoDetails.duration;
     const result = await this.postsRepository.createOrUpdatePost(post);
