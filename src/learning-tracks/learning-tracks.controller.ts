@@ -6,6 +6,7 @@ import { ErrorHandling } from './../config/error-handling';
 import { HttpResponseDto } from './../config/http-response.dto';
 import { LastLearningTracksFilterDto, LearningTrackDto, LearningTracksFilterDto } from './learning-tracks.dto';
 import { LearningTracksService } from './learning-tracks.service';
+import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 
 @Controller('learning-tracks')
 export class LearningTracksController {
@@ -23,11 +24,11 @@ export class LearningTracksController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtOptionalAuthGuard)
     @Get()
-    async getLearningTracks(@Req() { user }, @Query() filters : LearningTracksFilterDto) {
+    async getLearningTracks(@Req() req, @Query() filters : LearningTracksFilterDto) {
         try {
-            return await this.learningTracksService.getLearningTracks(filters, user.id);
+            return await this.learningTracksService.getLearningTracks(filters, req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -42,11 +43,11 @@ export class LearningTracksController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtOptionalAuthGuard)
     @Get('/last')
-    async getLastLearningTrack(@Req() { user }, @Query() filters : LastLearningTracksFilterDto) {
+    async getLastLearningTrack(@Req() req, @Query() filters : LastLearningTracksFilterDto) {
         try {
-            return this.learningTracksService.getLastLearningTrack(filters.locale, user.id);
+            return this.learningTracksService.getLastLearningTrack(filters.locale, req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
         }
