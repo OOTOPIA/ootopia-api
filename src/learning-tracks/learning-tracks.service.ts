@@ -130,18 +130,25 @@ export class LearningTracksService {
 
     }
 
-    async getLearningTracks(filters : LearningTracksFilterDto, userId : string) {
+    async getLearningTracks(filters : LearningTracksFilterDto, userId? : string) {
         let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
 
         let learningTracksIds : string[] = learningTracks.map((data) => data.id);
 
-        if (learningTracks.length) {
+        if (learningTracks.length && userId) {
             let chapters = await this.learningTrackCompletedChaptersRepository.getCompletedChaptersOfLearningTracks(learningTracksIds, userId);
             learningTracks.forEach((learningTrack) => {
                 let learningTrackCompletedChapters = chapters.filter((c) => c.learningTrackId == learningTrack.id);
                 learningTrack.completed = (learningTrackCompletedChapters.length == learningTrack.chapters.length && learningTrack.chapters.length > 0);
                 learningTrack.chapters.forEach((chapter) => {
                     chapter.completed = (chapters.filter((c) => +c.chapterId == +chapter.id).length > 0);
+                });
+            });
+        }else{
+            learningTracks.forEach((learningTrack) => {
+                learningTrack.completed = false;
+                learningTrack.chapters.forEach((chapter) => {
+                    chapter.completed = false;
                 });
             });
         }
@@ -153,7 +160,7 @@ export class LearningTracksService {
         return (await this.getLearningTracks({ id }, userId))[0];
     }
 
-    async getLastLearningTrack(locale : string, userId : string) {
+    async getLastLearningTrack(locale : string, userId? : string) {
         let filters : LearningTracksFilterDto = {
             limit: 1,
             locale,

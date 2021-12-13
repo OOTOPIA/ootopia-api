@@ -7,6 +7,7 @@ import { HttpResponseDto } from 'src/config/http-response.dto';
 import { SentryInterceptor } from 'src/interceptors/sentry.interceptor';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { MarketPlacePurchaseCreateDto } from './dto/market-place-purchase-create.dto';
+import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 
 @Controller('market-place')
 export class MarketPlaceProductsController {
@@ -14,7 +15,6 @@ export class MarketPlaceProductsController {
 
   @UseInterceptors(SentryInterceptor)
   @ApiTags('market-place')
-  @ApiBearerAuth('Bearer')
   @ApiOperation({ summary: "Returns a list of Market Place" })
   @ApiQuery({ name : "limit", type: "number", description: "Limit of entries (50 max.)", required: false })
   @ApiQuery({ name : "offset", type: "number", required: false })
@@ -22,7 +22,6 @@ export class MarketPlaceProductsController {
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(200)
   async getMarketPlaces(@Query() filters : MarketPlaceFilterDto) {
