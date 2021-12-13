@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
     Entity,
     Unique,
@@ -9,7 +10,9 @@ import {
     ManyToOne,
     JoinColumn,
 
-    JoinTable
+    JoinTable,
+    Generated,
+    Index
 } from 'typeorm';
 import { Users } from '../../users/users.entity';
 
@@ -19,14 +22,18 @@ enum TagType {
 }
 
 @Entity()
-@Unique(['code'])
+@Index(["invitationCode"], { unique: true })
 export class InvitationsCode extends BaseEntity {
 
     @PrimaryGeneratedColumn("uuid")
     id : string;
     
-    @Column({nullable : false, type: 'varchar'})
+    @Column({nullable : true, type: 'varchar'})
     code: String;
+
+    @Column({name: "invitation_code", nullable : false, unique: true})
+    @Generated("increment")
+    invitationCode: number;
 
     @Column({ nullable: false, type: 'enum', enum: TagType })
     type : string;

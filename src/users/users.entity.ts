@@ -49,6 +49,9 @@ export class Users extends BaseEntity {
     @Column({ nullable: true, type: 'varchar', name: "invitation_code_accepted" })
     invitationCodeAccepted : string;
 
+    @Column({ nullable: true, type: 'numeric', name: "invitation_code_accepted_number" })
+    invitationCodeAcceptedNumber : number;
+
     @Column({ nullable: true, name: 'daily_learning_goal_in_minutes', type: 'numeric', default: () => "0" })
     dailyLearningGoalInMinutes : number;
 

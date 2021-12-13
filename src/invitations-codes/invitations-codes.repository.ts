@@ -16,9 +16,9 @@ export class InvitationsCodeRepository extends Repository<InvitationsCode>{
     async createOrUpdateInvitation(data) {
         const invitationCode = this.create();
         Object.assign(invitationCode, data);
-        if (!invitationCode.code) {
-            invitationCode.code = nanoid(10);
-        }
+        // if (!invitationCode.code) {
+        //     invitationCode.code = nanoid(10);
+        // }
         return invitationCode;
     }
 

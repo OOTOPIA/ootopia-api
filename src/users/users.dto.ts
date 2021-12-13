@@ -222,6 +222,9 @@ export class UserInvitationsCodes {
     @ApiProperty({example : 'kMK9iksGc'})
     code : string;
 
+    @ApiProperty({example : '1234'})
+    invitationCode : number;
+
     @ApiProperty({example : 'true'})
     type : string;
 
