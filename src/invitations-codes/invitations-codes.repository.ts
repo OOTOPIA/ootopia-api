@@ -34,7 +34,7 @@ export class InvitationsCodeRepository extends Repository<InvitationsCode>{
     async getInvitationsCodesByCode(code: string) {
         let invitation = camelcaseKeys(await getConnection().query(`
             SELECT * FROM invitations_code
-            WHERE code = $1 and active is true
+            WHERE invitation_code = $1 and active is true
             `, [code]), { deep : true });
 
         return invitation && invitation.length ? invitation[0] : null;

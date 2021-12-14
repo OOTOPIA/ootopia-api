@@ -62,6 +62,8 @@ export class CreateUserDto {
     @ApiProperty({ required: false})
     invitationCode : string;
 
+    @ApiProperty({ required: false})
+    invitationCodeAcceptedNumber : number;
 }
 
 export class CreatedUserDto {
