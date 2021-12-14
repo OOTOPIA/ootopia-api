@@ -58,13 +58,13 @@ export class UsersService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        userData.invitationCodeAcceptedNumber = !!userData.invitationCodeAcceptedNumber ? userData.invitationCodeAcceptedNumber : null;
+        userData.invitationCodeAccepted = !!userData.invitationCode ? userData.invitationCode : null;
         userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
 
         let user = {
             id: null,
             photoUrl: null,
-            invitationCodeAcceptedNumber: userData.invitationCodeAcceptedNumber,
+            invitationCodeAccepted: userData.invitationCodeAccepted,
             addressId: null,
             badges: null,
             password: null,
@@ -112,8 +112,8 @@ export class UsersService {
                 await queryRunner.manager.save(userAddress);
             }
 
-            if(userData.invitationCodeAcceptedNumber) {
-                invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCodeAcceptedNumber);
+            if(userData.invitationCodeAccepted) {
+                invitation = await this.invitationsCodesService.getInvitationsCodesByCode(userData.invitationCodeAccepted);
                 if (!invitation) {
                     throw new HttpException("Invitation Code invalid", 401);
                 }
