@@ -29,7 +29,7 @@ export class InvitationsCode extends BaseEntity {
     id : string;
     
     @Column({nullable : true, type: 'varchar'})
-    code: String;
+    code: string;
 
     @Column({name: "invitation_code", nullable : false, unique: true})
     @Generated("increment")
