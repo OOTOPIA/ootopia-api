@@ -81,6 +81,7 @@ export class LearningTracksService {
             location : learningTrackData.location || "",
             time : "",
             ooz : 0,
+            showAtTimeline : !!learningTrackData.show_at_timeline,
             deletedAt : null,
         };
 

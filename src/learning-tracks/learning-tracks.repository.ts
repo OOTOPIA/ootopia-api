@@ -24,6 +24,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             offset = 0, 
             where = 'deleted_at IS NULL AND ', 
             locale = "en",
+            orderBy = filters.showAtTimeline ? " (CASE WHEN l.show_at_timeline THEN  1 else 2 END), l.updated_at " : " l.strapi_id ",
             params = [];
 
         let columns = [
@@ -54,7 +55,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             SELECT ${columns} FROM learning_tracks l
             LEFT JOIN users u ON u.id = l.user_id
             WHERE ${where}
-            ORDER BY l.strapi_id DESC
+            ORDER BY ${orderBy} DESC
             LIMIT ${limit} OFFSET ${offset}
         `, params), { deep : true }).map(this.mapper);
 
