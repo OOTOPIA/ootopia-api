@@ -28,6 +28,7 @@ export class LearningTracksController {
     @Get()
     async getLearningTracks(@Req() req, @Query() filters : LearningTracksFilterDto) {
         try {
+            filters.showAtTimeline = true;
             return await this.learningTracksService.getLearningTracks(filters, req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
