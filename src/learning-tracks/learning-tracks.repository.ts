@@ -18,7 +18,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         return this.save(learningTrack);
     }
 
-    async getLearningTracks(filters : LearningTracksFilterDto) {
+    async getLearningTracks(filters) {
 
         let limit = 50, 
             offset = 0, 
@@ -39,6 +39,11 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             }
             limit = filters.limit;
             offset = filters.offset || 0;
+        }
+
+        if (filters.strapiId) {
+            params.push(filters.strapiId);
+            where += `strapi_id = $${params.length} AND `;
         }
 
         if (filters.locale) {
