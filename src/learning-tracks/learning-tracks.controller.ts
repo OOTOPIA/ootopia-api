@@ -28,6 +28,7 @@ export class LearningTracksController {
     @Get()
     async getLearningTracks(@Req() req, @Query() filters : LearningTracksFilterDto) {
         try {
+            filters.showAtTimeline = true;
             return await this.learningTracksService.getLearningTracks(filters, req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
@@ -50,6 +51,28 @@ export class LearningTracksController {
             return this.learningTracksService.getLastLearningTrack(filters.locale, req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('learning-tracks')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: "Returns a Welcome Guide Learning Track" })
+    @ApiResponse({ status: 200, type: LearningTrackDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
+    @Get('/welcome-guide/:locale')
+    async getWelcomeGuide(@Req() req,  @Param('locale') locale : string) {
+        try {
+            if (locale != "pt-BR") {
+                locale = "en";
+            }
+            return await this.learningTracksService.getWelcomeGuideLearningTrack(locale, req.user ? req.user.id : null);
+        } catch (error) {
+            new ErrorHandling(error);
+            return error
         }
     }
 

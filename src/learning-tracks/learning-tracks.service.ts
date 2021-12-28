@@ -81,6 +81,7 @@ export class LearningTracksService {
             location : learningTrackData.location || "",
             time : "",
             ooz : 0,
+            showAtTimeline : !!learningTrackData.show_at_timeline,
             deletedAt : null,
         };
 
@@ -130,7 +131,7 @@ export class LearningTracksService {
 
     }
 
-    async getLearningTracks(filters : LearningTracksFilterDto, userId? : string) {
+    async getLearningTracks(filters, userId? : string) {
         let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
 
         let learningTracksIds : string[] = learningTracks.map((data) => data.id);
@@ -158,6 +159,11 @@ export class LearningTracksService {
 
     async getLearningTracksById(id : string, userId : string  ) {
         return (await this.getLearningTracks({ id }, userId))[0];
+    }
+
+    async getWelcomeGuideLearningTrack(locale : string, userId : string) {
+        let strapiId = locale == "en" ? "4" : "18";
+        return (await this.getLearningTracks({ strapiId, locale }, userId))[0];
     }
 
     async getLastLearningTrack(locale : string, userId? : string) {

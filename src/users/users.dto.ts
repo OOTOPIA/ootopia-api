@@ -61,7 +61,6 @@ export class CreateUserDto {
     
     @ApiProperty({ required: false})
     invitationCode : string;
-
 }
 
 export class CreatedUserDto {
@@ -219,8 +218,8 @@ export class UserInvitationsCodes {
     @ApiProperty({example : '11111111-1111-1111-1111-111111111111'})
     id : string;
 
-    @ApiProperty({example : 'kMK9iksGc'})
-    code : string;
+    @ApiProperty({example : '1234'})
+    invitationCode : number;
 
     @ApiProperty({example : 'true'})
     type : string;
