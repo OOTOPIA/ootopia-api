@@ -184,6 +184,7 @@ export class LearningTracksService {
             learningTrack.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
         }
         learningTrack.ooz = +learningTrack.ooz;
+        learningTrack.time = learningTrack.time.replace("m ", "min ");;
         return learningTrack;
     }
 
