@@ -118,7 +118,11 @@ export class WalletTransfersService {
         }
 
         let postAuthorId : any = (await this.postsService.getPostById(postId)).userId;
-        return await this.transferOOZBetweenUsers(userId, postAuthorId, balance, Origin.GRATITUDE_REWARD, postId);
+        var transferResult = await this.transferOOZBetweenUsers(userId, postAuthorId, balance, Origin.GRATITUDE_REWARD, postId);
+
+        await this.postsService.countPostUserRewarded(postId, userId, balance);
+
+        return transferResult;
 
     }
 
