@@ -15,11 +15,13 @@ import {
   Origin,
   WalletTransferAction,
 } from 'src/wallet-transfers/wallet-transfers.entity';
+import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly postsRepository: PostsRepository,
+    private readonly postsUsersRewardedRepository: PostsUsersRewardedRepository,
     private readonly videoService: VideoService,
     private readonly filesUploadService: FilesUploadService,
     private readonly interestsTagsService: InterestsTagsService,
@@ -297,5 +299,9 @@ export class PostsService {
 
   incrementOOZTotalCollected(balance: number, postId: string) {
     return this.postsRepository.incrementOOZTotalCollected(balance, postId);
+  }
+
+  async countPostUserRewarded(postId : string, userId : string, oozRewarded : number) {
+    return await this.postsUsersRewardedRepository.countReward(postId, userId, oozRewarded);
   }
 }

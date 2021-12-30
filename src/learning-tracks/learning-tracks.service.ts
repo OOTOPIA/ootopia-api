@@ -97,7 +97,7 @@ export class LearningTracksService {
                     delete chapter.tittle;
                     chapter.videoUrl = videoDetails.playback.hls;
                     chapter.videoThumbUrl = videoDetails.thumbnail;
-                    chapter.time = this.msToTime(videoDetails.duration * 1000); //convert duration to ms and get formatted time
+                    chapter.time = this.msToTime(videoDetails.duration * 1000).replace("m ", "min "); //convert duration to ms and get formatted time
                     chapter.ooz = await this.calcOOZToTransferForChapter(videoDetails.duration);
                     learningTrack.ooz += chapter.ooz;
                     totalDurationInSecs += videoDetails.duration;
@@ -143,6 +143,7 @@ export class LearningTracksService {
                 learningTrack.completed = (learningTrackCompletedChapters.length == learningTrack.chapters.length && learningTrack.chapters.length > 0);
                 learningTrack.chapters.forEach((chapter) => {
                     chapter.completed = (chapters.filter((c) => +c.chapterId == +chapter.id).length > 0);
+                    chapter.time = chapter.time.replace("m ", "min ");
                 });
             });
         }else{
@@ -150,6 +151,7 @@ export class LearningTracksService {
                 learningTrack.completed = false;
                 learningTrack.chapters.forEach((chapter) => {
                     chapter.completed = false;
+                    chapter.time = chapter.time.replace("m ", "min ");
                 });
             });
         }
@@ -199,7 +201,7 @@ export class LearningTracksService {
         minutes = (minutes < 10) ? "0" + minutes : minutes;
         seconds = (seconds < 10) ? "0" + seconds : seconds;
       
-        return (+hours ? hours + "h " : "") + (+minutes ? minutes + "m " : (+hours ? "00m " : "")) + seconds + "s";
+        return (+hours ? hours + "h " : "") + (+minutes ? minutes + "min " : (+hours ? "00min " : "")) + seconds + "s";
 
     }
 

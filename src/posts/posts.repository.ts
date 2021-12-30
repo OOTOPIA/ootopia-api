@@ -185,6 +185,7 @@ export class PostsRepository extends Repository<Posts>{
             columns.push(`(CASE WHEN $${params.length}=(
                 SELECT user_id from posts_likes WHERE post_id = p.id and posts_likes.user_id = $${params.length}) 
                 THEN true ELSE false END) as liked`);
+            columns.push(`COALESCE(pur.ooz_rewarded, 0)::numeric as ooz_rewarded`);
         }
 
         where = where.substring(0, where.length - 5);
@@ -192,10 +193,10 @@ export class PostsRepository extends Repository<Posts>{
         return camelcaseKeys(await getConnection().query(`
             SELECT 
                 ${columns}, array(
-                    select t.name
-                    from interests_tags_posts tp
-                    inner join interests_tags t on t.id = tp.tag_id
-                    where tp.post_id = p.id
+                        select t.name
+                        from interests_tags_posts tp
+                        inner join interests_tags t on t.id = tp.tag_id
+                        where tp.post_id = p.id
                     ) as tags,
                     array (
                         select 
@@ -210,10 +211,17 @@ export class PostsRepository extends Repository<Posts>{
             LEFT JOIN posts_comments_count pc ON pc.post_id = p.id
             LEFT JOIN addresses addr ON addr.id = p.address_id
             LEFT JOIN cities c ON c.id = addr.city_id
+            ${userId ? "LEFT JOIN posts_users_rewarded pur ON pur.post_id = p.id AND pur.user_id = $" + params.length : ""}
             WHERE ${where}
             ORDER BY p.created_at DESC
             ${limit}
-        `, params), { deep : true });
+        `, params), { deep : true })
+        .map((post) => {
+            post.oozRewarded = +post.oozRewarded;
+            post.oozTotalCollected = +post.oozTotalCollected;
+            post.oozToTransfer = 0;
+            return post;
+        });
 
     }
 
