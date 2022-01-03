@@ -220,6 +220,9 @@ export class PostsRepository extends Repository<Posts>{
             post.oozRewarded = +post.oozRewarded;
             post.oozTotalCollected = +post.oozTotalCollected;
             post.oozToTransfer = 0;
+            if (!userId) {
+                post.liked = false;
+            }
             return post;
         });
 
