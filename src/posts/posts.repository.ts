@@ -143,6 +143,7 @@ export class PostsRepository extends Repository<Posts>{
         const params = [];
         const perPage = 10;
         let limit = 'LIMIT ' + perPage;
+        let locale = 'en-US';
         const columns = [
           'p.id',
           'p.user_id',
@@ -180,6 +181,13 @@ export class PostsRepository extends Repository<Posts>{
             limit = 'LIMIT ' + filters.limit + ' OFFSET ' + filters.offset;
         }
 
+        if (filters.locale && ['en', 'pt-BR'].indexOf(filters.locale) != -1) {
+            locale = filters.locale;
+            if (locale == "en") {
+                locale = "en-US";
+            }
+        }
+
         if (userId) {
             params.push(userId);
             columns.push(`(CASE WHEN $${params.length}=(
@@ -195,8 +203,8 @@ export class PostsRepository extends Repository<Posts>{
                 ${columns}, array(
                         select t.name
                         from interests_tags_posts tp
-                        inner join interests_tags t on t.id = tp.tag_id
-                        where tp.post_id = p.id
+                        inner join interests_tags t on (t.id = tp.tag_id or t.related_id = tp.tag_id::text)
+                        where tp.post_id = p.id and t.language = '${locale}'
                     ) as tags,
                     array (
                         select 
