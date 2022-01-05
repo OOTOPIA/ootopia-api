@@ -158,15 +158,15 @@ export class MarketPlaceService {
   }
 
   private mapper(marketPlaceProduct) {
-    if (!marketPlaceProduct.userId) {
+    if (!marketPlaceProduct.userId || !marketPlaceProduct.userName) {
       marketPlaceProduct.userId = "ootopia";
-    }
-    if (!marketPlaceProduct.userName) {
       marketPlaceProduct.userName = "OOTOPIA";
-    }
-    if (!marketPlaceProduct.userPhotoUrl) {
       marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
     }
+    else if (!marketPlaceProduct.userPhotoUrl) {
+      marketPlaceProduct.userPhotoUrl = "https://ootopia-files.s3.amazonaws.com/assets/email/user.png";
+    }
+
     marketPlaceProduct.price = +marketPlaceProduct.price;
     return marketPlaceProduct;
   }
