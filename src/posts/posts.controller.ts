@@ -86,6 +86,7 @@ export class PostsController {
     @ApiBearerAuth('Bearer')
     @ApiQuery({ name : "limit", type: "number", description: "Limit of posts (50 max.)", required: false })
     @ApiQuery({ name : "offset", type: "number", required: false })
+    @ApiQuery({ name : "locale", type: "enum", enum: ['pt-BR', 'en'], required: false })
     @ApiResponse({ status: 200, type: PostTimelineDto, isArray: true })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })

@@ -150,6 +150,9 @@ export class PostTimelineDto {
     @ApiProperty()
     state : string;
 
+    @ApiProperty({enum: ["en", "pt-BR"]})
+    locale : string;
+
     @ApiProperty()
     country : string;
 

@@ -4,7 +4,10 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    BaseEntity
+    BaseEntity,
+    OneToOne,
+    JoinColumn,
+    ManyToMany
 } from 'typeorm';
 
 enum TagType {
@@ -33,6 +36,9 @@ export class InterestsTags extends BaseEntity {
 
     @Column({ nullable: false, type: 'varchar' })
     language : string;
+
+    @Column({ nullable: true, type: 'varchar', name : 'related_id' })
+    relatedId : string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

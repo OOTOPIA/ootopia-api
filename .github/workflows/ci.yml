@@ -1,35 +1,43 @@
-name: CI
+name: Build and run tests
+
 on:
-  pull_request:
-    branches:
-      - staging
   push:
-    branches:
-      - staging
-      
+    branches: [ master, staging ]
+  pull_request:
+    branches: [ master, staging ]
+
 jobs:
-  devmagic_staging_deploy:
-    name: Beta deploy on DevMagic's server
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Adding Known Hosts
-        run: |
-            mkdir -p ~/.ssh/
-            ssh-keyscan -H ${{ secrets.DEVMAGIC_SSH_HOST }} >> ~/.ssh/known_hosts
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
-      - run: | 
-            ssh ubuntu@${SSH_HOST} << EOSSH
-            . ~/.nvm/nvm.sh
-            cd /home/ubuntu/ootopia-api
-            git pull origin staging
-            npm ci
-            npm run build
-            pm2 delete ootopia-api-staging
-            pm2 start dist/main.js --name "ootopia-api-staging"
-            EOSSH
-        env:
-          SSH_HOST: ${{ secrets.DEVMAGIC_SSH_HOST }}
-          SSH_PRIVATE_KEY: ${{ secrets.DEVMAGIC_SSH_PRIVATE_KEY }}
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: 10.16.3
+        cache: 'npm'
+    - run: npm i
+    # - run: npm test
+
+  deploy_staging:
+    if: contains( github.ref, 'staging')
+    runs-on: ubuntu-latest
+    needs: build
+    environment: staging
+    env:
+        PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
+        HOSTNAME : ${{ secrets.HOSTNAME  }}
+        USER_NAME : ${{ secrets.USER_NAME  }}
+    steps:
+      - run: echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+      - run: ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} uptime
+      - run: |
+          ssh -i private_key ${USER_NAME}@${HOSTNAME} '
+          . ~/.nvm/nvm.sh &&
+          cd ootopia-api &&
+          git pull origin staging &&
+          npm ci &&
+          npm run build &&
+          pm2 delete ootopia-api-staging &&
+          pm2 start dist/main.js --name "ootopia-api-staging"
+          '

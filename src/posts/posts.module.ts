@@ -17,6 +17,7 @@ import { PostsWatchedVideotimeService } from './services/posts-watched-videotime
 import { PostsWatchedVideotimeRepository } from './repositories/posts-watched-videotime.repository';
 import { PostsTimelineViewTimeRepository } from './repositories/posts-timeline-view-time.repository';
 import { PostsTimelineViewTimeService } from './services/posts-timeline-view-time.service';
+import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PostsTimelineViewTimeService } from './services/posts-timeline-view-tim
       AddressesRepository,
       PostsWatchedVideotimeRepository,
       PostsTimelineViewTimeRepository,
+      PostsUsersRewardedRepository,
     ]),
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
