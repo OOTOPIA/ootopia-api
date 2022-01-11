@@ -9,7 +9,8 @@ import {
     ManyToOne,
     JoinColumn,
     ManyToMany,
-    JoinTable
+    JoinTable,
+    OneToMany
 } from 'typeorm';
 import { Addresses } from '../addresses/addresses.entity';
   
@@ -97,4 +98,6 @@ export class Users extends BaseEntity {
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
+    @Column({ nullable: true, type: 'varchar', name: 'device_token'  })
+    deviceToken : string;
 }

@@ -22,6 +22,7 @@ import { LearningTracks } from 'src/learning-tracks/learning-tracks.entity';
 import { MarketPlaceProducts } from 'src/market-place/entities/market-place-products.entity';
 import { LearningTrackCompletedChapters } from 'src/learning-tracks/entities/learning-track-completed-chapters.entity';
 import { PostsUsersRewarded } from 'src/posts/entities/posts-users-rewarded.entity';
+import { UsersDeviceToken } from 'src/users-device-token/entities/users-device-token.entity';
 
 require('dotenv').config();
 
@@ -86,6 +87,7 @@ class ConfigService {
           Badges,
           InvitationsCode,
           UsersTrophies,
+          UsersDeviceToken,
           LearningTracks,
           MarketPlaceProducts,
           LearningTrackCompletedChapters,

@@ -23,6 +23,9 @@ import { InvitationsCodesModule } from './invitations-codes/invitations-codes.mo
 import { LearningTracksModule } from './learning-tracks/learning-tracks.module';
 import { StrapiModule } from './strapi/strapi.module';
 import { MarketPlaceModule } from './market-place/market-place.module';
+import { NotificationMessagesService } from './notification-messages/notification-messages.service';
+import { TestModule } from './test/test.module';
+import { UsersDeviceTokenModule } from './users-device-token/users-device-token.module';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -83,8 +86,10 @@ const sqs = new AWS.SQS({
     LearningTracksModule,
     StrapiModule,
     MarketPlaceModule,
+    TestModule,
+    UsersDeviceTokenModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CronService],
+  providers: [AppService, CronService, NotificationMessagesService],
 })
 export class AppModule {}

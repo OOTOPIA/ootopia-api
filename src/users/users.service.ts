@@ -236,6 +236,11 @@ export class UsersService {
 
     }
 
+    async updateTokenDeviceUser(userId: string, deviceToken: string, deviceId: string) {
+        console.log('kole parsaaaaa ',userId, deviceToken, deviceId);
+        return this.usersRepository.updateTokenDevice(userId, deviceToken, deviceId);
+    }
+
     async resetPassword(userId: string, password: string) {        
         password = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
         return this.usersRepository.resetPassword(userId, password);    

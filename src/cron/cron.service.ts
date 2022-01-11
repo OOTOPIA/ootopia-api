@@ -3,11 +3,15 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import * as moment from 'moment-timezone';
+import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
+
 import * as _ from 'lodash';
 import { PostsWatchedVideotimeService } from 'src/posts/services/posts-watched-videotime.service';
 import { SqsWorkerService } from 'src/sqs-worker/sqs-worker.service';
 import { PostsTimelineViewTimeService } from 'src/posts/services/posts-timeline-view-time.service';
 import { UsersAppUsageTimeService } from 'src/users/services/users-app-usage-time/users-app-usage-time.service';
+import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
+// import { CommentsRepository } from 'src/posts/repositories/comments.repository';
 
 @Injectable()
 export class CronService {
@@ -16,6 +20,7 @@ export class CronService {
     allUsersUsedAppPage = 1;
 
     constructor(
+        @Inject(forwardRef(() => NotificationMessagesService)) private notificationMessagesService  : NotificationMessagesService,
         @Inject(forwardRef(() => GeneralConfigService)) private readonly generalConfigService : GeneralConfigService,
         @Inject(forwardRef(() => UsersAppUsageTimeService)) private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
         @Inject(forwardRef(() => SqsWorkerService)) private readonly sqsWorkerService : SqsWorkerService,
@@ -57,6 +62,68 @@ export class CronService {
 
         }catch(err) {
             console.log('ERROR: cronDailyGoalDistribution >>>>', err);
+        }
+
+    }
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    async cronPushNotificationComments() {
+        let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
+        // let finishDate = moment.utc(moment().toISOString()).set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
+        let finishDate = moment();
+        // this.commentsRepository.queryRunner
+
+        console.log("ASDFGHJKL", initDate.toISOString(), finishDate.toISOString());
+        
+        try {
+            let allComments = await getConnection().query(`
+            select udt.device_token as "token", json_build_object('comments','type','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', u.id , 'userName', u.fullname) as "data" from posts_comments pc 
+            left join users u on u.id = pc.user_id 
+            left join posts p on p.id = pc.post_id
+            left join users_device_token udt on udt.user_id = u.id::text
+            where pc.created_at >= $1 and pc.created_at < $2 and pc.deleted is false and udt.device_token is not null;
+            `,
+            [ initDate.toISOString(), finishDate.toISOString()]);
+
+            
+            let result = await this.notificationMessagesService.sendFirebaseMessage(allComments);
+            console.log('allComments', result);
+
+        } catch(err) {
+
+        }
+
+    }
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    async cronPushNotificationRewards() {
+        let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
+        // let finishDate = moment.utc(moment().toISOString()).set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
+        let finishDate = moment();
+        // this.commentsRepository.queryRunner
+
+        console.log("ASDFGHJKL", initDate.toISOString(), finishDate.toISOString());
+        
+        try {
+            let allgratitudeReward = await getConnection().query(`
+            select  udt.device_token as "token", json_build_object('type','gratitude_reward','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', ou.id , 'userName', ou.fullname, 'amounnt', wt.balance) as "data"  
+            from wallet_transfers wt 
+            left join users u on u.id = wt.user_id 
+            left join users ou on ou.id = wt.other_user_id 
+            left join posts p on p.id = wt.post_id 
+            left join users_device_token udt on udt.user_id = u.id::text
+            where 
+                wt.created_at >= $1 and wt.created_at < $2 and 
+                udt.device_token is not null and
+                wt.origin = 'gratitude_reward' and
+                wt."action" = 'received';
+            `,
+            [ initDate.toISOString(), finishDate.toISOString()]);
+
+            let result = await this.notificationMessagesService.sendFirebaseMessage(allgratitudeReward);
+            console.log('allgratitudeReward', result);
+        } catch(err) {
+
         }
 
     }

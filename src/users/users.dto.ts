@@ -112,6 +112,15 @@ export class UserLoginDto {
   
 }
 
+export class DeviceTokenDTO {
+
+    @ApiProperty({ required: true })
+    deviceToken : string;
+
+    @ApiProperty({ required: true })
+    deviceId : string;
+}
+
 export class RecoverPasswordDto {
 
     @ApiProperty({ required: true })
@@ -119,7 +128,7 @@ export class RecoverPasswordDto {
     email : string;
 
     @ApiProperty({ required: false, enum: ['ptbr', 'en'] })
-    language : string;    
+    language : string;
   
 }
 

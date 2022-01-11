@@ -58,6 +58,30 @@ export class UsersRepository extends Repository<Users>{
         }
     }
 
+    async updateTokenDevice(id: string, deviceToken: string,deviceId: string ) {
+        // let result = await getConnection()
+        // .createQueryBuilder()
+        // .update(Users)
+        // .set({ deviceToken: null })
+        // .where("device_token = :deviceToken", { deviceToken })
+        // .execute();
+
+        let result = await getConnection()
+        .createQueryBuilder()
+        .update(Users)
+        .set({ deviceToken })
+        .where("id = :id", { id })
+        .execute();
+
+        // console.log('asd', id, deviceToken, result);
+        
+        if (result && result.affected) {
+            return { status: "ok" }
+        } else {
+            return null;
+        }
+    }
+
     async updateDailyGoalAchieved(id: string, dailyGoalAchieved: boolean) {
         let result = await getConnection()
         .createQueryBuilder()

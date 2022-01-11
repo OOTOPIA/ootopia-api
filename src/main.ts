@@ -9,6 +9,7 @@ import { urlencoded, json } from 'express';
 import { AllExceptionsFilter } from './config/all-exception-filter';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import * as admin from 'firebase-admin';
 
 async function bootstrap() {
   const expressApp = express();
@@ -28,6 +29,13 @@ async function bootstrap() {
     tracesSampleRate: 1.0,
   });
 
+  // Initialize Firebase
+
+  var serviceAccount = require("../ootopia-beta-staging-firebase-adminsdk-lnkap-28e50ddaa1.json");
+  //sertextes-firebase-adminsdk-jupxv-75dfc38494.json
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
   // RequestHandler creates a separate execution context using domains, so that every
   // transaction/span/breadcrumb is attached to its own Hub instance
   expressApp.use(Sentry.Handlers.requestHandler());
