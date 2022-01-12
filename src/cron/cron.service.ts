@@ -81,8 +81,6 @@ export class CronService {
             `,
             [ initDate.toISOString(), finishDate.toISOString()]);
 
-            console.log('teste',allComments.length);
-            
             if(allComments.length) {
                 await this.notificationMessagesService.sendFirebaseMessage(allComments);
             } 

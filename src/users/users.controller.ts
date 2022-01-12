@@ -74,29 +74,6 @@ export class UsersController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
-    @ApiOperation({ summary: 'Login' })
-    @ApiBody({ type: DeviceTokenDTO })
-    @ApiResponse({ status: 200, description: 'updateed token device ' })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
-    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @ApiBearerAuth('Bearer')
-    @UseGuards(JwtAuthGuard)
-    @Put('/token-device')
-    @HttpCode(200)
-    async updateTokenDevice(@Req() { user }, @Body() body : DeviceTokenDTO) {
-        console.log(user,'asssssssssss', body);
-        
-        try {
-            return this.usersService.updateTokenDeviceUser(user.id, body.deviceToken, body.deviceId);
-
-        } catch (error) {
-            new ErrorHandling(error);
-        }
-    }
-
-    @UseInterceptors(SentryInterceptor)
-    @ApiTags('users')
     @ApiOperation({ summary: 'Send reset password email' })
     @ApiBody({ type: RecoverPasswordDto })
     @ApiResponse({ status: 200, description: 'Successfully logged in '})

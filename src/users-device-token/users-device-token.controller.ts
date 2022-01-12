@@ -25,8 +25,6 @@ export class UsersDeviceTokenController {
   @Put('/')
   @HttpCode(200)
   async updateTokenDevice(@Req() { user }, @Body() body : DeviceTokenDTO) {
-      console.log(user,' novoooooooooooo', body);
-      
       try {
           return this.usersDeviceTokenService.updateTokenDeviceUser(user.id, body.deviceToken, body.deviceId);
 
@@ -35,23 +33,4 @@ export class UsersDeviceTokenController {
       }
   }
 
-  @Get()
-  findAll() {
-    return this.usersDeviceTokenService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersDeviceTokenService.findOne(+id);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateUsersDeviceTokenDto: UpdateUsersDeviceTokenDto) {
-    return this.usersDeviceTokenService.update(+id, updateUsersDeviceTokenDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersDeviceTokenService.remove(+id);
-  }
 }
