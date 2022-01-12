@@ -11,7 +11,7 @@ import { SqsWorkerService } from 'src/sqs-worker/sqs-worker.service';
 import { PostsTimelineViewTimeService } from 'src/posts/services/posts-timeline-view-time.service';
 import { UsersAppUsageTimeService } from 'src/users/services/users-app-usage-time/users-app-usage-time.service';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
-// import { CommentsRepository } from 'src/posts/repositories/comments.repository';
+import * as Sentry from '@sentry/minimal';
 
 @Injectable()
 export class CronService {
@@ -66,47 +66,40 @@ export class CronService {
 
     }
 
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_DAY_AT_11AM)
     async cronPushNotificationComments() {
         let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
-        // let finishDate = moment.utc(moment().toISOString()).set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
-        let finishDate = moment();
-        // this.commentsRepository.queryRunner
+        let finishDate = moment.utc(moment().toISOString()).set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
 
-        console.log("ASDFGHJKL", initDate.toISOString(), finishDate.toISOString());
-        
         try {
             let allComments = await getConnection().query(`
-            select udt.device_token as "token", json_build_object('comments','type','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', u.id , 'userName', u.fullname) as "data" from posts_comments pc 
+            select udt.device_token as "token", json_build_object('type','comments','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', u.id , 'userName', u.fullname) as "data" from posts_comments pc 
             left join users u on u.id = pc.user_id 
             left join posts p on p.id = pc.post_id
             left join users_device_token udt on udt.user_id = u.id::text
-            where pc.created_at >= $1 and pc.created_at < $2 and pc.deleted is false and udt.device_token is not null;
+            where pc.created_at >= $1 and pc.created_at < $2 and pc.deleted is false and p.user_id != u.id and udt.device_token is not null;
             `,
             [ initDate.toISOString(), finishDate.toISOString()]);
 
+            console.log('teste',allComments.length);
             
-            let result = await this.notificationMessagesService.sendFirebaseMessage(allComments);
-            console.log('allComments', result);
-
+            if(allComments.length) {
+                await this.notificationMessagesService.sendFirebaseMessage(allComments);
+            } 
         } catch(err) {
-
+            this.captureExceptionSentry("push notification gratitude reward", err);
         }
 
     }
 
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_DAY_AT_9PM)
     async cronPushNotificationRewards() {
-        let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
-        // let finishDate = moment.utc(moment().toISOString()).set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
-        let finishDate = moment();
-        // this.commentsRepository.queryRunner
-
-        console.log("ASDFGHJKL", initDate.toISOString(), finishDate.toISOString());
+        let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 21, minutes: 0, seconds: 0, milliseconds: 0});
+        let finishDate = moment.utc(moment().toISOString()).set({hours: 21, minutes: 0, seconds: 0, milliseconds: 0});
         
         try {
             let allgratitudeReward = await getConnection().query(`
-            select  udt.device_token as "token", json_build_object('type','gratitude_reward','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', ou.id , 'userName', ou.fullname, 'amounnt', wt.balance) as "data"  
+            select  udt.device_token as "token", json_build_object('type','gratitude_reward','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', ou.id , 'userName', ou.fullname, 'amounnt', wt.balance::text) as "data"  
             from wallet_transfers wt 
             left join users u on u.id = wt.user_id 
             left join users ou on ou.id = wt.other_user_id 
@@ -119,13 +112,18 @@ export class CronService {
                 wt."action" = 'received';
             `,
             [ initDate.toISOString(), finishDate.toISOString()]);
-
-            let result = await this.notificationMessagesService.sendFirebaseMessage(allgratitudeReward);
-            console.log('allgratitudeReward', result);
+            
+            if (allgratitudeReward.length) {
+                await this.notificationMessagesService.sendFirebaseMessage(allgratitudeReward);
+            }
         } catch(err) {
-
+            this.captureExceptionSentry("push notification gratitude reward", err);
         }
+    }
 
+    captureExceptionSentry(initialMessage : string , error ) {
+        console.log(initialMessage, error);
+        Sentry.captureException(initialMessage, error);
     }
 
 }
