@@ -66,10 +66,10 @@ export class CronService {
 
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_11AM)
+    @Cron(CronExpression.EVERY_DAY_AT_5PM)
     async cronPushNotificationComments() {        
-        let startDate = moment.utc().subtract(1,'days').set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
-        let endDate = moment.utc().set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
+        let startDate = moment.utc().subtract(1,'days').set({hours: 17, minutes: 0, seconds: 0, milliseconds: 0});
+        let endDate = moment.utc().set({hours: 17, minutes: 0, seconds: 0, milliseconds: 0});
         let allPost = [];
         let allPostGroupByPost = [];
         let pagination = {
@@ -110,10 +110,10 @@ export class CronService {
 
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_3PM)
+    @Cron(CronExpression.EVERY_DAY_AT_9PM)
     async cronPushNotificationRewards() {
-        let startDate = moment.utc().subtract(1,'days').set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
-        let endDate = moment.utc().set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
+        let startDate = moment.utc().subtract(1,'days').set({hours: 21, minutes: 0, seconds: 0, milliseconds: 0});
+        let endDate = moment.utc().set({hours: 21, minutes: 0, seconds: 0, milliseconds: 0});
         let allGratitudeReward = [];
         let allGratitudeRewardGroupedByPost = [];
         let pagination = {
