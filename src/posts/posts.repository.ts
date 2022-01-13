@@ -226,11 +226,12 @@ export class PostsRepository extends Repository<Posts>{
         `, params), { deep : true })
         .map((post) => {
             post.oozRewarded = +post.oozRewarded;
-            post.oozTotalCollected = +post.oozTotalCollected;
+            //post.oozTotalCollected = +post.oozTotalCollected;
             post.oozToTransfer = 0;
             if (!userId) {
                 post.liked = false;
             }
+            post.liked = post.liked || false;
             return post;
         });
 
