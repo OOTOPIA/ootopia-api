@@ -31,8 +31,8 @@ async function bootstrap() {
 
   // Initialize Firebase
 
-  const serviceAccount = require(process.env.FIREBASESDKPATH);
-
+  const serviceAccount = require("../ootopia-firebase-adminsdk.json");
+  
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });

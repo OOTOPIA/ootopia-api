@@ -67,56 +67,123 @@ export class CronService {
     }
 
     @Cron(CronExpression.EVERY_DAY_AT_11AM)
-    async cronPushNotificationComments() {
-        let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
-        let finishDate = moment.utc(moment().toISOString()).set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
+    async cronPushNotificationComments() {        
+        let startDate = moment.utc().subtract(1,'days').set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
+        let endDate = moment.utc().set({hours: 11, minutes: 0, seconds: 0, milliseconds: 0});
+        let allPost = [];
+        let allPostGroupByPost = [];
+        let pagination = {
+            offset: 0,
+            limit: 50,
+            finished: false,
+        };
 
         try {
-            let allComments = await getConnection().query(`
-            select udt.device_token as "token", json_build_object('type','comments','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', u.id , 'userName', u.fullname) as "data" from posts_comments pc 
-            left join users u on u.id = pc.user_id 
-            left join posts p on p.id = pc.post_id
-            left join users_device_token udt on udt.user_id = u.id::text
-            where pc.created_at >= $1 and pc.created_at < $2 and pc.deleted is false and p.user_id != u.id and udt.device_token is not null;
-            `,
-            [ initDate.toISOString(), finishDate.toISOString()]);
+            while (!pagination.finished) {
+                let comments = await getConnection().query(`
+                select udt.device_token as "token", json_build_object('type','comments', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT u.fullname))) as "data"
+                from posts_comments pc
+                inner join posts p on p.id = pc.post_id 
+                inner join users u on u.id = pc.user_id
+                inner join users_device_token udt on udt.user_id = p.user_id::text
+                where pc.created_at >= $1 and pc.created_at < $2 and pc.deleted is false and p.user_id != u.id and udt.device_token is not null
+                group by p.id, udt.device_token order by min(pc.created_at) asc offset $3 limit $4;
+                `,
+                [ startDate.toISOString(), endDate.toISOString(), pagination.offset, pagination.limit]);
+                
+                if (!comments || !comments.length) {
+                    pagination.finished = true;
+                } else {
+                    allPost = allPost.concat(comments);
+                    pagination.offset = allPost.length;
+                }
+            }
 
-            if(allComments.length) {
-                await this.notificationMessagesService.sendFirebaseMessage(allComments);
+            allPostGroupByPost = this.groupByNotificationsByPostId(allPost);
+
+            if(allPostGroupByPost.length) {
+                await this.notificationMessagesService.sendFirebaseMessage(allPostGroupByPost);
             } 
         } catch(err) {
-            this.captureExceptionSentry("push notification gratitude reward", err);
+            this.captureExceptionSentry("push notification comments", err);
         }
 
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_9PM)
+    @Cron(CronExpression.EVERY_DAY_AT_3PM)
     async cronPushNotificationRewards() {
-        let initDate = moment.utc(moment().toISOString()).subtract(1,'days').set({hours: 21, minutes: 0, seconds: 0, milliseconds: 0});
-        let finishDate = moment.utc(moment().toISOString()).set({hours: 21, minutes: 0, seconds: 0, milliseconds: 0});
+        let startDate = moment.utc().subtract(1,'days').set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
+        let endDate = moment.utc().set({hours: 15, minutes: 0, seconds: 0, milliseconds: 0});
+        let allGratitudeReward = [];
+        let allGratitudeRewardGroupedByPost = [];
+        let pagination = {
+            offset: 0,
+            limit: 50,
+            finished: false,
+        };
         
         try {
-            let allgratitudeReward = await getConnection().query(`
-            select  udt.device_token as "token", json_build_object('type','gratitude_reward','typeId',p.id, 'photoURL', p.thumbnail_url , 'userId', ou.id , 'userName', ou.fullname, 'amounnt', wt.balance::text) as "data"  
-            from wallet_transfers wt 
-            left join users u on u.id = wt.user_id 
-            left join users ou on ou.id = wt.other_user_id 
-            left join posts p on p.id = wt.post_id 
-            left join users_device_token udt on udt.user_id = u.id::text
-            where 
-                wt.created_at >= $1 and wt.created_at < $2 and 
-                udt.device_token is not null and
-                wt.origin = 'gratitude_reward' and
-                wt."action" = 'received';
-            `,
-            [ initDate.toISOString(), finishDate.toISOString()]);
-            
-            if (allgratitudeReward.length) {
-                await this.notificationMessagesService.sendFirebaseMessage(allgratitudeReward);
+            while (!pagination.finished) {
+                let gratitudeReward = await getConnection().query(`
+                select udt.device_token as "token",json_build_object('type','gratitude_reward', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'oozAmount', sum(wt.balance)) as "data"
+                from wallet_transfers wt 
+                inner join posts p on p.id = wt.post_id 
+                inner join users ou on ou.id = wt.other_user_id 
+                inner join users_device_token udt on udt.user_id = p.user_id::text
+                where 
+                    wt.created_at >= $1 and
+                    wt.created_at < $2 and 
+                    udt.device_token is not null and
+                    wt.origin = 'gratitude_reward' and
+                    wt."action" = 'received'
+                group by p.id, udt.device_token 
+                order by min(wt.created_at) asc 
+                offset $3 limit $4;
+                `,
+                [ startDate.toISOString(), endDate.toISOString(), pagination.offset, pagination.limit]);
+                
+                if (!gratitudeReward || !gratitudeReward.length) {
+                    pagination.finished = true;
+                } else {
+                    allGratitudeReward = allGratitudeReward.concat(gratitudeReward);
+                    pagination.offset = allGratitudeReward.length;
+                }
+            }
+
+            allGratitudeRewardGroupedByPost = this.groupByNotificationsByPostId(allGratitudeReward);
+
+            if(allGratitudeRewardGroupedByPost.length) {
+                await this.notificationMessagesService.sendFirebaseMessage(allGratitudeRewardGroupedByPost);
             }
         } catch(err) {
             this.captureExceptionSentry("push notification gratitude reward", err);
         }
+    }
+
+    groupByNotificationsByPostId(notifications) {
+        let notificationsGrouped = [];
+        notifications.forEach(notification => {
+            let hasExistPost = notificationsGrouped.find( _notification => _notification.token == notification.token && _notification.data.postId == notification.data.postId );
+            
+            if (hasExistPost) {
+                hasExistPost.data.usersName = _.uniq(hasExistPost.data.usersName.concat(notification.data.usersName));
+                if (notification.data.oozAmount) {
+                    hasExistPost.data.oozAmount += notification.data.oozAmount;
+                }
+            }
+            else {
+                notificationsGrouped.push(notification);
+            }
+        });
+
+        notificationsGrouped.forEach( notification => {
+            notification.data.usersName = JSON.stringify(notification.data.usersName);
+            if(notification.data.oozAmount) {
+                notification.data.oozAmount = JSON.stringify(notification.data.oozAmount);
+            }
+        });
+
+        return notificationsGrouped;
     }
 
     captureExceptionSentry(initialMessage : string , error ) {
