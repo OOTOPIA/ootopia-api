@@ -18,12 +18,15 @@ import { PostsWatchedVideotimeRepository } from './repositories/posts-watched-vi
 import { PostsTimelineViewTimeRepository } from './repositories/posts-timeline-view-time.repository';
 import { PostsTimelineViewTimeService } from './services/posts-timeline-view-time.service';
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
+import { UsersRepository } from 'src/users/users.repository';
+import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       PostsRepository,
       CommentsRepository,
+      UsersRepository,
       AddressesRepository,
       PostsWatchedVideotimeRepository,
       PostsTimelineViewTimeRepository,
@@ -38,6 +41,7 @@ import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarde
     GeneralConfigModule,
   ],
   providers: [
+    NotificationMessagesService,
     PostsService, 
     CommentsService,
     PostsWatchedVideotimeService, 

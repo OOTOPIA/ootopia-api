@@ -9,7 +9,8 @@ import {
     ManyToOne,
     JoinColumn,
     ManyToMany,
-    JoinTable
+    JoinTable,
+    OneToMany
 } from 'typeorm';
 import { Addresses } from '../addresses/addresses.entity';
   
