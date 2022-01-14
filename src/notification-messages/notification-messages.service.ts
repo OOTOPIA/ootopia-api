@@ -8,7 +8,7 @@ import { NotificationMessageDTO } from './notification-messages.dto'
 @Injectable()
 export class NotificationMessagesService {
 
-    async sendFirebaseMessage (messages) {
+    async sendFirebaseMessages(messages: NotificationMessageDTO[]) {
         const android :any = {
             priority: "high",
             ttl: 60 * 60 * 24 * 1000,

@@ -102,8 +102,8 @@ export class CronService {
             allPostGroupByPost = this.groupByNotificationsByPostId(allPost);
 
             if(allPostGroupByPost.length) {
-                await this.notificationMessagesService.sendFirebaseMessage(allPostGroupByPost);
-            } 
+                await this.notificationMessagesService.sendFirebaseMessages(allPostGroupByPost);
+            }
         } catch(err) {
             this.captureExceptionSentry("push notification comments", err);
         }
@@ -153,7 +153,7 @@ export class CronService {
             allGratitudeRewardGroupedByPost = this.groupByNotificationsByPostId(allGratitudeReward);
 
             if(allGratitudeRewardGroupedByPost.length) {
-                await this.notificationMessagesService.sendFirebaseMessage(allGratitudeRewardGroupedByPost);
+                await this.notificationMessagesService.sendFirebaseMessages(allGratitudeRewardGroupedByPost);
             }
         } catch(err) {
             this.captureExceptionSentry("push notification gratitude reward", err);

@@ -4,28 +4,36 @@ import { Type } from 'class-transformer';
 
 export class Android {
     @ApiProperty()
-    priority: String;
+    priority: string;
 
     @ApiProperty()
     ttl: number;
 }
 
-export class NotificationDTO {
+export class NotificationDataDTO {
     @ApiProperty()
-    title: String;
+    type: string;
 
     @ApiProperty()
-    body: String;
+    usersName: string[];
+
+    @ApiProperty()
+    postId: string;
+
+    @ApiProperty()
+    photoUrl: string;
     
+    @ApiProperty()
+    oozAmount?:  string;
 }
 
 export class NotificationMessageDTO {
     @ApiProperty({ required: true, type: "string" })
-    token: String;
+    token: string;
 
     @ApiProperty()
-    notification: NotificationDTO;
+    data: NotificationDataDTO;
 
     @ApiProperty({required: false})
-    android: Android;
+    android?: Android;
 }
