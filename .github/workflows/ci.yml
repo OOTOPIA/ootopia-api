@@ -25,10 +25,10 @@ jobs:
     needs: build
     environment: staging
     env:
-        PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-        HOSTNAME : ${{ secrets.HOSTNAME  }}
-        USER_NAME : ${{ secrets.USER_NAME  }}
-        FIREBASE_ADMIN_SDK : ${{ secrets.FIREBASE_ADMIN_SDK  }}
+        PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
+        HOSTNAME : ${{ secrets.HOSTNAME }}
+        USER_NAME : ${{ secrets.USER_NAME }}
+        FIREBASE_ADMIN_SDK : ${{ secrets.FIREBASE_ADMIN_SDK }}
     steps:
       - run: echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
       - run: ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} uptime
@@ -37,7 +37,7 @@ jobs:
           . ~/.nvm/nvm.sh &&
           cd ootopia-api &&
           git pull origin staging &&
-          echo "$FIREBASE_ADMIN_SDK" > ootopia-firebase-adminsdk2.json &&
+          echo "$FIREBASE_ADMIN_SDK" > ootopia-firebase-adminsdk.txt &&
           npm ci &&
           npm run build &&
           pm2 delete ootopia-api-staging &&
