@@ -35,7 +35,7 @@ jobs:
           ssh -i private_key ${USER_NAME}@${HOSTNAME} '
           . ~/.nvm/nvm.sh &&
           cd ootopia-api &&
-          git pull -f origin staging &&
+          git pull origin staging &&
           echo "$FIREBASE_ADMIN_SDK" > ootopia-firebase-adminsdk.json &&
           npm ci &&
           npm run build &&
