@@ -28,17 +28,14 @@ jobs:
         PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
         HOSTNAME : ${{ secrets.HOSTNAME }}
         USER_NAME : ${{ secrets.USER_NAME }}
-        FIREBASE_ADMIN_SDK : ${{ secrets.FIREBASE_ADMIN_SDK }}
     steps:
-      - name: set firebasesdk
-        id: set
-        run: |
-          echo ::set-firebasesdk name=json_var::'$FIREBASE_ADMIN_SDK'
-      - name: use firebasesdk
-        run: |
-          echo $json_var | jq '.[].name'
-        env:
-          json_var: ${{ steps.set.firebasesdk.json_var}}
+      - name: create-firebase-admin-sdk
+        id: create-firebase-admin-sdk
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "ootopia-firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_ADMIN_SDK }}
+          dir: 'ootopia-api/'
       - run: echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
       - run: ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} uptime
       - run: |
@@ -46,7 +43,6 @@ jobs:
           . ~/.nvm/nvm.sh &&
           cd ootopia-api &&
           git pull origin staging &&
-          echo "$json_var" > ootopia-firebase-adminsdk.json &&
           npm ci &&
           npm run build &&
           pm2 delete ootopia-api-staging &&
