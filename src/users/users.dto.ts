@@ -10,6 +10,11 @@ class UserLinks {
     @ApiProperty({ required: false, example : "Google"})
     title : string;
 }
+
+export enum JSONType {
+    decode = 'decode',
+    encoder = 'encoder'
+} 
 export class CreateUserDto {
 
     @ApiProperty({ required: true})

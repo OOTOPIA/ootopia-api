@@ -19,7 +19,7 @@ import { BadgesService } from 'src/badges/badges.service';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { TrophyType } from './entities/users-trophies.entity';
 
-import { CreateUserDto, UserProfileUpdateDto } from './users.dto';
+import { CreateUserDto, JSONType, UserProfileUpdateDto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -41,7 +41,7 @@ export class UsersService {
     }
 
     async createUser(userData, photoFile = null) {
-
+        
         if (!userData.acceptedTerms) {
             throw new HttpException("You must accept the terms to register", 401);
         }
@@ -58,7 +58,7 @@ export class UsersService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        userData = this.convertJSONLinks(userData);
+        userData = this.jsonDecodeOrEncoderUserLinks(userData, JSONType.decode);
 
         userData.invitationCodeAccepted = !!userData.invitationCode ? userData.invitationCode : null;
         userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
@@ -155,7 +155,7 @@ export class UsersService {
             
             await queryRunner.commitTransaction();
 
-            userData = this.convertJSONLinks(userData, true);
+            userData = this.jsonDecodeOrEncoderUserLinks(userData, JSONType.encoder);
         } catch (err) {
             await queryRunner.rollbackTransaction();
 			if (wallet && wallet.id)	await this.walletsService.delete(wallet.id);
@@ -166,21 +166,21 @@ export class UsersService {
         }
 
         delete user.password;
-
+        console.log("createUser2");
         return user;
        
     }
 
     async updateUser(userData: UserProfileUpdateDto, photoFile = null) {
-
+        console.log("updateUser1");
         let queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
         let currentUser = await this.getUserById(userData.id);
-
-        userData = this.convertJSONLinks(userData);
-
+        
+        userData = this.jsonDecodeOrEncoderUserLinks(userData, JSONType.decode);
+        
         let _userData: any = {
             id: userData.id,
             fullname: userData.fullname,
@@ -257,11 +257,11 @@ export class UsersService {
     }
 
     async getUserById(id : string) {
-        return this.convertJSONLinks(await this.usersRepository.getUserById(id));
+        return this.jsonDecodeOrEncoderUserLinks(await this.usersRepository.getUserById(id), JSONType.encoder);
     }
 
     async getUserProfile(id : string) {
-        let user = this.convertJSONLinks(await this.usersRepository.getUserById(id));
+        let user = await this.getUserById(id);
         delete user.email;
         delete user.dailyLearningGoalInMinutes;
         delete user.enableSustainableAds;
@@ -427,15 +427,18 @@ export class UsersService {
         return !!(await this.usersRepository.getUserByEmail(email));
     }
 
-    convertJSONLinks(user, forJSON = false) {
+    jsonDecodeOrEncoderUserLinks(user, type: JSONType) {
         try {
-            if (forJSON) {
+            if (type == 'decode') {
+                if (user.links && !Array.isArray(user.links)) {
+                    user.links = JSON.parse(user.links);
+                }
                 if (user.links && Array.isArray(user.links)) {
                     user.links = user.links.map( link => JSON.stringify(link));
                 }
             } else {
                 if (user.links && !Array.isArray(user.links)) {
-                    user.links = JSON.parse(user.links)
+                    user.links = JSON.parse(user.links);
                 }
                 
                 if (user.links && Array.isArray(user.links)) {
@@ -443,7 +446,7 @@ export class UsersService {
                 }
             }
         } catch (error) {
-            
+                
         }
         return user;
     }
