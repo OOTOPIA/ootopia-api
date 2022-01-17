@@ -30,13 +30,13 @@ jobs:
         USER_NAME : ${{ secrets.USER_NAME  }}
     steps:
       - run: echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-      - run: echo "$FIREBASE_ADMIN_SDK" > ootopia-firebase-adminsdk.json
       - run: ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} uptime
       - run: |
           ssh -i private_key ${USER_NAME}@${HOSTNAME} '
           . ~/.nvm/nvm.sh &&
           cd ootopia-api &&
-          git pull origin staging &&
+          git pull -f origin staging &&
+          echo "$FIREBASE_ADMIN_SDK" > ootopia-firebase-adminsdk.json &&
           npm ci &&
           npm run build &&
           pm2 delete ootopia-api-staging &&
