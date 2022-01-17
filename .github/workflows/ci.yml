@@ -37,7 +37,7 @@ jobs:
           . ~/.nvm/nvm.sh &&
           cd ootopia-api &&
           git pull origin staging &&
-          echo "$FIREBASE_ADMIN_SDK" | base64 -d > ootopia-firebase-adminsdk.json &&
+          echo '$FIREBASE_ADMIN_SDK' | base64 -d > ootopia-firebase-adminsdk.json &&
           npm ci &&
           npm run build &&
           pm2 delete ootopia-api-staging &&
