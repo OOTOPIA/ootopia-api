@@ -45,7 +45,7 @@ export class UsersService {
         if (!userData.acceptedTerms) {
             throw new HttpException("You must accept the terms to register", 401);
         }
-
+        
         userData.password = bcryptjs.hashSync(userData.password, bcryptjs.genSaltSync(10));
 
         let checkEmail = await this.getUserByEmail(userData.email);
@@ -57,6 +57,8 @@ export class UsersService {
         const queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
+
+        userData = this.convertJSONLinks(userData);
 
         userData.invitationCodeAccepted = !!userData.invitationCode ? userData.invitationCode : null;
         userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
@@ -152,6 +154,8 @@ export class UsersService {
             );
             
             await queryRunner.commitTransaction();
+
+            userData = this.convertJSONLinks(userData, true);
         } catch (err) {
             await queryRunner.rollbackTransaction();
 			if (wallet && wallet.id)	await this.walletsService.delete(wallet.id);
@@ -175,6 +179,8 @@ export class UsersService {
 
         let currentUser = await this.getUserById(userData.id);
 
+        userData = this.convertJSONLinks(userData);
+
         let _userData: any = {
             id: userData.id,
             fullname: userData.fullname,
@@ -184,6 +190,7 @@ export class UsersService {
             birthdate : userData.birthdate || null,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
             dialCode : userData.dialCode,
+            links: userData.links || null
         };  
 
         if (photoFile != null) {
@@ -250,11 +257,11 @@ export class UsersService {
     }
 
     async getUserById(id : string) {
-        return await this.usersRepository.getUserById(id);
+        return this.convertJSONLinks(await this.usersRepository.getUserById(id));
     }
 
     async getUserProfile(id : string) {
-        let user = await this.usersRepository.getUserById(id);
+        let user = this.convertJSONLinks(await this.usersRepository.getUserById(id));
         delete user.email;
         delete user.dailyLearningGoalInMinutes;
         delete user.enableSustainableAds;
@@ -418,6 +425,27 @@ export class UsersService {
 
     async validationEmail(email) {
         return !!(await this.usersRepository.getUserByEmail(email));
+    }
+
+    convertJSONLinks(user, forJSON = false) {
+        try {
+            if (forJSON) {
+                if (user.links && Array.isArray(user.links)) {
+                    user.links = user.links.map( link => JSON.stringify(link));
+                }
+            } else {
+                if (user.links && !Array.isArray(user.links)) {
+                    user.links = JSON.parse(user.links)
+                }
+                
+                if (user.links && Array.isArray(user.links)) {
+                    user.links = user.links.map( link => JSON.parse(link));
+                }
+            }
+        } catch (error) {
+            
+        }
+        return user;
     }
 
 }
