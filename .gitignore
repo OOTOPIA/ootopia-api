@@ -4,6 +4,7 @@
 
 *.env
 *.env.*
+ootopia-firebase-adminsdk.json*
 
 # Logs
 logs

@@ -158,7 +158,7 @@ export class MarketPlaceService {
   }
 
   private mapper(marketPlaceProduct) {
-    if (!marketPlaceProduct.userId || !marketPlaceProduct.userName) {
+    if (!marketPlaceProduct.userId) {
       marketPlaceProduct.userId = "ootopia";
       marketPlaceProduct.userName = "OOTOPIA";
       marketPlaceProduct.userPhotoUrl = "https://ootopia-files-staging.s3.sa-east-1.amazonaws.com/ootopia_marketplace_icon.png";
