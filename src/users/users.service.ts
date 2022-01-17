@@ -166,13 +166,11 @@ export class UsersService {
         }
 
         delete user.password;
-        console.log("createUser2");
         return user;
        
     }
 
     async updateUser(userData: UserProfileUpdateDto, photoFile = null) {
-        console.log("updateUser1");
         let queryRunner = getConnection().createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
