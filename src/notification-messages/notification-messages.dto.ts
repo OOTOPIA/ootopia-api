@@ -27,9 +27,23 @@ export class NotificationDataDTO {
     oozAmount?:  string;
 }
 
+class Notification {
+    @ApiProperty()
+    title: string;
+
+    @ApiProperty()
+    body: string;
+
+    @ApiProperty()
+    imageUrl: string;
+}
+
 export class NotificationMessageDTO {
     @ApiProperty({ required: true, type: "string" })
     token: string;
+
+    @ApiProperty()
+    notification: Notification;
 
     @ApiProperty()
     data: NotificationDataDTO;
