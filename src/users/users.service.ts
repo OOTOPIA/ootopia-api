@@ -237,6 +237,8 @@ export class UsersService {
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
+        userData = this.jsonDecodeOrEncoderUserLinks(userData, JSONType.encoder);
+        
         return Object.assign(currentUser, _userData);
 
     }
