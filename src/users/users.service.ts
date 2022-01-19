@@ -155,7 +155,7 @@ export class UsersService {
             
             await queryRunner.commitTransaction();
 
-            userData = this.jsonDecodeOrEncoderUserLinks(userData, JSONType.encoder);
+            user = this.jsonDecodeOrEncoderUserLinks(user, JSONType.encoder);
         } catch (err) {
             await queryRunner.rollbackTransaction();
 			if (wallet && wallet.id)	await this.walletsService.delete(wallet.id);
