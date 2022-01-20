@@ -26,7 +26,7 @@ export class UsersDeviceTokenController {
   @HttpCode(200)
   async updateTokenDevice(@Req() { user }, @Body() body : DeviceTokenDTO) {
       try {
-          return this.usersDeviceTokenService.updateTokenDeviceUser(user.id, body.deviceToken, body.deviceId);
+          return this.usersDeviceTokenService.updateTokenDeviceUser(user.id, body.deviceToken, body.deviceId, body.language);
 
       } catch (error) {
           new ErrorHandling(error);

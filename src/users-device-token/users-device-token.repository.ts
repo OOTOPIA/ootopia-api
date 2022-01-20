@@ -11,13 +11,13 @@ export class UsersDeviceTokenRepository extends Repository<UsersDeviceToken>{
         super();
     }
 
-     async createOrUpdateTokenDevice(userId: string, deviceToken: string,deviceId: string ) {
+     async createOrUpdateTokenDevice(userId: string, deviceToken: string,deviceId: string, language: string ) {
         let result = await this.findOne({where: {deviceId}});
         
         if (result) {
-            await this.create({id: result.id, deviceId: deviceId, deviceToken: deviceToken, userId: userId}).save();
+            await this.create({id: result.id, deviceId: deviceId, deviceToken: deviceToken, userId: userId, language: language}).save();
         } else {
-            await this.create({deviceId: deviceId, deviceToken: deviceToken, userId: userId}).save();
+            await this.create({deviceId: deviceId, deviceToken: deviceToken, userId: userId, language: language}).save();
         }
 
     }

@@ -12,4 +12,8 @@ export class DeviceTokenDTO {
     @ApiProperty({ required: true })
     @IsNotEmpty()
     deviceId : string;
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    language : string;
 }
