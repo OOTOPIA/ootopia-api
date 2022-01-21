@@ -10,6 +10,7 @@ import { EmailsService } from 'src/emails/emails.service';
 import { UsersService } from 'src/users/users.service';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import * as Sentry from '@sentry/node';
+import { LinksService } from 'src/links/links.service';
 
 const axios = Axios.default;
 
@@ -18,6 +19,7 @@ export class MarketPlaceService {
 
   constructor(
     private marketPlaceRepository: MarketPlaceRepository,
+    private linksService: LinksService,
     private filesUploadService : FilesUploadService,
     private walletTransfersService : WalletTransfersService,
     private emailsService: EmailsService,
@@ -112,6 +114,16 @@ export class MarketPlaceService {
     }
 
     return this.mapper(marketPlaceProduct);
+  }
+
+  async getMarketPlaceSharedLink(id: string) {
+    let marketPlace = await this.getMarketPlaceProductById(id);
+    
+    return this.linksService.linkForShared({
+      title: marketPlace.title,
+      description: marketPlace.description,
+      imageUrl: marketPlace.imageUrl
+    });
   }
 
   async getMarketPlaceProductByStrapiId(id : number) {

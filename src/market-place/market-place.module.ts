@@ -10,6 +10,7 @@ import { WalletsModule } from 'src/wallets/wallets.module';
 import { EmailsModule } from 'src/emails/emails.module';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { UsersModule } from 'src/users/users.module';
+import { LinksService } from 'src/links/links.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { UsersModule } from 'src/users/users.module';
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
   ],
-  providers: [MarketPlaceService],
+  providers: [MarketPlaceService, LinksService],
   controllers: [MarketPlaceProductsController],
   exports: [ MarketPlaceService]
 })

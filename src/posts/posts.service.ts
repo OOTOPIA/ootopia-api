@@ -16,10 +16,12 @@ import {
   WalletTransferAction,
 } from 'src/wallet-transfers/wallet-transfers.entity';
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
+import { LinksService } from 'src/links/links.service';
 
 @Injectable()
 export class PostsService {
   constructor(
+    private readonly linksService: LinksService,
     private readonly postsRepository: PostsRepository,
     private readonly postsUsersRewardedRepository: PostsUsersRewardedRepository,
     private readonly videoService: VideoService,
@@ -140,6 +142,16 @@ export class PostsService {
 
   getPostById(id: string) {
     return this.postsRepository.getPostById(id);
+  }
+
+  async getPostShareLink(id: string) {
+    let post = await this.postsRepository.getPostById(id);
+
+    return this.linksService.linkForShared({
+      title: post.userId.fullname,
+      description: post.description,
+      imageUrl : post.thumbnailUrl
+    });
   }
 
   async likePost(postId, userId) {

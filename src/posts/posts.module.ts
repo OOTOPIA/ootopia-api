@@ -20,6 +20,7 @@ import { PostsTimelineViewTimeService } from './services/posts-timeline-view-tim
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
+import { LinksService } from 'src/links/links.service';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { NotificationMessagesService } from 'src/notification-messages/notificat
     CommentsService,
     PostsWatchedVideotimeService, 
     PostsTimelineViewTimeService,
+    LinksService
   ],
   controllers: [PostsController],
   exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService]

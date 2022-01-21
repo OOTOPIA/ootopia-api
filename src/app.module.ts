@@ -25,6 +25,7 @@ import { StrapiModule } from './strapi/strapi.module';
 import { MarketPlaceModule } from './market-place/market-place.module';
 import { NotificationMessagesService } from './notification-messages/notification-messages.service';
 import { UsersDeviceTokenModule } from './users-device-token/users-device-token.module';
+import { LinksService } from './links/links.service';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -88,6 +89,6 @@ const sqs = new AWS.SQS({
     UsersDeviceTokenModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CronService, NotificationMessagesService],
+  providers: [AppService, CronService, NotificationMessagesService, LinksService],
 })
 export class AppModule {}
