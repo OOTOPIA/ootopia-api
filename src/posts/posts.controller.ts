@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator, Header } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -125,6 +125,25 @@ export class PostsController {
             
             return posts.length ? posts[0] : null;
             
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'redirect to post or Store' })
+    @ApiParam({name : "id" })
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Header('content-type', 'text/html')
+    @HttpCode(200)
+    @Get('/shared/:id')
+    async getPostShared(@Param('id') id) {
+        try {
+            return await this.postsService.getPostById(id);
         } catch (error) {
             new ErrorHandling(error);
         }

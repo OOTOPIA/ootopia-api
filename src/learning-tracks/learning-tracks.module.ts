@@ -12,6 +12,7 @@ import { LearningTrackCompletedChaptersRepository } from './repositories/learnin
 import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.module';
 import { WalletsModule } from 'src/wallets/wallets.module';
 import { UsersModule } from 'src/users/users.module';
+import { LinksService } from 'src/links/links.service';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { UsersModule } from 'src/users/users.module';
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
   ],
-  providers: [LearningTracksService],
+  providers: [LearningTracksService, LinksService],
   controllers: [LearningTracksController],
   exports: [LearningTracksService],
 })
