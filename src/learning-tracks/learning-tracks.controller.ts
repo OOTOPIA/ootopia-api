@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpException, Param, Query, Req, UseInterceptors, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, Param, Query, Req, UseInterceptors, UseGuards, HttpCode, Header } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -30,6 +30,25 @@ export class LearningTracksController {
         try {
             filters.showAtTimeline = true;
             return await this.learningTracksService.getLearningTracks(filters, req.user ? req.user.id : null);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('learning-tracks')
+    @ApiOperation({ summary: "redirect to Learning Tracks or Store" })
+    @ApiParam({name : "id" })
+    @ApiResponse({ status: 200, type: LearningTrackDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+    @Header('content-type', 'text/html')
+    @Get('/shared/:id')
+    async getLearningTracksShared(@Param('id') id : string) {
+        try {
+            return this.learningTracksService.getLearningTrackSharedLink(id);
+      
         } catch (error) {
             new ErrorHandling(error);
         }
