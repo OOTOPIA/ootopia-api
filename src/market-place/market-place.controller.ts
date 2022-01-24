@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, Query, UseGuards, Req, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, Query, UseGuards, Req, HttpCode, Res, Header, Request } from '@nestjs/common';
 import { MarketPlaceService } from './market-place.service';
 import { MarketPlaceByIdDto, MarketPlaceDto, MarketPlaceFilterDto } from './dto/create-market-place.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -47,6 +47,25 @@ export class MarketPlaceProductsController {
   async getMarketPlaceProductById(@Param('id') id : string) {
     try {
       return this.marketPlaceService.getMarketPlaceProductById(id);
+    }
+    catch (error) {
+      new ErrorHandling(error);
+    }
+  }
+
+  @UseInterceptors(SentryInterceptor)
+  @ApiTags('market-place')
+  @ApiOperation({ summary: "redirect to Market place or Store" })
+  @ApiParam({name : "id" })
+  @ApiResponse({ status: 200, type: MarketPlaceDto })
+  @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+  @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+  @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
+  @Header('content-type', 'text/html')
+  @Get('/shared/:id')
+  async getMarketPlaceShared(@Param('id') id : string) {
+    try {
+      return this.marketPlaceService.getMarketPlaceSharedLink(id);
     }
     catch (error) {
       new ErrorHandling(error);

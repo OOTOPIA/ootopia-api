@@ -13,6 +13,7 @@ import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.se
 import { WalletsService } from 'src/wallets/wallets.service';
 import { UsersService } from 'src/users/users.service';
 import * as Sentry from '@sentry/node';
+import { LinksService } from 'src/links/links.service';
 
 const axios = Axios.default;
 
@@ -21,6 +22,7 @@ export class LearningTracksService {
 
     constructor(
         private readonly learningTracksRepository : LearningTracksRepository,
+        private readonly linksService : LinksService,
         private readonly learningTrackCompletedChaptersRepository : LearningTrackCompletedChaptersRepository,
         private readonly filesUploadService: FilesUploadService,
         private readonly videoService: VideoService,
@@ -267,6 +269,16 @@ export class LearningTracksService {
 
         }
 
+    }
+
+    async getLearningTrackSharedLink(learningTrackId: string) {
+        let learningTrack = await this.learningTracksRepository.getById(learningTrackId);
+        
+        return this.linksService.linkForShared({
+            title: learningTrack.title,
+            description: learningTrack.description,
+            imageUrl: learningTrack.imageUrl,
+        });
     }
 
 }
