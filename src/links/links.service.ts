@@ -21,10 +21,7 @@ export class LinksService {
                 <meta property="og:image" itemprop="image" content="${content.imageUrl}">
                 <meta property="og:type" content="website">
 
-            </head>
-            <body>
-            <script>
-                document.addEventListener("DOMContentLoaded", function(event) {
+                <script>
                     function detectMob() {
                         const toMatch = [
                             /Android/i,
@@ -40,15 +37,16 @@ export class LinksService {
                             return navigator.userAgent.match(toMatchItem);
                         });
                     }
-
+    
                     let platform = detectMob();
                     if(platform == '/Android/i') {
                         window.location.href = "https://play.google.com/store/apps/details?id=org.ootopia.beta";
                     } else if(['/webOS/i','/iPhone/i','/iPad/i','/iPod/i'].find( _platform => _platform == platform)) {
-                        window.location.href = "https://bit.ly/ootopiaappbetaiphone";
+                        window.location.href = "https://testflight.apple.com/join/6uVd4CNC"; 
                     }
-                });
-            </script>
+                </script>
+            </head>
+            <body>
             </body>
             </html>
             `: null;
