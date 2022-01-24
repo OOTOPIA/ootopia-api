@@ -17,7 +17,7 @@ export class LinksService {
                 <title><strong>${content.title}</strong></title>
 
                 <meta property="og:site_name" content="OOTOPIA">
-                <meta property="description" content="${content.description}\r\nDownload OOTOPIA">
+                <meta property="description" content="${content.description}">
                 <meta property="og:image" itemprop="image" content="${content.imageUrl}">
                 <meta property="og:type" content="website">
 
