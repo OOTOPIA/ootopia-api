@@ -5,8 +5,7 @@ export class CreateUsersDeviceTokenDto {}
 
 export class DeviceTokenDTO {
 
-    @ApiProperty({ required: true })
-    @IsNotEmpty()
+    @ApiProperty()
     deviceToken : string;
 
     @ApiProperty({ required: true })

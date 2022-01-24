@@ -13,7 +13,7 @@ export class UsersDeviceToken extends BaseEntity {
     @Column({unique: true, nullable: false, type: "varchar", name: 'device_id' })
     deviceId : string;
 
-    @Column({ nullable: false, type: "varchar", name: 'device_token' })
+    @Column({ nullable: true, type: "varchar", name: 'device_token' })
     deviceToken : string;
 
     @Column({name: 'language', nullable: false, type: "varchar" })
