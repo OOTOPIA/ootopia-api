@@ -188,11 +188,11 @@ export class CronService {
         });
 
         notificationsGrouped.forEach( notification => {
-            notification.notification = {
-                title: this.getTitleNotification(notification),
-                body: this.bodyTitleNotification(notification),
-                imageUrl: notification.data.photoURL
-            }
+            // notification.notification = {
+            //     title: this.getTitleNotification(notification),
+            //     body: this.bodyTitleNotification(notification),
+            //     imageUrl: notification.data.photoURL
+            // }
             notification.data.usersName = JSON.stringify(notification.data.usersName);
             if(notification.data.oozAmount) {
                 notification.data.oozAmount = JSON.stringify(notification.data.oozAmount);
