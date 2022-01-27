@@ -16,9 +16,6 @@ export class UsersDeviceToken extends BaseEntity {
     @Column({ nullable: true, type: "varchar", name: 'device_token' })
     deviceToken : string;
 
-    @Column({name: 'language', nullable: false, type: "varchar" })
-    language : string;
-
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
