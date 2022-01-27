@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
+import { EntityRepository, Repository, Not, IsNull } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { UsersDeviceToken } from "./entities/users-device-token.entity";
 
@@ -20,5 +20,9 @@ export class UsersDeviceTokenRepository extends Repository<UsersDeviceToken>{
             await this.create({deviceId: deviceId, deviceToken: deviceToken, userId: userId}).save();
         }
 
+    }
+
+    async getDevicesTokenByUserId(userId: string) {
+        return this.find({where: {userId: userId, deviceToken: Not(IsNull()) }});
     }
 }

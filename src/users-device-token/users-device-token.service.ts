@@ -10,4 +10,8 @@ export class UsersDeviceTokenService {
   async updateTokenDeviceUser(userId: string, deviceToken: string, deviceId: string) {
       return this.usersDeviceTokenRepository.createOrUpdateTokenDevice(userId, deviceToken, deviceId);
   }
+
+  getByUserId(id : string) {
+    return this.usersDeviceTokenRepository.getDevicesTokenByUserId(id);
+  }
 }
