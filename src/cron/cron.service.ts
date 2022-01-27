@@ -82,7 +82,7 @@ export class CronService {
             while (!pagination.finished) {
                 let comments = await getConnection().query(`
                 select udt.device_token as "token", 
-                json_build_object('type','comments', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'language', udt."language", 'postUser', u.fullname) as "data"
+                json_build_object('type','comments', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'postUser', u.fullname) as "data"
                 from posts_comments pc
                 inner join posts p on p.id = pc.post_id 
                 inner join users ou on ou.id = pc.user_id
@@ -94,7 +94,7 @@ export class CronService {
                     pc.deleted is false and 
                     p.user_id != ou.id and 
                     udt.device_token is not null
-                group by p.id, udt.device_token, udt."language", u.fullname 
+                group by p.id, udt.device_token, u.fullname 
                 order by min(pc.created_at) asc 
                 offset $3 limit $4;
                 `,
@@ -135,7 +135,7 @@ export class CronService {
             while (!pagination.finished) {
                 let gratitudeReward = await getConnection().query(`
                 select udt.device_token as "token",
-                json_build_object('type','gratitude_reward', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'oozAmount', sum(wt.balance), 'language', udt."language", 'postUser', u.fullname) as "data"
+                json_build_object('type','gratitude_reward', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'oozAmount', sum(wt.balance), 'postUser', u.fullname) as "data"
                 from wallet_transfers wt 
                 inner join posts p on p.id = wt.post_id 
                 inner join users ou on ou.id = wt.other_user_id 
@@ -147,7 +147,7 @@ export class CronService {
                     udt.device_token is not null and
                     wt.origin = 'gratitude_reward' and
                     wt."action" = 'received'
-                group by p.id, udt.device_token, udt.language, u.fullname 
+                group by p.id, udt.device_token, u.fullname 
                 order by min(wt.created_at) asc 
                 offset $3 limit $4;
                 `,
@@ -188,74 +188,13 @@ export class CronService {
         });
 
         notificationsGrouped.forEach( notification => {
-            notification.notification = {
-                title: this.getTitleNotification(notification),
-                body: this.bodyTitleNotification(notification),
-                imageUrl: notification.data.photoURL
-            }
             notification.data.usersName = JSON.stringify(notification.data.usersName);
             if(notification.data.oozAmount) {
                 notification.data.oozAmount = JSON.stringify(notification.data.oozAmount);
             }
-            notification.data.language = notification.data.language || 'en';
         });
 
         return notificationsGrouped;
-    }
-
-    getTitleNotification(notification) {
-        let title = "";
-
-        if (notification.data.type == 'comments') {
-            title = notification.data.language == 'pt' ? 
-                "Olá, %YOUR_NAME%!".replace("%YOUR_NAME%", notification.data.postUser) :
-                "Hello, %YOUR_NAME%!".replace("%YOUR_NAME%", notification.data.postUser);
-        } else {
-            title = notification.data.language == 'pt' ? 
-            "Você recebeu %OOZ_RECEIVED% OOz!".replace("%OOZ_RECEIVED%", (notification.data.oozAmount).toString()) :
-            "You received %OOZ_RECEIVED% OOz!".replace("%OOZ_RECEIVED%", (notification.data.oozAmount).toString());
-        }
-
-        return title; 
-    }
-
-    bodyTitleNotification(notification) {
-        let body = "";
-        if (notification.data.type == 'comments') {
-            if (notification.data.language == 'pt') {
-                body = notification.data.usersName.length == 1 ? 
-                    "%USER_NAME%, comentou sua publicação."
-                        .replace("%USER_NAME%", notification.data.usersName[0]) :
-                    "%USER_NAME% e mais %PEOPLE_AMOUNT% pessoas comentaram sua publicação."
-                        .replace("%USER_NAME%", notification.data.usersName[0])
-                        .replace("%PEOPLE_AMOUNT%", (notification.data.usersName.length - 1).toString());               
-            } else {
-                body = notification.data.usersName.length == 1 ?
-                    "%USER_NAME%, commented your post."
-                        .replace("%USER_NAME%", notification.data.usersName[0]) :
-                    "%USER_NAME% AND %PEOPLE_AMOUNT% other people commented your post."
-                        .replace("%USER_NAME%", notification.data.usersName[0])
-                        .replace("%PEOPLE_AMOUNT%", (notification.data.usersName.length - 1).toString());
-            }
-        } else {
-            if (notification.data.language == 'pt') {
-                body = notification.data.usersName.length == 1 ? 
-                    "%USER_NAME% enviou uma recompensa de gratidão por sua publicação."
-                        .replace("%USER_NAME%", notification.data.usersName[0]) :
-                    "%USER_NAME% e mais %PEOPLE_AMOUNT% pessoas enviaram uma recompensa de gratidão por sua publicação."
-                        .replace("%USER_NAME%", notification.data.usersName[0])
-                        .replace("%PEOPLE_AMOUNT%", (notification.data.usersName.length - 1).toString());
-            } else {
-                body = notification.data.usersName.length == 1 ?
-                    "%USER_NAME% sent you a gratitude reward for your post."
-                        .replace("%USER_NAME%", notification.data.usersName[0]) :
-                    "%USER_NAME% and %PEOPLE_AMOUNT% other people sent you a gratitude reward for your post."
-                        .replace("%USER_NAME%", notification.data.usersName[0])
-                        .replace("%PEOPLE_AMOUNT%", (notification.data.usersName.length - 1).toString());                
-            }
-        }
-
-        return body;
     }
 
     captureExceptionSentry(initialMessage : string , error ) {

@@ -7,7 +7,7 @@ export class UsersDeviceTokenService {
   constructor(
     private readonly usersDeviceTokenRepository : UsersDeviceTokenRepository, 
   ){}
-  async updateTokenDeviceUser(userId: string, deviceToken: string, deviceId: string, language: string) {
-      return this.usersDeviceTokenRepository.createOrUpdateTokenDevice(userId, deviceToken, deviceId, language);
+  async updateTokenDeviceUser(userId: string, deviceToken: string, deviceId: string) {
+      return this.usersDeviceTokenRepository.createOrUpdateTokenDevice(userId, deviceToken, deviceId);
   }
 }
