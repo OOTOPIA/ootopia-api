@@ -15,13 +15,13 @@ export class NotificationDataDTO {
     type: string;
 
     @ApiProperty()
-    usersName: string[];
+    usersName?: string[];
 
     @ApiProperty()
-    postId: string;
+    postId?: string;
 
     @ApiProperty()
-    photoUrl: string;
+    photoUrl?: string;
     
     @ApiProperty()
     oozAmount?:  string;
@@ -43,7 +43,7 @@ export class NotificationMessageDTO {
     token: string;
 
     @ApiProperty()
-    notification: Notification;
+    notification?: Notification;
 
     @ApiProperty()
     data: NotificationDataDTO;
