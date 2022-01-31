@@ -19,6 +19,7 @@ import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 import { BadgesModule } from 'src/badges/badges.module';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { UsersTrophiesRepository } from './repositories/users-trophies.repository';
+import { LinksService } from 'src/links/links.service';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { UsersTrophiesRepository } from './repositories/users-trophies.repositor
     InvitationsCodesModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersAppUsageTimeService, UsersTrophiesService],
+  providers: [UsersService, UsersAppUsageTimeService, UsersTrophiesService, LinksService],
   exports: [UsersService, UsersAppUsageTimeService]
 })
 export class UsersModule {}

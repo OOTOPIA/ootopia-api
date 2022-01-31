@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef, Header } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
@@ -91,6 +91,25 @@ export class UsersController {
 
             return this.authService.recoverPassword(recoverPasswordData.email, recoverPasswordData.language);
 
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'Send reset password email' })
+    @ApiBody({ type: RecoverPasswordDto })
+    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Header('content-type', 'text/html')
+    @Get('/auth/login')
+    @HttpCode(200)
+    async sharedResetPassword() {
+        try {
+            return this.usersService.getRecoverPasswordLink();
         } catch (error) {
             new ErrorHandling(error);
         }
