@@ -6,7 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import * as moment from 'moment-timezone';
 import * as _ from 'lodash';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
-import { UsersDeviceTokenService } from 'src/Users-Device-Token/users-device-token.service';
+import { UsersDeviceTokenService } from 'src/users-Device-Token/users-device-token.service';
 import { getConnection } from 'typeorm';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { Origin, WalletTransferAction, WalletTransfers } from 'src/wallet-transfers/wallet-transfers.entity';
