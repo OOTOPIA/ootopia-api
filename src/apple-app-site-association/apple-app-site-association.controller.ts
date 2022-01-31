@@ -5,7 +5,7 @@ import { HttpResponseDto } from 'src/config/http-response.dto';
 import { SentryInterceptor } from 'src/interceptors/sentry.interceptor';
 import { AppleAppSiteAssociationService } from './apple-app-site-association.service';
 
-@Controller('apple-app-site-association')
+@Controller('.well-known/apple-app-site-association')
 export class AppleAppSiteAssociationController {
   constructor(private readonly appleAppSiteAssociationService: AppleAppSiteAssociationService) {
   }
