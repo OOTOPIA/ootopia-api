@@ -23,12 +23,12 @@ export class AppleAppSiteAssociationController {
     try {
       return `
       {
-        "applinks" : { 
-          "aplicativos" : [ ] , 
-          "detalhes" : [ 
+        "applinks": {
+          "apps": [],
+          "details": [
             {
-              "appID" : "org.ootopia.beta2" , 
-              "caminhos" : [ "*" ] 
+              "appID": "org.ootopia.beta2",
+              "paths": ["*"]
             }
           ]
         }
