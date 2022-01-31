@@ -28,7 +28,7 @@ export class AppleAppSiteAssociationController {
           "details": [
             {
               "appID": "Y48286ZBAN.org.ootopia.beta2",
-              "paths": ["*"]
+              "paths": ["/*"]
             }
           ]
         }
