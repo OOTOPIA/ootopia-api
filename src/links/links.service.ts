@@ -14,7 +14,7 @@ export class LinksService {
             <!DOCTYPE html>
             <html>
             <head>
-                <title><strong>${content.title}</strong></title>
+                <title>${content.title}</title>
 
                 <meta property="og:site_name" content="OOTOPIA">
                 <meta property="description" content="${content.description}">

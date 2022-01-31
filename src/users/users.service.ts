@@ -20,12 +20,14 @@ import { UsersTrophiesService } from './services/users-trophies/users-trophies.s
 import { TrophyType } from './entities/users-trophies.entity';
 
 import { CreateUserDto, JSONType, UserProfileUpdateDto } from './users.dto';
+import { LinksService } from 'src/links/links.service';
 
 @Injectable()
 export class UsersService {
 
     constructor(
         private readonly usersRepository : UsersRepository, 
+        private readonly linksService: LinksService,
         private readonly filesUploadService : FilesUploadService,
         private readonly interestsTagsService : InterestsTagsService,
         private readonly citiesService : CitiesService,
@@ -292,7 +294,7 @@ export class UsersService {
 
         if (!dailyGoalStartTime) dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
         if (!dailyGoalEndTime) dailyGoalEndTime = this.generalConfigService.getDailyGoalEndTime(globalGoalLimitTimeConfig.value);
-
+        
         let remainingTimeUntilEndOfGameInMs = moment(dailyGoalEndTime).diff(moment.utc(), 'milliseconds');
         let remainingTimeUntilEndOfGame = this.msToTime(remainingTimeUntilEndOfGameInMs);
 
@@ -342,11 +344,17 @@ export class UsersService {
             remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
             percentageOfDailyGoalAchieved : percentageOfDailyGoalAchieved >= 100 ? 100 : percentageOfDailyGoalAchieved
         };
-
+        
     }
 
     async putDialogOpened(id : string, dialogType : string){
        return await this.usersRepository.putDialogOpened(id, dialogType)
+    }
+
+    getRecoverPasswordLink() {
+        return this.linksService.linkForShared({
+            title: "Recover Password",
+          });
     }
 
     msToTime(duration) {
