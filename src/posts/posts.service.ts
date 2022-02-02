@@ -17,6 +17,7 @@ import {
 } from 'src/wallet-transfers/wallet-transfers.entity';
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 import { LinksService } from 'src/links/links.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PostsService {
@@ -31,6 +32,7 @@ export class PostsService {
     private readonly addressesRepository: AddressesRepository,
     private readonly generalConfigService: GeneralConfigService,
     private readonly walletsService: WalletsService,
+    private readonly usersService: UsersService,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
   ) {}
@@ -231,6 +233,9 @@ export class PostsService {
       console.log("failed to get post update status >>> ", streamMediaId);
       return null;
     }
+    if (post.videoStatus == 'ready') {
+      return post;
+    }
     post.videoStatus = status;
     post.durationInSecs = +videoDetails.duration;
     const result = await this.postsRepository.createOrUpdatePost(post);
@@ -251,12 +256,12 @@ export class PostsService {
 
   async sendRewardToCreatorForPost(postId: string) {
     const post = await this.getPostById(postId);
-    const totalOOZ = this.calcOOZToTransferForPostVideos();
+    const totalOOZ = await this.calcOOZToTransferForPostVideos();
 
     const receiverUserWalletId = (
       await this.walletsService.getWalletByUserId(post.userId)
     ).id;
-
+    
     await this.walletTransfersService.createTransfer(
       post.userId,
       {
@@ -268,8 +273,10 @@ export class PostsService {
         processed: false,
         fromPlatform: true,
       },
-      true,
+      false,
     );
+    
+    await this.usersService.updateAccumulatedOOZInDeviceUser(<any>post.userId);
   }
 
   async sendRewardToCreatorForPostPhoto(postId: string) {
@@ -283,7 +290,7 @@ export class PostsService {
       await this.walletsService.getWalletByUserId(post.userId)
     ).id;
 
-    return await this.walletTransfersService.createTransfer(
+      return await this.walletTransfersService.createTransfer(
       post.userId,
       {
         userId: post.userId,
@@ -295,7 +302,7 @@ export class PostsService {
         fromPlatform: true,
       },
       false,
-    );
+    ); 
   }
 
   async getPostsTimeline(filters, userId?: string) {

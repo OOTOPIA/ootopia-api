@@ -21,6 +21,8 @@ import { TrophyType } from './entities/users-trophies.entity';
 
 import { CreateUserDto, JSONType, UserProfileUpdateDto } from './users.dto';
 import { LinksService } from 'src/links/links.service';
+import { UsersDeviceTokenService } from 'src/users-device-token/users-device-token.service';
+import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +41,8 @@ export class UsersService {
         private readonly invitationsCodesService : InvitationsCodesService,
         private readonly badgesService : BadgesService,
         private readonly usersTrophiesService : UsersTrophiesService,
+        private readonly usersDeviceTokenService : UsersDeviceTokenService,
+        private readonly notificationMessagesService: NotificationMessagesService
         ) {
     }
 
@@ -345,6 +349,22 @@ export class UsersService {
             percentageOfDailyGoalAchieved : percentageOfDailyGoalAchieved >= 100 ? 100 : percentageOfDailyGoalAchieved
         };
         
+    }
+
+    async updateAccumulatedOOZInDeviceUser(userId: string) {
+        let userDailyGoal = await this.getUserDailyGoalStats(userId);
+        Object.keys(userDailyGoal).forEach( key => userDailyGoal[key] = typeof userDailyGoal[key] == 'string' ? userDailyGoal[key] : ""+userDailyGoal[key])
+        let allTokensDevices = await this.usersDeviceTokenService.getByUserId(userId);
+        let messagesNotification = allTokensDevices.map( device => (
+            {
+                token: device.deviceToken,
+                data: {
+                    type: 'update_regeneration_game',
+                    ...userDailyGoal
+                }
+            }
+        ));
+        if (messagesNotification.length) await this.notificationMessagesService.sendFirebaseMessages(messagesNotification);
     }
 
     async putDialogOpened(id : string, dialogType : string){

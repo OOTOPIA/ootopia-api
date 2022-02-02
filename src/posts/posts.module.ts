@@ -21,6 +21,7 @@ import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarde
 import { UsersRepository } from 'src/users/users.repository';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 import { LinksService } from 'src/links/links.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { LinksService } from 'src/links/links.service';
     InterestsTagsModule,
     CitiesModule,
     GeneralConfigModule,
+    UsersModule
   ],
   providers: [
     NotificationMessagesService,
