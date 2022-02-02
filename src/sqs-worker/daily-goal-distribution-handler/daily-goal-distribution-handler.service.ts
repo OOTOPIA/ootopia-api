@@ -63,8 +63,9 @@ export class DailyGoalDistributionHandlerService {
                     }
                 }
             ));
-            await this.notificationMessagesService.sendFirebaseMessages(messagesNotification);
-
+            if (messagesNotification.length) {
+                await this.notificationMessagesService.sendFirebaseMessages(messagesNotification);
+            }
         }
 
     }

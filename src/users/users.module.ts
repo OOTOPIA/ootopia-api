@@ -20,6 +20,8 @@ import { BadgesModule } from 'src/badges/badges.module';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { UsersTrophiesRepository } from './repositories/users-trophies.repository';
 import { LinksService } from 'src/links/links.service';
+import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
+import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-token.module';
 
 @Module({
   imports: [
@@ -36,9 +38,10 @@ import { LinksService } from 'src/links/links.service';
     GeneralConfigModule,
     forwardRef(() => SqsWorkerModule),
     InvitationsCodesModule,
+    UsersDeviceTokenModule
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersAppUsageTimeService, UsersTrophiesService, LinksService],
+  providers: [UsersService, UsersAppUsageTimeService, UsersTrophiesService, LinksService, NotificationMessagesService],
   exports: [UsersService, UsersAppUsageTimeService]
 })
 export class UsersModule {}
