@@ -16,6 +16,7 @@ import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { PostsWatchedVideotimeService } from './services/posts-watched-videotime.service';
 import { PostsTimelineViewTimeService } from './services/posts-timeline-view-time.service';
+import { SqsWorkerService } from 'src/sqs-worker/sqs-worker.service';
 
 @Controller('posts')
 export class PostsController {
@@ -27,6 +28,7 @@ export class PostsController {
         private readonly filesUploadService: FilesUploadService,
         private readonly postsWatchedVideotimeService : PostsWatchedVideotimeService,
         private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
+        private readonly sqsWorkerService: SqsWorkerService,
         ) {}
 
     @UseInterceptors(SentryInterceptor)
@@ -192,8 +194,7 @@ export class PostsController {
             }
 
             //await this.videoService.validateWebhookSignature(webhookSignature, req.body);
-
-            return await this.postsService.updatePostVideoStatus(data.uid, data.status.state, true);
+            await this.sqsWorkerService.sendUpdatePostVideoStatusMessage({streamMediaId: data.uid, status: data.status.state});
             
         } catch (error) {
             new ErrorHandling(error);

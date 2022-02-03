@@ -22,6 +22,7 @@ import { UsersRepository } from 'src/users/users.repository';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 import { LinksService } from 'src/links/links.service';
 import { UsersModule } from 'src/users/users.module';
+import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UsersModule } from 'src/users/users.module';
     ]),
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
+    SqsWorkerModule,
     VideoModule,
     FilesUploadModule,
     InterestsTagsModule,

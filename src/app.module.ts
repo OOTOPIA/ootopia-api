@@ -53,6 +53,11 @@ const sqs = new AWS.SQS({
             name: "strapi_webhook",
             queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
             sqs : sqs,
+          },
+          {
+            name: "update-post-video-status",
+            queueUrl: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE,
+            sqs : sqs,
           }],
           producers: [{
             name: "daily_goal_distribution",
@@ -64,6 +69,12 @@ const sqs = new AWS.SQS({
             name: "strapi_webhook",
             queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
             region: process.env.SQS_STRAPI_WEBHOOK_QUEUE_REGION,
+            sqs: sqs,
+          },
+          {
+            name: "update-post-video-status",
+            queueUrl: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE,
+            region: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE_REGION,
             sqs: sqs,
           }],
         };
