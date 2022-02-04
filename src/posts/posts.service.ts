@@ -230,7 +230,6 @@ export class PostsService {
       streamMediaId,
     );
     if (!post) {
-      console.log("failed to get post update status >>> ", streamMediaId);
       return null;
     }
     if (post.videoStatus == 'ready') {
@@ -261,13 +260,14 @@ export class PostsService {
     const receiverUserWalletId = (
       await this.walletsService.getWalletByUserId(post.userId)
     ).id;
-    
+
     await this.walletTransfersService.createTransfer(
       post.userId,
       {
         userId: post.userId,
         walletId: receiverUserWalletId,
         balance: totalOOZ,
+        postId: postId,
         origin: Origin.POSTED_VIDEOS,
         action: WalletTransferAction.RECEIVED,
         processed: false,
