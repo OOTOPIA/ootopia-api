@@ -1,4 +1,4 @@
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpService, Inject, Injectable } from '@nestjs/common';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { CitiesService } from 'src/cities/cities.service';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
@@ -18,10 +18,12 @@ import {
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 import { LinksService } from 'src/links/links.service';
 import { UsersService } from 'src/users/users.service';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class PostsService {
   constructor(
+    private readonly httpService  : HttpService,
     private readonly linksService: LinksService,
     private readonly postsRepository: PostsRepository,
     private readonly postsUsersRewardedRepository: PostsUsersRewardedRepository,
@@ -148,12 +150,42 @@ export class PostsService {
 
   async getPostShareLink(id: string) {
     let post = await this.postsRepository.getPostById(id);
-
+    let user = await this.usersService.getUserById(<any>post.userId);
+    
     return this.linksService.linkForShared({
-      title: post.userId.fullname,
+      title: user.fullname,
       description: post.description,
-      imageUrl : post.thumbnailUrl
+      imageUrl : post.thumbnailUrl,
+      thumbnail: {
+        id: post.type == 'video'? id : null,
+        type: post.type == 'video'? 'posts' : null
+      }
     });
+  }
+
+  async geThumbnailVideo(type: string, id: string) {
+    let post = await this.postsRepository.getPostById(id);
+    const response = await this.httpService.axiosRef({
+      url: post.thumbnailUrl,
+      method:"GET",
+      responseType: 'arraybuffer'
+    });
+
+    const image = sharp(response.data);
+    const logo = sharp('src/assets/play.png');
+    // const imageMetadata = await image.metadata();
+    // const width = (imageMetadata.width / 2);
+    // const height = (imageMetadata.height / 2);
+    // console.log('size image ', width, height);
+    
+    logo.resize({
+      fit: sharp.fit.contain,
+      width: 90,
+      height: 90,
+    });
+
+    image.composite([{ input: (await logo.toBuffer()) }])
+    return image.jpeg().toBuffer();
   }
 
   async likePost(postId, userId) {
