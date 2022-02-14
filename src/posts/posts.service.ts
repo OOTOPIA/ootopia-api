@@ -18,7 +18,7 @@ import {
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 import { LinksService } from 'src/links/links.service';
 import { UsersService } from 'src/users/users.service';
-import * as sharp from 'sharp';
+import * as jimp from 'jimp';
 
 @Injectable()
 export class PostsService {
@@ -171,21 +171,25 @@ export class PostsService {
       responseType: 'arraybuffer'
     });
 
-    const image = sharp(response.data);
-    const logo = sharp('src/assets/play.png');
+    const image = await jimp.read(response.data);
+    const logo = await jimp.read('src/assets/play.png');
     // const imageMetadata = await image.metadata();
     // const width = (imageMetadata.width / 2);
     // const height = (imageMetadata.height / 2);
     // console.log('size image ', width, height);
+    logo.resize(90,90);
+    // logo.resize({ sharp
+    //   fit: sharp.fit.contain,
+    //   width: 90,
+    //   height: 90,
+    // });
     
-    logo.resize({
-      fit: sharp.fit.contain,
-      width: 90,
-      height: 90,
+    image.composite(await logo, image.getWidth()/ 2 - 45, image.getHeight() / 2 - 45, {
+      mode: jimp.BLEND_SOURCE_OVER,
+      opacityDest: 1,
+      opacitySource: 1
     });
-
-    image.composite([{ input: (await logo.toBuffer()) }])
-    return image.jpeg().toBuffer();
+    return image.getBufferAsync(image.getMIME());
   }
 
   async likePost(postId, userId) {
