@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator, Header } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator, Header, Response, HttpService } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -145,7 +145,27 @@ export class PostsController {
     @Get('/shared/:id')
     async getPostShared(@Param('id') id) {
         try {
-            return await this.postsService.getPostById(id);
+            return await this.postsService.getPostShareLink(id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'redirect to post or Store' })
+    @ApiParam({name : "id" })
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Header('content-type', 'image/jpg')
+    @HttpCode(200)
+    @Get('/thumbnail-video/:type/:id')
+    async geThumbnailVideo(@Param('type') type, @Param('id') id, @Response() res) {
+        try {
+            res.send( await this.postsService.geThumbnailVideo(type, id))
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -166,7 +186,7 @@ export class PostsController {
         try {
 
             return await this.postsService.deletePost(postId, user.id);
-            
+
         } catch (error) {
             new ErrorHandling(error);
         }

@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -43,7 +43,8 @@ import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
     InterestsTagsModule,
     CitiesModule,
     GeneralConfigModule,
-    UsersModule
+    UsersModule,
+    HttpModule
   ],
   providers: [
     NotificationMessagesService,

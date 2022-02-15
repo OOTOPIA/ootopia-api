@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
+interface ThumbnailVideo {
+    id: string;
+    type: string;
+}
+
 interface LinkForShared {
     title?: string;
     description?: string;
     imageUrl?: string;
     type?: string;
+    thumbnail?: ThumbnailVideo;
 }
 
 @Injectable()
@@ -18,7 +24,7 @@ export class LinksService {
 
                 <meta property="og:site_name" content="OOTOPIA">
                 <meta property="description" content="${content.description}">
-                <meta property="og:image" itemprop="image" content="${content.imageUrl}">
+                <meta property="og:image" itemprop="image" content="${ content.thumbnail && content.thumbnail.id && content.thumbnail.type ? `${process.env.LINK_SHARING_URL_API}posts/thumbnail-video/${content.thumbnail.type}/${content.thumbnail.id}`: content.imageUrl }">
                 <meta property="og:type" content="website">
 
                 <script>
