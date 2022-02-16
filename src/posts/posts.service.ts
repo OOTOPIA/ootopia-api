@@ -1,4 +1,4 @@
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpService, Inject, Injectable } from '@nestjs/common';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { CitiesService } from 'src/cities/cities.service';
 import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
@@ -16,10 +16,15 @@ import {
   WalletTransferAction,
 } from 'src/wallet-transfers/wallet-transfers.entity';
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
+import { LinksService } from 'src/links/links.service';
+import { UsersService } from 'src/users/users.service';
+import * as jimp from 'jimp';
 
 @Injectable()
 export class PostsService {
   constructor(
+    private readonly httpService  : HttpService,
+    private readonly linksService: LinksService,
     private readonly postsRepository: PostsRepository,
     private readonly postsUsersRewardedRepository: PostsUsersRewardedRepository,
     private readonly videoService: VideoService,
@@ -29,6 +34,7 @@ export class PostsService {
     private readonly addressesRepository: AddressesRepository,
     private readonly generalConfigService: GeneralConfigService,
     private readonly walletsService: WalletsService,
+    private readonly usersService: UsersService,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
   ) {}
@@ -142,6 +148,40 @@ export class PostsService {
     return this.postsRepository.getPostById(id);
   }
 
+  async getPostShareLink(id: string) {
+    let post = await this.postsRepository.getPostById(id);
+    let user = await this.usersService.getUserById(<any>post.userId);
+    
+    return this.linksService.linkForShared({
+      title: user.fullname,
+      description: post.description,
+      imageUrl : post.thumbnailUrl,
+      thumbnail: {
+        id: post.type == 'video'? id : null,
+        type: post.type == 'video'? 'posts' : null
+      }
+    });
+  }
+
+  async geThumbnailVideo(type: string, id: string) {
+    let post = await this.postsRepository.getPostById(id);
+    const response = await this.httpService.axiosRef({
+      url: post.thumbnailUrl,
+      method:"GET",
+      responseType: 'arraybuffer'
+    });
+
+    const image = await jimp.read(response.data);
+    const logo = await jimp.read('src/assets/play.png');
+    logo.resize(90,90);
+    image.composite(await logo, image.getWidth()/ 2 - 45, image.getHeight() / 2 - 45, {
+      mode: jimp.BLEND_SOURCE_OVER,
+      opacityDest: 1,
+      opacitySource: 1
+    });
+    return image.getBufferAsync(image.getMIME());
+  }
+
   async likePost(postId, userId) {
     const likeResult = await this.postsRepository.likePost(postId, userId);
     if (likeResult.liked) {
@@ -216,8 +256,10 @@ export class PostsService {
       streamMediaId,
     );
     if (!post) {
-      console.log("failed to get post update status >>> ", streamMediaId);
       return null;
+    }
+    if (post.videoStatus == 'ready') {
+      return post;
     }
     post.videoStatus = status;
     post.durationInSecs = +videoDetails.duration;
@@ -239,7 +281,7 @@ export class PostsService {
 
   async sendRewardToCreatorForPost(postId: string) {
     const post = await this.getPostById(postId);
-    const totalOOZ = this.calcOOZToTransferForPostVideos();
+    const totalOOZ = await this.calcOOZToTransferForPostVideos();
 
     const receiverUserWalletId = (
       await this.walletsService.getWalletByUserId(post.userId)
@@ -251,13 +293,16 @@ export class PostsService {
         userId: post.userId,
         walletId: receiverUserWalletId,
         balance: totalOOZ,
+        postId: postId,
         origin: Origin.POSTED_VIDEOS,
         action: WalletTransferAction.RECEIVED,
         processed: false,
         fromPlatform: true,
       },
-      true,
+      false,
     );
+    
+    await this.usersService.updateAccumulatedOOZInDeviceUser(<any>post.userId);
   }
 
   async sendRewardToCreatorForPostPhoto(postId: string) {
@@ -271,7 +316,7 @@ export class PostsService {
       await this.walletsService.getWalletByUserId(post.userId)
     ).id;
 
-    return await this.walletTransfersService.createTransfer(
+      return await this.walletTransfersService.createTransfer(
       post.userId,
       {
         userId: post.userId,
@@ -283,7 +328,7 @@ export class PostsService {
         fromPlatform: true,
       },
       false,
-    );
+    ); 
   }
 
   async getPostsTimeline(filters, userId?: string) {

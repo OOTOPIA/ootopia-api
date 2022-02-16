@@ -25,4 +25,16 @@ export class SqsWorkerService {
         });
     }
 
+    public async sendUpdatePostVideoStatusMessage(
+        data : {
+            streamMediaId: string,
+            status: string,
+        }
+    ) {
+        return await this.sqsService.send('update-post-video-status', {
+            id: uuidv4(),
+            body: data,
+            delaySeconds: 0,
+        });
+    }
 }

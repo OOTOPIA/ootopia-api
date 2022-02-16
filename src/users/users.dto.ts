@@ -3,6 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Double } from 'typeorm';
 
+class UserLinks {
+    @ApiProperty({ required: false, example : "www.google.com.br"})
+    URL : string;
+
+    @ApiProperty({ required: false, example : "Google"})
+    title : string;
+}
+
+export enum JSONType {
+    decode = 'decode',
+    encoder = 'encoder'
+} 
 export class CreateUserDto {
 
     @ApiProperty({ required: true})
@@ -20,7 +32,7 @@ export class CreateUserDto {
     @ApiProperty({ required: true})
     acceptedTerms : boolean;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     countryCode: string;
 
     @ApiProperty()
@@ -29,38 +41,41 @@ export class CreateUserDto {
     @ApiProperty()
     phone: string;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     bio: string;
 
-    @ApiProperty({ required: true, type: "file", description: "User photo" })
+    @ApiProperty({ required: false, type: "file", description: "User photo" })
     file : object;
 
-    @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
+    @ApiProperty({ example : "1993/07/08", description: "User birthdate in format YYYY-MM-DD" })
     birthdate : Date;
 
     @ApiProperty({type: "number", minimum: 10, maximum: 60})
     dailyLearningGoalInMinutes : number;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     addressCountryCode : string;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     addressState : string;
     
-    @ApiProperty()
+    @ApiProperty({required: false})
     addressCity : string;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     addressLatitude : number;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     addressLongitude : number;
 
-    @ApiProperty({description: "IDs of selected tags separated by commas"})
+    @ApiProperty({required: false,description: "IDs of selected tags separated by commas"})
     tagsIds : string;
     
     @ApiProperty({ required: false})
     invitationCode : string;
+
+    @ApiProperty({ required: false, description: "this field is received in JSON format"})
+    links : [UserLinks];
 }
 
 export class CreatedUserDto {
@@ -98,6 +113,8 @@ export class CreatedUserDto {
     @ApiProperty()
     updatedAt : Date;
 
+    @ApiProperty({type: [UserLinks]})
+    links : [UserLinks];
 }
 
 export class UserLoginDto {
@@ -295,36 +312,38 @@ export class UserProfileUpdateDto {
     @ApiProperty()
     phone: string;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     bio: string;
 
-    @ApiProperty({ required: true, type: "file", description: "User photo" })
+    @ApiProperty({ required: false, type: "file", description: "User photo" })
     file : object;
 
-    @ApiProperty({ example : "1993-07-08", description: "User birthdate in format YYYY-MM-DD" })
+    @ApiProperty({ example : "1993/07/08", description: "User birthdate in format YYYY/MM/DD" })
     birthdate : string;
 
     @ApiProperty({type: "number", minimum: 10, maximum: 60})
     dailyLearningGoalInMinutes : number;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     addressCountryCode : string;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     addressState : string;
     
-    @ApiProperty()
+    @ApiProperty({ required: false })
     addressCity : string;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     addressLatitude : number;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     addressLongitude : number;
 
-    @ApiProperty({description: "IDs of selected tags separated by commas"})
+    @ApiProperty({ required: false, description: "IDs of selected tags separated by commas"})
     tagsIds : string;
 
+    @ApiProperty({ required: false, description: "this field is received in JSON format"})
+    links : [UserLinks];
 }
 
 export class UsersAppUsageTimeDto {

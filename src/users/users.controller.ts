@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef, Header } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -65,7 +65,7 @@ export class UsersController {
                 throw new HttpException({ status: 400, error: "Invalid Body" }, 400);
             }
 
-            return this.authService.validateUser(loginData.email, loginData.password);
+            return this.usersService.jsonDecodeOrEncoderUserLinks(await this.authService.validateUser(loginData.email, loginData.password), JSONType.encoder);
 
         } catch (error) {
             new ErrorHandling(error);
@@ -91,6 +91,25 @@ export class UsersController {
 
             return this.authService.recoverPassword(recoverPasswordData.email, recoverPasswordData.language);
 
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'Send reset password email' })
+    @ApiBody({ type: RecoverPasswordDto })
+    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Header('content-type', 'text/html')
+    @Get('/auth/login')
+    @HttpCode(200)
+    async sharedResetPassword() {
+        try {
+            return this.usersService.getRecoverPasswordLink();
         } catch (error) {
             new ErrorHandling(error);
         }

@@ -81,13 +81,22 @@ export class CronService {
         try {
             while (!pagination.finished) {
                 let comments = await getConnection().query(`
-                select udt.device_token as "token", json_build_object('type','comments', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT u.fullname))) as "data"
+                select udt.device_token as "token", 
+                json_build_object('type','comments', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'postUser', u.fullname) as "data"
                 from posts_comments pc
                 inner join posts p on p.id = pc.post_id 
-                inner join users u on u.id = pc.user_id
+                inner join users ou on ou.id = pc.user_id
+                inner join users u on u.id = p.user_id
                 inner join users_device_token udt on udt.user_id = p.user_id::text
-                where pc.created_at >= $1 and pc.created_at < $2 and pc.deleted is false and p.user_id != u.id and udt.device_token is not null
-                group by p.id, udt.device_token order by min(pc.created_at) asc offset $3 limit $4;
+                where 
+                    pc.created_at >= $1 and 
+                    pc.created_at < $2 and 
+                    pc.deleted is false and 
+                    p.user_id != ou.id and 
+                    udt.device_token is not null
+                group by p.id, udt.device_token, u.fullname 
+                order by min(pc.created_at) asc 
+                offset $3 limit $4;
                 `,
                 [ startDate.toISOString(), endDate.toISOString(), pagination.offset, pagination.limit]);
                 
@@ -125,10 +134,12 @@ export class CronService {
         try {
             while (!pagination.finished) {
                 let gratitudeReward = await getConnection().query(`
-                select udt.device_token as "token",json_build_object('type','gratitude_reward', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'oozAmount', sum(wt.balance)) as "data"
+                select udt.device_token as "token",
+                json_build_object('type','gratitude_reward', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'oozAmount', sum(wt.balance), 'postUser', u.fullname) as "data"
                 from wallet_transfers wt 
                 inner join posts p on p.id = wt.post_id 
                 inner join users ou on ou.id = wt.other_user_id 
+                inner join users u on u.id = wt.user_id 
                 inner join users_device_token udt on udt.user_id = p.user_id::text
                 where 
                     wt.created_at >= $1 and
@@ -136,7 +147,7 @@ export class CronService {
                     udt.device_token is not null and
                     wt.origin = 'gratitude_reward' and
                     wt."action" = 'received'
-                group by p.id, udt.device_token 
+                group by p.id, udt.device_token, u.fullname 
                 order by min(wt.created_at) asc 
                 offset $3 limit $4;
                 `,

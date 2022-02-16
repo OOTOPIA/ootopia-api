@@ -25,6 +25,8 @@ import { StrapiModule } from './strapi/strapi.module';
 import { MarketPlaceModule } from './market-place/market-place.module';
 import { NotificationMessagesService } from './notification-messages/notification-messages.service';
 import { UsersDeviceTokenModule } from './users-device-token/users-device-token.module';
+import { LinksService } from './links/links.service';
+import { AppleAppSiteAssociationModule } from './apple-app-site-association/apple-app-site-association.module';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -52,6 +54,11 @@ const sqs = new AWS.SQS({
             name: "strapi_webhook",
             queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
             sqs : sqs,
+          },
+          {
+            name: "update-post-video-status",
+            queueUrl: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE,
+            sqs : sqs,
           }],
           producers: [{
             name: "daily_goal_distribution",
@@ -63,6 +70,12 @@ const sqs = new AWS.SQS({
             name: "strapi_webhook",
             queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
             region: process.env.SQS_STRAPI_WEBHOOK_QUEUE_REGION,
+            sqs: sqs,
+          },
+          {
+            name: "update-post-video-status",
+            queueUrl: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE,
+            region: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE_REGION,
             sqs: sqs,
           }],
         };
@@ -86,8 +99,9 @@ const sqs = new AWS.SQS({
     StrapiModule,
     MarketPlaceModule,
     UsersDeviceTokenModule,
+    AppleAppSiteAssociationModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CronService, NotificationMessagesService],
+  providers: [AppService, CronService, NotificationMessagesService, LinksService],
 })
 export class AppModule {}

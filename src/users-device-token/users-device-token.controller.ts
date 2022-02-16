@@ -24,7 +24,7 @@ export class UsersDeviceTokenController {
   @UseGuards(JwtAuthGuard)
   @Put('/')
   @HttpCode(200)
-  async updateTokenDevice(@Req() { user }, @Body() body : DeviceTokenDTO) {
+  async updateTokenDevice(@Req() { user }, @Body() body: DeviceTokenDTO) {
       try {
           return this.usersDeviceTokenService.updateTokenDeviceUser(user.id, body.deviceToken, body.deviceId);
 

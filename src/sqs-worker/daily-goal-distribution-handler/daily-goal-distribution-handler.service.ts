@@ -6,9 +6,11 @@ import { UsersService } from 'src/users/users.service';
 import * as moment from 'moment-timezone';
 import * as _ from 'lodash';
 import { WalletTransfersService } from 'src/wallet-transfers/wallet-transfers.service';
+import { UsersDeviceTokenService } from 'src/users-device-token/users-device-token.service';
 import { getConnection } from 'typeorm';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { Origin, WalletTransferAction, WalletTransfers } from 'src/wallet-transfers/wallet-transfers.entity';
+import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 
 @Injectable()
 export class DailyGoalDistributionHandlerService {
@@ -17,6 +19,8 @@ export class DailyGoalDistributionHandlerService {
         @Inject(forwardRef(() => UsersService)) private readonly usersService : UsersService,
         private readonly generalConfigService : GeneralConfigService,
         @Inject(forwardRef(() => WalletTransfersService)) private readonly walletTransfersService : WalletTransfersService,
+        @Inject(forwardRef(() => UsersDeviceTokenService)) private readonly usersDeviceTokenService : UsersDeviceTokenService,
+        @Inject(forwardRef(() => NotificationMessagesService)) private readonly notificationMessagesService : NotificationMessagesService,
         private readonly walletsService : WalletsService
     ) {}
 
@@ -47,9 +51,21 @@ export class DailyGoalDistributionHandlerService {
         for (let i = 0; i < usersIds.length; i++) {
             let userId = usersIds[i];
             let userDailyGoalStats = await this.usersService.getUserDailyGoalStats(userId, dailyGoalStartTime, dailyGoalEndTime);
-
+            
             await this.walletTransfersService.transferTodaysGameCompleted(userId, userDailyGoalStats.dailyGoalAchieved == false);
+            let allTokensDevices = await this.usersDeviceTokenService.getByUserId(userId);
+            let messagesNotification = allTokensDevices.map( device => (
+                {
+                    token: device.deviceToken,
+                    data: {
+                        type: 'regeneration-game',
 
+                    }
+                }
+            ));
+            if (messagesNotification.length) {
+                await this.notificationMessagesService.sendFirebaseMessages(messagesNotification);
+            }
         }
 
     }

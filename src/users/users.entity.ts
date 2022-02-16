@@ -98,4 +98,6 @@ export class Users extends BaseEntity {
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
+    @Column({ nullable: true, array: true, type: 'varchar', name : 'links' })
+    links: string;
 }

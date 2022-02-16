@@ -15,21 +15,35 @@ export class NotificationDataDTO {
     type: string;
 
     @ApiProperty()
-    usersName: string[];
+    usersName?: string[];
 
     @ApiProperty()
-    postId: string;
+    postId?: string;
 
     @ApiProperty()
-    photoUrl: string;
+    photoUrl?: string;
     
     @ApiProperty()
     oozAmount?:  string;
 }
 
+class Notification {
+    @ApiProperty()
+    title: string;
+
+    @ApiProperty()
+    body: string;
+
+    @ApiProperty()
+    imageUrl: string;
+}
+
 export class NotificationMessageDTO {
     @ApiProperty({ required: true, type: "string" })
     token: string;
+
+    @ApiProperty()
+    notification?: Notification;
 
     @ApiProperty()
     data: NotificationDataDTO;

@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -20,6 +20,9 @@ import { PostsTimelineViewTimeService } from './services/posts-timeline-view-tim
 import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarded.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
+import { LinksService } from 'src/links/links.service';
+import { UsersModule } from 'src/users/users.module';
+import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 
 @Module({
   imports: [
@@ -34,11 +37,14 @@ import { NotificationMessagesService } from 'src/notification-messages/notificat
     ]),
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
+    SqsWorkerModule,
     VideoModule,
     FilesUploadModule,
     InterestsTagsModule,
     CitiesModule,
     GeneralConfigModule,
+    UsersModule,
+    HttpModule
   ],
   providers: [
     NotificationMessagesService,
@@ -46,6 +52,7 @@ import { NotificationMessagesService } from 'src/notification-messages/notificat
     CommentsService,
     PostsWatchedVideotimeService, 
     PostsTimelineViewTimeService,
+    LinksService
   ],
   controllers: [PostsController],
   exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService]

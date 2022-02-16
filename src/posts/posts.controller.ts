@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile, UseInterceptors, Param, Headers, Query, HttpCode, Delete, Req, UseGuards, createParamDecorator, Header, Response, HttpService } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
@@ -16,6 +16,7 @@ import { JwtOptionalAuthGuard } from 'src/auth/jwt-optional-auth.guard';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
 import { PostsWatchedVideotimeService } from './services/posts-watched-videotime.service';
 import { PostsTimelineViewTimeService } from './services/posts-timeline-view-time.service';
+import { SqsWorkerService } from 'src/sqs-worker/sqs-worker.service';
 
 @Controller('posts')
 export class PostsController {
@@ -27,6 +28,7 @@ export class PostsController {
         private readonly filesUploadService: FilesUploadService,
         private readonly postsWatchedVideotimeService : PostsWatchedVideotimeService,
         private readonly postsTimelineViewTimeService : PostsTimelineViewTimeService,
+        private readonly sqsWorkerService: SqsWorkerService,
         ) {}
 
     @UseInterceptors(SentryInterceptor)
@@ -132,6 +134,45 @@ export class PostsController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
+    @ApiOperation({ summary: 'redirect to post or Store' })
+    @ApiParam({name : "id" })
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Header('content-type', 'text/html')
+    @HttpCode(200)
+    @Get('/shared/:id')
+    async getPostShared(@Param('id') id) {
+        try {
+            return await this.postsService.getPostShareLink(id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'redirect to post or Store' })
+    @ApiParam({name : "id" })
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Header('content-type', 'image/jpg')
+    @HttpCode(200)
+    @Get('/thumbnail-video/:type/:id')
+    async geThumbnailVideo(@Param('type') type, @Param('id') id, @Response() res) {
+        try {
+            res.send( await this.postsService.geThumbnailVideo(type, id))
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Remove post' })
     @ApiBearerAuth('Bearer')
     @ApiParam({ name : "postId", type: "string", description: "Post ID" })
@@ -145,7 +186,7 @@ export class PostsController {
         try {
 
             return await this.postsService.deletePost(postId, user.id);
-            
+
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -173,8 +214,7 @@ export class PostsController {
             }
 
             //await this.videoService.validateWebhookSignature(webhookSignature, req.body);
-
-            return await this.postsService.updatePostVideoStatus(data.uid, data.status.state, true);
+            await this.sqsWorkerService.sendUpdatePostVideoStatusMessage({streamMediaId: data.uid, status: data.status.state});
             
         } catch (error) {
             new ErrorHandling(error);
