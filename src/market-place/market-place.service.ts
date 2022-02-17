@@ -98,7 +98,7 @@ export class MarketPlaceService {
   }
 
   async deleteMarketPlaces(entryId) {
-    await this.marketPlaceRepository.deleteMarketPlace(entryId);
+    return await this.marketPlaceRepository.deleteMarketPlace(entryId);
   }
 
   async getMarketPlaceProducts(filters: MarketPlaceFilterDto) {
