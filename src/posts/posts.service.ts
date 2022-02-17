@@ -173,7 +173,6 @@ export class PostsService {
 
     const image = await jimp.read(response.data);
     const logo = await jimp.read('src/assets/play.png');
-    logo.resize(90,90);
     image.composite(await logo, image.getWidth()/ 2 - 45, image.getHeight() / 2 - 45, {
       mode: jimp.BLEND_SOURCE_OVER,
       opacityDest: 1,
