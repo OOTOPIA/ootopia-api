@@ -280,7 +280,7 @@ export class UsersService {
                         });
                         break;
                 }
-            } 
+            }
             if(existLink && create) {
                 // change title link
                 existLink.title = `${value.title}`;

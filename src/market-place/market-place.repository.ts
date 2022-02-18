@@ -63,7 +63,8 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
 
     async getById(id : string) {
         return camelcaseKeys(await getConnection().query(`
-            SELECT m.* FROM market_place_products m
+            SELECT m.*, u.fullname as "user_name", u.photo_url as "user_photo_url" FROM market_place_products m
+            LEFT JOIN users u ON u.id = m.user_id
             WHERE m.id = $1 and m.deleted_at is null
         `, [id]))[0];
     }
