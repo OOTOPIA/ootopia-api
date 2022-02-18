@@ -254,11 +254,11 @@ export class UsersService {
 
         if (userId) {
             currentUser = await this.getUserById(userId);
-        } else {
+        } else if (value.author) {
             currentUser = this.jsonDecodeOrEncoderUserLinks(await this.getUserByEmail(value.author), JSONType.encoder);
         }
         
-        if (currentUser.links) {
+        if (currentUser && currentUser.links) {
             let existLink = currentUser.links.find( link =>  {
                 let parts = link.URL.split('shared/');
                 return parts[parts.length - 1] == value.id;
