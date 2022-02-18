@@ -165,6 +165,10 @@ export class LearningTracksService {
         return (await this.getLearningTracks({ id }, userId))[0];
     }
 
+    async getLearningTracksByStrapiId(strapiId : string ) {
+        return (await this.learningTracksRepository.getLearningTracks({strapiId})[0] || null);
+    }
+
     async getWelcomeGuideLearningTrack(locale : string, userId : string) {
         let strapiId = locale == "en" ? "4" : "18";
         return (await this.getLearningTracks({ strapiId, locale }, userId))[0];
@@ -191,7 +195,7 @@ export class LearningTracksService {
     }
 
     async deleteLearningTrack(strapiId) {
-        await this.learningTracksRepository.deleteLearningTrack(strapiId);
+        return await this.learningTracksRepository.deleteLearningTrack(strapiId);
     }
 
     private msToTime(duration) {

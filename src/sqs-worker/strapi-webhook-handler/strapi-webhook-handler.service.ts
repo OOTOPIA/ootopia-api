@@ -2,11 +2,13 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SqsMessageHandler } from "@ssut/nestjs-sqs";
 import { LearningTracksService } from 'src/learning-tracks/learning-tracks.service';
 import { MarketPlaceService } from 'src/market-place/market-place.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class StrapiWebhookHandlerService {
 
     constructor(
+        private readonly usersService : UsersService,
         private readonly learningTracksService : LearningTracksService,
         private readonly marketPlaceService : MarketPlaceService
     ){}
@@ -25,7 +27,8 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
-                            await this.createOrUpdateLearningTrack(entry, data.event);
+                            let learningTrack = await this.createOrUpdateLearningTrack(entry, data.event);
+                            if(learningTrack) await this.createLinkInUserProfile(learningTrack, 'learning-tracks');
                         }
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
                         if (!data.entry.push) {
@@ -33,7 +36,9 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
-                            await this.deleteLearningTrack(entry.id);
+                            let learningTrack: any = await this.deleteLearningTrack(entry.id);
+                            learningTrack.author = entry.author;
+                            await this.createLinkInUserProfile(learningTrack, 'learning-tracks', false);
                         }
                     }
                 break;
@@ -44,7 +49,8 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
-                            await this.createOrUpdateMarketPlaces(entry, data.event);
+                            let marketPlaces = await this.createOrUpdateMarketPlaces(entry, data.event);
+                            if(marketPlaces) await this.createLinkInUserProfile(marketPlaces, 'market-place');
                         }
                     }else if (data.event == "entry.delete" || data.event == "entry.unpublish") {
                         if (!data.entry.push) {
@@ -52,7 +58,9 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
-                            await this.deleteMarketPlaces(entry.id);
+                            let marketPlaces: any = await this.deleteMarketPlaces(entry.id);
+                            marketPlaces.author = entry.seller;
+                            await this.createLinkInUserProfile(marketPlaces, 'market-place', false);
                         }
                     }
                 break;
@@ -65,19 +73,23 @@ export class StrapiWebhookHandlerService {
     }
 
     async createOrUpdateLearningTrack(entry, event : string) {
-        await this.learningTracksService.createOrUpdate(entry, event);
+        return this.learningTracksService.createOrUpdate(entry, event);
+    }
+
+    async createLinkInUserProfile(modal, event : string, create: boolean = true) {
+        await this.usersService.updateLinks(modal, modal && modal.userId ? modal.userId : null, event, create);
     }
 
     async deleteLearningTrack(entryId) {
-        await this.learningTracksService.deleteLearningTrack(entryId);
+        return this.learningTracksService.deleteLearningTrack(entryId);
     }
 
     async createOrUpdateMarketPlaces(entry, event : string) {
-        await this.marketPlaceService.createOrUpdate(entry, event);
+        return this.marketPlaceService.createOrUpdate(entry, event);
     }
 
     async deleteMarketPlaces(entryId) {
-        await this.marketPlaceService.deleteMarketPlaces(entryId);
+        return this.marketPlaceService.deleteMarketPlaces(entryId);
     }
 
 }
