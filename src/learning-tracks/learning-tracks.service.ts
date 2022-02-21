@@ -161,8 +161,8 @@ export class LearningTracksService {
         return learningTracks.map(this.mapper);
     }
 
-    async getLearningTracksById(id : string, userId : string  ) {
-        return (await this.getLearningTracks({ id }, userId))[0];
+    async getLearningTracksById(id : string ) {
+        return (await this.getLearningTracks({ id }))[0];
     }
 
     async getLearningTracksByStrapiId(strapiId : string ) {
