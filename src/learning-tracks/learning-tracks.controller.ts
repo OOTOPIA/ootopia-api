@@ -107,7 +107,7 @@ export class LearningTracksController {
     @Get('/:learningTrackId')
     async getLearningTracksById(@Req() { user }, @Param('learningTrackId') learningTrackId : string) {
         try {
-            return await this.learningTracksService.getLearningTracksById(learningTrackId, user.id);
+            return this.learningTracksService.getLearningTracksById(learningTrackId, user.id);
         } catch (error) {
             new ErrorHandling(error);
             return error
