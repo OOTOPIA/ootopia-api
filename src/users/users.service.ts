@@ -290,10 +290,11 @@ export class UsersService {
     }
 
     async getUserDailyGoalStats(id : string, dailyGoalStartTime? : Date, dailyGoalEndTime? : Date) {
-        let user = await this.getUserById(id), globalGoalLimitTimeConfig;
+        let user = await this.getUserById(id), globalGoalLimitTimeConfig, accumulatedOOZDailyGoal;
 
         if (!dailyGoalStartTime || !dailyGoalEndTime) {
             globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
+            accumulatedOOZDailyGoal = await this.generalConfigService.getConfig(ConfigName.USER_REWARD_PER_MINUTE_OF_WATCHED_VIDEO);
         }
 
         if (!dailyGoalStartTime) dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
@@ -317,13 +318,14 @@ export class UsersService {
             };
         }
 
-        let totalAppUserUsageTimeInMs = await this.usersAppUsageTimeService.getTimeSumOfUserUsedAppInThisPeriod(id, dailyGoalStartTime);
+        let totalAppUserUsageTimeInMs = await this.usersAppUsageTimeService.getTimeSumOfUserUsedAppInThisPeriod(id, dailyGoalStartTime, dailyGoalEndTime);
         let totalTimeInMinutes = Math.floor(totalAppUserUsageTimeInMs / 60000);
         let dailyGoalAchieved = (+totalTimeInMinutes >= +user.dailyLearningGoalInMinutes);
         let dailyGoalAchievedSoFar = this.msToTime(totalAppUserUsageTimeInMs);
         let accumulatedOOZ = await this.walletTransfersService.getUserOOZAccumulatedInThisPeriod(id, false, dailyGoalStartTime);
         let dailyLearningGoalInMs = +user.dailyLearningGoalInMinutes * 60000;
         let percentageOfDailyGoalAchieved = +((totalAppUserUsageTimeInMs/dailyLearningGoalInMs) * 100).toFixed(1);
+        if(!!+totalTimeInMinutes && accumulatedOOZDailyGoal) accumulatedOOZ += totalTimeInMinutes * accumulatedOOZDailyGoal.value;
 
         if (user.dailyGoalAchieved != dailyGoalAchieved) {
             let result = await this.updateDailyGoalAchieved(user.id, dailyGoalAchieved);

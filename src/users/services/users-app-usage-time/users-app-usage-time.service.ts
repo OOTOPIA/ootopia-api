@@ -30,8 +30,8 @@ export class UsersAppUsageTimeService {
         return await this.usersAppUsageTimeRepository.getUsersIdsWhoUsedAppInThisPeriod(startDateTime, page);
     }
 
-    async getTimeSumOfUserUsedAppInThisPeriod(userId : string, startDateTime : Date) : Promise<number> {
-        let result = await this.usersAppUsageTimeRepository.getTimeSumOfUserUsedAppInThisPeriod(userId, startDateTime);
+    async getTimeSumOfUserUsedAppInThisPeriod(userId : string, startDateTime : Date, endDateTime : Date) : Promise<number> {
+        let result = await this.usersAppUsageTimeRepository.getTimeSumOfUserUsedAppInThisPeriod(userId, startDateTime, endDateTime);
         return result.length ? +result[0].sum : 0;
     }
 

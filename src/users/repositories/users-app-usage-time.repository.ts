@@ -30,11 +30,12 @@ export class UsersAppUsageTimeRepository extends Repository<UsersAppUsageTime>{
         `, [startDateTime]), { deep : true });
     }
 
-    async getTimeSumOfUserUsedAppInThisPeriod(userId : string, startDateTime : Date) {
+    async getTimeSumOfUserUsedAppInThisPeriod(userId : string, startDateTime : Date,
+        endDateTime : Date) {
         return camelcaseKeys(await getConnection().query(`
             SELECT sum(time_in_milliseconds) FROM users_app_usage_time 
-            WHERE user_id = $1 AND created_at BETWEEN $2 and now() at time zone 'UTC';
-        `, [userId, startDateTime]), { deep : true });
+            WHERE user_id = $1 AND created_at BETWEEN $2 and $3;
+        `, [userId, startDateTime.toISOString(), endDateTime.toISOString()]), { deep : true });
     }
 
 }
