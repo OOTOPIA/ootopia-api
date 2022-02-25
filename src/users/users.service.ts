@@ -19,7 +19,7 @@ import { BadgesService } from 'src/badges/badges.service';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { TrophyType } from './entities/users-trophies.entity';
 
-import { CreateUserDto, JSONType, UserProfileUpdateDto } from './users.dto';
+import { CreateUserDto, JSONType, UserList, UserProfileUpdateDto } from './users.dto';
 import { LinksService } from 'src/links/links.service';
 import { UsersDeviceTokenService } from 'src/users-device-token/users-device-token.service';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
@@ -440,7 +440,12 @@ export class UsersService {
     getRecoverPasswordLink() {
         return this.linksService.linkForShared({
             title: "Recover Password",
-          });
+        });
+    }
+
+    async getUsersList(filter : UserList) {
+        let skip = (filter.page - 1) * filter.limit;
+        return this.usersRepository.usersList(skip ,filter.limit, filter.fullname);
     }
 
     msToTime(duration) {

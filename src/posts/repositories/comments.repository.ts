@@ -71,7 +71,14 @@ export class CommentsRepository extends Repository<PostsComments>{
 
         return camelcaseKeys(await getConnection().query(`
             SELECT 
-                ${columns}
+                ${columns},
+                array_to_json(
+                    (
+                        select ARRAY_AGG(
+                            jsonb_build_object('id',id, 'fullname', fullname, 'photoUrl', photo_url)
+                        ) from users where users.id = any(c.tagged_user)
+                    )
+                ) as "users_comments"
             FROM posts_comments c
             INNER JOIN users ON users.id = c.user_id
             WHERE ${where}
