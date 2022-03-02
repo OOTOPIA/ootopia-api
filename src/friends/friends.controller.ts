@@ -51,10 +51,10 @@ export class FriendsController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @Get()
+    @Get("/:userId")
     async searchFriends(
-        @Req() { user }
+        @Param('userId') userId: string
     ) {
-        return await this.friendService.searchFriends(user.id)
+        return await this.friendService.searchFriends(userId)
     }
  }

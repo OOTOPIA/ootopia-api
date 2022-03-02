@@ -3,6 +3,7 @@ import { FriendRequestsRepository } from './repositories/friends.repository';
 import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
 import { FriendsCircle } from './entities/friends.entity';
+import { Users } from '../users/users.entity';
 
 @Injectable()
 export class FriendsService {
@@ -34,7 +35,12 @@ export class FriendsService {
         return this.friendRequestsRepository.removeFriend(userId, friendId)
     }
 
-    async searchFriends(userId: string): Promise<FriendsCircle[]> {
-        return this.friendRequestsRepository.searchFriends(userId)
+    async searchFriends(userId: string){
+        return (await this.friendRequestsRepository.searchFriends(userId)).map(value => {
+            delete value.updated_at
+            delete value.friend_id
+            delete value.user_id
+            return value
+        })
     }
 }
