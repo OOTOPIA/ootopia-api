@@ -22,7 +22,7 @@ export class FriendsService {
             {
                 token: device.deviceToken,
                 data: {
-                    type: 'friends-request',
+                    type: 'new-follower',
                 }
             }
         ));

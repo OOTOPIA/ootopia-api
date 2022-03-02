@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { FriendsCircle } from '../entities/friends.entity';
+import * as camelcaseKeys from 'camelcase-keys';
 
 
 @Injectable()
@@ -46,7 +47,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
     }
 
     async searchFriends(userId: string): Promise<QueryFriends[]> {
-        let queryTest: QueryFriends[] = await this.query(`
+        let queryTest: QueryFriends[] = camelcaseKeys(await this.query(`
         select fc.*,
         array_to_json(
             (
@@ -66,7 +67,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         inner join users as f on f.id = fc.friend_id
         left join users_addresses ua on ua.id = f.address_id
         left join cities c on c.id = ua.city_id
-        where fc.user_id = $1`, [userId])
+        where fc.user_id = $1`, [userId]))
         return queryTest
     }
 }
