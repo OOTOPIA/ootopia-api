@@ -11,7 +11,7 @@ export class UsersDeviceTokenService {
       return this.usersDeviceTokenRepository.createOrUpdateTokenDevice(userId, deviceToken, deviceId);
   }
 
-  getByUserId(id : string) {
+  getByUsersId(id : string|string[]) {
     return this.usersDeviceTokenRepository.getDevicesTokenByUserId(id);
   }
 }

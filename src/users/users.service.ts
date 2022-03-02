@@ -420,7 +420,7 @@ export class UsersService {
     async updateAccumulatedOOZInDeviceUser(userId: string) {
         let userDailyGoal = await this.getUserDailyGoalStats(userId);
         Object.keys(userDailyGoal).forEach( key => userDailyGoal[key] = typeof userDailyGoal[key] == 'string' ? userDailyGoal[key] : ""+userDailyGoal[key])
-        let allTokensDevices = await this.usersDeviceTokenService.getByUserId(userId);
+        let allTokensDevices = await this.usersDeviceTokenService.getByUsersId(userId);
         let messagesNotification = allTokensDevices.map( device => (
             {
                 token: device.deviceToken,
