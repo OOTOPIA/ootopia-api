@@ -445,6 +445,7 @@ export class UsersService {
 
     async getUsersList(filter : FilterSearchUsers) {
         let skip = (filter.page - 1) * filter.limit;
+        filter.limit = filter.limit  > 100 ? 100 : filter.limit;
         return this.usersRepository.usersList(skip ,filter.limit, filter.fullname);
     }
 
