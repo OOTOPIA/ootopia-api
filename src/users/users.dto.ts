@@ -16,17 +16,6 @@ export enum JSONType {
     encoder = 'encoder'
 } 
 
-export class UserList {
-    @ApiProperty({ required: true, example : 50})
-    limit : number;
-
-    @ApiProperty({ required: true, example : 1})
-    page : number;
-
-    @ApiProperty({ required: true, example : "joao"})
-    fullname : string;
-}
-
 export class CreateUserDto {
 
     @ApiProperty({ required: true})
@@ -159,6 +148,20 @@ export class RecoverPasswordDto {
     @ApiProperty({ required: false, enum: ['ptbr', 'en'] })
     language : string;
   
+}
+
+export class FilterSearchUsers {
+    @ApiProperty({ required: true, example : 1 })
+    @IsNotEmpty()
+    page : number;
+
+    @ApiProperty({ required: true, example : 50 })
+    @IsNotEmpty()
+    limit : number;
+
+    @ApiProperty({ required: true, example : "joão" })
+    @IsNotEmpty()
+    fullname: string;
 }
 
 export class ResetPasswordDto {

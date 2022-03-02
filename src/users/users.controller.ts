@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, UserList } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, FilterSearchUsers } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -118,22 +118,18 @@ export class UsersController {
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'get list of users' })
-    @ApiParam({ name : "page", type: "number", description: "1" })
-    @ApiParam({ name : "limit", type: "number", description: "2" })
-    @ApiParam({ name : "fullname", type: "string", description: "Jão" })
+    @ApiQuery({ name : "page", type: "number", description: "1" })
+    @ApiQuery({ name : "limit", type: "number", description: "2" })
+    @ApiQuery({ name : "fullname", type: "string", description: "Jão" })
     @ApiResponse({ status: 200, description: 'Successfully logged in '})
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @Get('/list/:page/:limit/:fullname')
+    @Get('/search')
     @HttpCode(200)
-    async getUsersList(@Param('limit') limit, @Param('page') page, @Param('fullname') fullname) {
+    async getUsersList(@Query() filter: FilterSearchUsers) {
         try {
-            return this.usersService.getUsersList({
-                limit,
-                page,
-                fullname
-            });
+            return this.usersService.getUsersList(filter);
         } catch (error) {
             new ErrorHandling(error);
         }
