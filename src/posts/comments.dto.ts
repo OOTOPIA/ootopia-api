@@ -65,6 +65,9 @@ export class CommentsListDto {
     createdAt : Date;
 
     @ApiProperty()
+    taggedUser: any;
+
+    @ApiProperty()
     updatedAt : Date;
 
 }

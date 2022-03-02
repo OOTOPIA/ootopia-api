@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
+import { EntityRepository, Repository, UpdateResult, getConnection, ILike } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { Users } from "./users.entity";
 
@@ -162,6 +162,16 @@ export class UsersRepository extends Repository<Users>{
             return null;
         }
 
+    }
+
+    async usersList(skip: number, limit: number, fullname: string) {
+        return this.find({
+            select: [ "id","email","fullname", "photoUrl"],
+            where: { fullname: ILike(`%${fullname}%`)},
+            skip: skip,
+            take: limit,
+            order: {createdAt: "ASC"}
+        });
     }
 
     async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {

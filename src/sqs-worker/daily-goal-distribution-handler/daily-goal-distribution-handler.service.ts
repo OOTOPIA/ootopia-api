@@ -53,7 +53,7 @@ export class DailyGoalDistributionHandlerService {
             let userDailyGoalStats = await this.usersService.getUserDailyGoalStats(userId, dailyGoalStartTime, dailyGoalEndTime);
             
             await this.walletTransfersService.transferTodaysGameCompleted(userId, userDailyGoalStats.dailyGoalAchieved == false);
-            let allTokensDevices = await this.usersDeviceTokenService.getByUserId(userId);
+            let allTokensDevices = await this.usersDeviceTokenService.getByUsersId(userId);
             let messagesNotification = allTokensDevices.map( device => (
                 {
                     token: device.deviceToken,

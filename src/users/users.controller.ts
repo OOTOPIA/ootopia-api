@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType } from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, FilterSearchUsers } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -110,6 +110,26 @@ export class UsersController {
     async sharedResetPassword() {
         try {
             return this.usersService.getRecoverPasswordLink();
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiOperation({ summary: 'get list of users' })
+    @ApiQuery({ name : "page", type: "number", description: "1" })
+    @ApiQuery({ name : "limit", type: "number", description: "2" })
+    @ApiQuery({ name : "fullname", type: "string", description: "Jão" })
+    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Get('/search')
+    @HttpCode(200)
+    async getUsersList(@Query() filter: FilterSearchUsers) {
+        try {
+            return this.usersService.getUsersList(filter);
         } catch (error) {
             new ErrorHandling(error);
         }
