@@ -32,7 +32,7 @@ export class CommentsService {
             data: {
               type: "user-tagged-in-comment",
               postId: post.id,
-              photoUrl : post.imageUrl,
+              photoUrl : post.thumbnailUrl,
               commentId : comment.id,
               usersName: <any>JSON.stringify([userComment.fullname])
             }

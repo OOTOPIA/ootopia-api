@@ -6,6 +6,9 @@ export class CreateCommentsDto {
 
     @ApiProperty({ required: true, type: "string" })
     text : string;
+    
+    @ApiProperty({ required: false })
+    taggedUser: string[]; 
 
 }
 
