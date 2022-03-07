@@ -23,6 +23,7 @@ import { MarketPlaceProducts } from 'src/market-place/entities/market-place-prod
 import { LearningTrackCompletedChapters } from 'src/learning-tracks/entities/learning-track-completed-chapters.entity';
 import { PostsUsersRewarded } from 'src/posts/entities/posts-users-rewarded.entity';
 import { UsersDeviceToken } from 'src/users-device-token/entities/users-device-token.entity';
+import { FriendsCircle } from '../friends/entities/friends.entity';
 
 require('dotenv').config();
 
@@ -92,6 +93,7 @@ class ConfigService {
           MarketPlaceProducts,
           LearningTrackCompletedChapters,
           PostsUsersRewarded,
+          FriendsCircle
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
