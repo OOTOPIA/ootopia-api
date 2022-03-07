@@ -4,7 +4,7 @@ import { NotificationMessagesService } from '../notification-messages/notificati
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
 import { FriendsCircle } from './entities/friends.entity';
 import { Users } from '../users/users.entity';
-import { FriendPagingByUser, FriendRequestPagingByUser } from './dto/friends.dto';
+import { FriendPagingByUser, ServiceFriendPagingByUser } from './dto/friends.dto';
 
 @Injectable()
 export class FriendsService {
@@ -36,21 +36,15 @@ export class FriendsService {
         return this.friendRequestsRepository.removeFriend(userId, friendId)
     }
 
-    async searchFriends(userId: string){
-        return (await this.friendRequestsRepository.searchFriends(userId)).map(value => {
-            delete value.updated_at
-            delete value.friend_id
-            delete value.user_id
-            return value
-        })
-    }
-
-    async searchFriendsByUser(userId: string, filter: FriendRequestPagingByUser){
+    async searchNotFriends(filter: ServiceFriendPagingByUser){
         let page: FriendPagingByUser = {
-            limit: filter.limit,
-            skip: (filter.limit - 1)  * filter.page
+            limit: +filter.limit,
+            skip: +filter.limit * +filter.page,
+            userId: filter.userId,
+            name: filter.name
         };
         page.limit = page.limit > 100 ? 100 : page.limit;
+
         if (page.skip < 0 || (page.skip == 0 && page.limit == 0)) {
             throw new HttpException(
                 {
@@ -58,9 +52,31 @@ export class FriendsService {
                   error: "Page not found",
                 },
                 404
-              );
+            );
         }
         
-        return this.friendRequestsRepository.searchFriendsByUserId(userId, page);
+        return this.friendRequestsRepository.searchNotFriendsByUser(page);
+    }
+
+    async searchFriendsByUser(filter: ServiceFriendPagingByUser){
+        let page: FriendPagingByUser = {
+            limit: +filter.limit,
+            skip: +filter.limit * +filter.page,
+            userId: filter.userId,
+            name: null
+        };
+        page.limit = page.limit > 100 ? 100 : page.limit;
+
+        if (page.skip < 0 || (page.skip == 0 && page.limit == 0)) {
+            throw new HttpException(
+                {
+                  status: 404,
+                  error: "Page not found",
+                },
+                404
+            );
+        }
+        
+        return this.friendRequestsRepository.searchFriends(page);
     }
 }

@@ -47,41 +47,75 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             .execute();
     }
 
-    async searchFriends(userId: string): Promise<QueryFriends[]> {
-        let queryFriends: QueryFriends[] = camelcaseKeys(await this.query(`
-        select fc.*,
-        array_to_json(
-            (
-                select ARRAY_AGG(
-                    jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+    async searchFriends(filter: FriendPagingByUser) {
+        const [friends, total ] = await Promise.all([
+            camelcaseKeys( 
+                await this.query(`
+                select
+                array_to_json(
+                    (
+                        select ARRAY_AGG(
+                            jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+                        )
+                    from (
+                        select "type",thumbnail_url 
+                        from posts pt where pt.user_id = fc.friend_id order by pt.created_at desc limit 5
+                    ) as "thumbs")
+                ) as "friendsThumbs",
+                f.id,
+                f.fullname,
+                f.photo_url,
+                c.city , c.state , c.country
+                from friends_circle fc
+                inner join users as f on f.id = fc.friend_id
+                left join users_addresses ua on ua.id = f.address_id
+                left join cities c on c.id = ua.city_id
+                where fc.user_id = $1 
+                offset $2 limit $3`, [filter.userId, filter.skip, filter.limit]
                 )
-            from (
-                select "type",thumbnail_url 
-                from posts pt where pt.user_id = fc.friend_id order by pt.created_at desc limit 5
-            ) as "thumbs")
-        ) as "friendsThumbs",
-        f.id,
-        f.fullname,
-        f.photo_url,
-        c.city , c.state , c.country
-        from friends_circle fc
-        inner join users as f on f.id = fc.friend_id
-        left join users_addresses ua on ua.id = f.address_id
-        left join cities c on c.id = ua.city_id
-        where fc.user_id = $1`, [userId]))
-        return queryFriends
+            ),
+            this.count({
+                where: { userId: filter.userId}
+            }),
+        ])
+        return {
+            total,
+            friends
+        };
     }
     
-    async searchFriendsByUserId(userId: string, page: FriendPagingByUser) {
-        return this.find({
-            where: {
-                userId
-            },
-            relations: ['friend'],
-            skip: page.skip,
-            take: page.limit,
-            order: {createdAt: "ASC"}
-        });
+    async searchNotFriendsByUser(filter: FriendPagingByUser) {
+        return camelcaseKeys( 
+            await this.query(`
+            select
+                array_to_json(
+                    (
+                        select ARRAY_AGG(
+                            jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+                        )
+                        from (
+                            select "type",thumbnail_url 
+                            from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
+                        )
+                    as "thumbs")
+                ) as "friendsThumbs",
+                u.id,
+                u.fullname,
+                u.photo_url,
+                u.created_at ,
+                c.city , c.state , c.country
+            from users u
+            left join friends_circle fc on u.id = fc.user_id
+            left join users_addresses ua on ua.id = u.id
+            left join cities c on c.id = ua.city_id
+            where 
+                fc.id is null and
+                u.id != $1 and 
+                (u.fullname ilike($2) or u.email ilike($2))
+            order by u.created_at desc
+            offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit]
+            )
+        );
     }
 }
 type QueryFriends =  {
