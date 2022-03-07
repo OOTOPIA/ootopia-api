@@ -47,7 +47,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
     }
 
     async searchFriends(userId: string): Promise<QueryFriends[]> {
-        let queryTest: QueryFriends[] = camelcaseKeys(await this.query(`
+        let queryFriends: QueryFriends[] = camelcaseKeys(await this.query(`
         select fc.*,
         array_to_json(
             (
@@ -68,7 +68,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         left join users_addresses ua on ua.id = f.address_id
         left join cities c on c.id = ua.city_id
         where fc.user_id = $1`, [userId]))
-        return queryTest
+        return queryFriends
     }
 }
 type QueryFriends =  {
