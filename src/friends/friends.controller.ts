@@ -1,9 +1,11 @@
 import { Controller, Post, Put, Query, Req, Param, Delete, UseInterceptors, UseGuards, Get } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { HttpResponseDto } from '../config/http-response.dto';
 import { JwtOptionalAuthGuard } from '../auth/jwt-optional-auth.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FriendRequestPagingByUser } from './dto/friends.dto';
 
 @UseGuards(JwtOptionalAuthGuard)
 @Controller('friends-request')
@@ -41,6 +43,25 @@ export class FriendsController {
         @Param('friendId') friendId: string
     ) {
         return await this.friendService.removeFriend(user.id, friendId)
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('friends')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'List all friends by user' })
+    @ApiQuery({ name : "page", type: "number", description: "1" })
+    @ApiQuery({ name : "limit", type: "number", description: "2" })
+    @ApiResponse({ status: 200, description: 'Successfully List'})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Get("/friends-by-user")
+    async getFriendsByUser(
+        @Req() { user },
+        @Query() filter: FriendRequestPagingByUser
+    ) {
+        return this.friendService.searchFriendsByUser(user.id, filter);
     }
 
     @UseInterceptors(SentryInterceptor)

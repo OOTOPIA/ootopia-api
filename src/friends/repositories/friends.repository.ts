@@ -2,6 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { FriendsCircle } from '../entities/friends.entity';
 import * as camelcaseKeys from 'camelcase-keys';
+import { FriendPagingByUser } from "../dto/friends.dto";
 
 
 @Injectable()
@@ -69,6 +70,18 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         left join cities c on c.id = ua.city_id
         where fc.user_id = $1`, [userId]))
         return queryFriends
+    }
+    
+    async searchFriendsByUserId(userId: string, page: FriendPagingByUser) {
+        return this.find({
+            where: {
+                userId
+            },
+            relations: ['friend'],
+            skip: page.skip,
+            take: page.limit,
+            order: {createdAt: "ASC"}
+        });
     }
 }
 type QueryFriends =  {
