@@ -2,7 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { FriendsCircle } from '../entities/friends.entity';
 import * as camelcaseKeys from 'camelcase-keys';
-import { FriendSearchParameters, NonFriendsSearchParameters } from "../dto/friends.dto";
+import { FriendSearchParametersDto, NonFriendsSearchParametersDto } from "../dto/friends.dto";
 
 
 @Injectable()
@@ -47,7 +47,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             .execute();
     }
 
-    async searchFriends(filter: FriendSearchParameters) {
+    async searchFriends(filter: FriendSearchParametersDto) {
         let order = this.orderByQueryParams(filter);
         const [friends, total ] = await Promise.all([
             camelcaseKeys( 
@@ -86,7 +86,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         };
     }
     
-    async searchNotFriendsByUser(filter: NonFriendsSearchParameters) {
+    async searchNotFriendsByUser(filter: NonFriendsSearchParametersDto) {
         let order = this.orderByQueryParams(filter);
         return camelcaseKeys( 
             await this.query(`
