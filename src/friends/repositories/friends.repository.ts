@@ -2,7 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
 import { FriendsCircle } from '../entities/friends.entity';
 import * as camelcaseKeys from 'camelcase-keys';
-import { FriendPagingByUser } from "../dto/friends.dto";
+import { FriendSearchParameters, NonFriendsSearchParameters } from "../dto/friends.dto";
 
 
 @Injectable()
@@ -47,7 +47,8 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             .execute();
     }
 
-    async searchFriends(filter: FriendPagingByUser) {
+    async searchFriends(filter: FriendSearchParameters) {
+        let order = this.orderByQueryParams(filter);
         const [friends, total ] = await Promise.all([
             camelcaseKeys( 
                 await this.query(`
@@ -71,6 +72,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 left join users_addresses ua on ua.id = f.address_id
                 left join cities c on c.id = ua.city_id
                 where fc.user_id = $1 
+                order by f.${order.orderBy} ${order.sortingType}
                 offset $2 limit $3`, [filter.userId, filter.skip, filter.limit]
                 )
             ),
@@ -84,7 +86,8 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         };
     }
     
-    async searchNotFriendsByUser(filter: FriendPagingByUser) {
+    async searchNotFriendsByUser(filter: NonFriendsSearchParameters) {
+        let order = this.orderByQueryParams(filter);
         return camelcaseKeys( 
             await this.query(`
             select
@@ -105,19 +108,46 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 u.created_at ,
                 c.city , c.state , c.country
             from users u
-            left join friends_circle fc on u.id = fc.user_id
             left join users_addresses ua on ua.id = u.id
             left join cities c on c.id = ua.city_id
             where 
-                fc.id is null and
+                not exists(select 1 from friends_circle fc where fc.user_id = $1 and fc.friend_id = u.id) and
                 u.id != $1 and 
-                (u.fullname ilike($2) or u.email ilike($2))
-            order by u.created_at desc
+                (
+                    u.fullname ilike($2) or
+                    u.email ilike($2)
+                )
+            order by u.${order.orderBy} ${order.sortingType}
             offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit]
             )
         );
     }
+
+    orderByQueryParams(filter) {
+        let orderBy, sortingType;
+        switch (filter.orderBy) {
+            case 'name':
+                orderBy = 'fullname'
+                break;
+            default:
+                orderBy = 'created_at'
+                break;
+        }
+        switch (filter.sortingType) {
+            case 'asc':
+                sortingType = 'asc';
+                break;
+            default:
+                sortingType = 'desc';
+                break;
+        }
+        return {
+            orderBy,
+            sortingType
+        }
+    }
 }
+
 type QueryFriends =  {
     id: string;
     friend_id: string;

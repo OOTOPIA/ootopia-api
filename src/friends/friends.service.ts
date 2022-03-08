@@ -2,9 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { FriendRequestsRepository } from './repositories/friends.repository';
 import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
-import { FriendsCircle } from './entities/friends.entity';
-import { Users } from '../users/users.entity';
-import { FriendPagingByUser, ServiceFriendPagingByUser } from './dto/friends.dto';
+import { FriendSearchParameters, FriendSearchService, NonFriendsLookupService, NonFriendsSearchParameters } from './dto/friends.dto';
 
 @Injectable()
 export class FriendsService {
@@ -36,12 +34,14 @@ export class FriendsService {
         return this.friendRequestsRepository.removeFriend(userId, friendId)
     }
 
-    async searchNotFriends(filter: ServiceFriendPagingByUser){
-        let page: FriendPagingByUser = {
+    async searchNotFriends(filter: NonFriendsLookupService){
+        let page: NonFriendsSearchParameters = {
             limit: +filter.limit,
             skip: +filter.limit * +filter.page,
             userId: filter.userId,
-            name: filter.name
+            name: filter.name || '',
+            orderBy: filter.orderBy,
+            sortingType: filter.sortingType,
         };
         page.limit = page.limit > 100 ? 100 : page.limit;
 
@@ -58,12 +58,13 @@ export class FriendsService {
         return this.friendRequestsRepository.searchNotFriendsByUser(page);
     }
 
-    async searchFriendsByUser(filter: ServiceFriendPagingByUser){
-        let page: FriendPagingByUser = {
+    async searchFriendsByUser(filter: FriendSearchService){
+        let page: FriendSearchParameters = {
             limit: +filter.limit,
             skip: +filter.limit * +filter.page,
             userId: filter.userId,
-            name: null
+            orderBy: filter.orderBy,
+            sortingType: filter.sortingType,
         };
         page.limit = page.limit > 100 ? 100 : page.limit;
 
