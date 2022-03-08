@@ -446,6 +446,17 @@ export class UsersService {
     async getUsersList(filter : FilterSearchUsers) {
         let skip = (filter.page - 1) * filter.limit;
         filter.limit = filter.limit  > 100 ? 100 : filter.limit;
+
+        if (skip < 0 || (skip == 0 && filter.limit == 0)) {
+            throw new HttpException(
+                {
+                  status: 404,
+                  error: "Page not found",
+                },
+                404
+              );
+        }
+        
         return this.usersRepository.usersList(skip ,filter.limit, filter.fullname);
     }
 
