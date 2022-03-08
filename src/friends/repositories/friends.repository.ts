@@ -69,7 +69,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 c.city , c.state , c.country
                 from friends_circle fc
                 inner join users as f on f.id = fc.friend_id
-                left join users_addresses ua on ua.id = f.address_id
+                left join addresses ua on ua.id = f.address_id
                 left join cities c on c.id = ua.city_id
                 where fc.user_id = $1 
                 order by f.${order.orderBy} ${order.sortingType}
@@ -108,8 +108,8 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 u.created_at ,
                 c.city , c.state , c.country
             from users u
-            left join users_addresses ua on ua.id = u.id
-            left join cities c on c.id = ua.city_id
+            left join addresses a on a.id = u.address_id
+            left join cities c on c.id = a.city_id
             where 
                 not exists(select 1 from friends_circle fc where fc.user_id = $1 and fc.friend_id = u.id) and
                 u.id != $1 and 
