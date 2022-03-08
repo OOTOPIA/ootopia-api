@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { FriendRequestsRepository } from './repositories/friends.repository';
 import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
-import { FriendSearchParameters, FriendSearchService, NonFriendsLookupService, NonFriendsSearchParameters } from './dto/friends.dto';
+import { FriendSearchParametersDto, FriendSearchServiceDto, NonFriendsLookupServiceDto, NonFriendsSearchParametersDto } from './dto/friends.dto';
 
 @Injectable()
 export class FriendsService {
@@ -34,8 +34,8 @@ export class FriendsService {
         return this.friendRequestsRepository.removeFriend(userId, friendId)
     }
 
-    async searchNotFriends(filter: NonFriendsLookupService){
-        let page: NonFriendsSearchParameters = {
+    async searchNotFriends(filter: NonFriendsLookupServiceDto){
+        let page: NonFriendsSearchParametersDto = {
             limit: +filter.limit,
             skip: +filter.limit * +filter.page,
             userId: filter.userId,
@@ -58,8 +58,8 @@ export class FriendsService {
         return this.friendRequestsRepository.searchNotFriendsByUser(page);
     }
 
-    async searchFriendsByUser(filter: FriendSearchService){
-        let page: FriendSearchParameters = {
+    async searchFriendsByUser(filter: FriendSearchServiceDto){
+        let page: FriendSearchParametersDto = {
             limit: +filter.limit,
             skip: +filter.limit * +filter.page,
             userId: filter.userId,

@@ -37,7 +37,7 @@ export class SearchNotFriends {
     sortingType: string;
 }
 
-export class NonFriendsLookupService {
+export class NonFriendsLookupServiceDto {
     @ApiProperty({ required: true, example : 1 })
     @IsNotEmpty()
     page : number;
@@ -59,7 +59,7 @@ export class NonFriendsLookupService {
     sortingType: string;
 }
 
-export class FriendSearchService {
+export class FriendSearchServiceDto {
     @ApiProperty({ required: true, example : 1 })
     @IsNotEmpty()
     page : number;
@@ -78,7 +78,7 @@ export class FriendSearchService {
     sortingType: string;
 }
 
-export class FriendSearchParameters {
+export class FriendSearchParametersDto {
     @ApiProperty({ required: true, example : 1 })
     @IsNotEmpty()
     skip : number;
@@ -98,7 +98,7 @@ export class FriendSearchParameters {
 
 }
 
-export class NonFriendsSearchParameters {
+export class NonFriendsSearchParametersDto {
     @ApiProperty({ required: true, example : 1 })
     @IsNotEmpty()
     skip : number;
