@@ -49,6 +49,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
 
     async searchFriends(filter: FriendSearchParametersDto) {
         let order = this.orderByQueryParams(filter);
+        order.orderBy = order.orderBy == 'fullname' ? 'f.fullname' : 'fc.created_at';
         const [friends, total ] = await Promise.all([
             camelcaseKeys( 
                 await this.query(`
@@ -72,7 +73,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 left join addresses ua on ua.id = f.address_id
                 left join cities c on c.id = ua.city_id
                 where fc.user_id = $1 
-                order by f.${order.orderBy} ${order.sortingType}
+                order by ${order.orderBy} ${order.sortingType}
                 offset $2 limit $3`, [filter.userId, filter.skip, filter.limit]
                 )
             ),
