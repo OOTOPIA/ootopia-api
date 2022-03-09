@@ -1,16 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
 
-export class CreatePostCommentReplyDto {
+export class CreatePostCommentRepliesDto {
     
     @ApiProperty({ required: true, example : '87945473-616c-4fe5-bfab-ea9f83155d85' })
+    @IsNotEmpty()
     commentId : string;
 
     @ApiProperty({ required: true, example : 1 })
     @IsNotEmpty()
-    page : number;
+    text : string;
 
-    @ApiProperty({ required: true, example : 50 })
-    @IsNotEmpty()
-    limit : number;
+    @ApiProperty({ required: false, nullable: true, isArray: true })
+    taggedUser : string;
 }

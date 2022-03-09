@@ -28,7 +28,7 @@ import { NotificationMessagesService } from './notification-messages/notificatio
 import { UsersDeviceTokenModule } from './users-device-token/users-device-token.module';
 import { LinksService } from './links/links.service';
 import { AppleAppSiteAssociationModule } from './apple-app-site-association/apple-app-site-association.module';
-import { PostCommentReplyModule } from './post-comment-reply/post-comment-reply.module';
+import { PostCommentRepliesModule } from './post-comment-replies/post-comment-replies.module';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -103,7 +103,7 @@ const sqs = new AWS.SQS({
     UsersDeviceTokenModule,
     AppleAppSiteAssociationModule,
     FriendsModule,
-    PostCommentReplyModule
+    PostCommentRepliesModule
   ],
   controllers: [ AppController ],
   providers: [AppService, CronService, NotificationMessagesService, LinksService],

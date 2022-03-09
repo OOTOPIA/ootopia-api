@@ -14,16 +14,9 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class PostCommentReply extends BaseEntity {
+export class PostCommentReplies extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id : string;
-
-    @OneToOne(type => Posts, post => post.id)
-    @JoinColumn({ name: "post_id" })
-    post : Posts;
-
-    @Column({ name: "post_id", nullable : false, type: "uuid" })
-    postId: Posts;
 
     @OneToOne(type => PostsComments, post => post.id)
     @JoinColumn({ name: "comment_id" })
@@ -32,14 +25,14 @@ export class PostCommentReply extends BaseEntity {
     @Column({ name: "comment_id", nullable : false, type: "uuid" })
     commentId: PostsComments;
 
-    @Column({ nullable : true, type: 'varchar'})
+    @Column({ nullable : false, type: 'varchar'})
     text : string;
 
-    @Column({ name: "tagged_user", nullable : false, array: true, type: "uuid" })
+    @Column({ name: "tagged_user", nullable : true, array: true, type: "uuid" })
     taggedUser: Users[];
 
-    @Column({ nullable : true, type: 'boolean', default: () => "false" })
-    deleted : boolean;
+    @Column({ nullable : true })
+    deleted : Date;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

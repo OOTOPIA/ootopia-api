@@ -24,7 +24,7 @@ import { LearningTrackCompletedChapters } from 'src/learning-tracks/entities/lea
 import { PostsUsersRewarded } from 'src/posts/entities/posts-users-rewarded.entity';
 import { UsersDeviceToken } from 'src/users-device-token/entities/users-device-token.entity';
 import { FriendsCircle } from '../friends/entities/friends.entity';
-import { PostCommentReply } from 'src/post-comment-reply/entities/post-comment-reply.entity';
+import { PostCommentReplies } from 'src/post-comment-replies/entities/post-comment-replies.entity';
 
 require('dotenv').config();
 
@@ -77,7 +77,7 @@ class ConfigService {
           PostsCommentsCount,
           PostsWatchedVideotime,
           PostsTimelineViewTime,
-          PostCommentReply,
+          PostCommentReplies,
           InterestsTags,
           InterestsTagsUsers,
           InterestsTagsPosts,
