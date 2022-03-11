@@ -138,6 +138,14 @@ export class Friends {
 
     @ApiProperty({ required: true, type: CreatedUserDto })
     friend: CreatedUserDto;
+
+    @ApiProperty({ required: true, example: true })
+    isFriend: boolean;
+}
+
+export class IsFriend {
+    @ApiProperty({ required: true, example: true })
+    isFriend: boolean;
 }
 
 export class FriendByUser {
