@@ -95,6 +95,46 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         );
     }
 
+    async friendsByUser(filter: FriendSearchParametersDto) {
+        let order = this.orderByQueryParams(filter);
+        order.orderBy = order.orderBy == 'fullname' ? 'f.fullname' : 'fc.created_at';
+        const [friends, total ] = await Promise.all([
+            camelcaseKeys( 
+                await this.query(`
+                select
+                array_to_json(
+                    (
+                        select ARRAY_AGG(
+                            jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+                        )
+                    from (
+                        select "type",thumbnail_url 
+                        from posts pt where pt.user_id = fc.friend_id order by pt.created_at desc limit 5
+                    ) as "thumbs")
+                ) as "friendsThumbs",
+                f.id,
+                f.fullname,
+                f.photo_url,
+                c.city , c.state , c.country
+                from friends_circle fc
+                inner join users as f on f.id = fc.friend_id
+                left join addresses ua on ua.id = f.address_id
+                left join cities c on c.id = ua.city_id
+                where fc.user_id = $1 
+                order by ${order.orderBy} ${order.sortingType}
+                offset $2 limit $3`, [filter.userId, filter.skip, filter.limit]
+                )
+            ),
+            this.count({
+                where: { userId: filter.userId}
+            }),
+        ])
+        return {
+            total,
+            friends
+        };
+    }
+
     orderByQueryParams(filter) {
         let orderBy, sortingType;
         switch (filter.orderBy) {

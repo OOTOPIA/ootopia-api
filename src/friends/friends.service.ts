@@ -71,4 +71,27 @@ export class FriendsService {
         
         return { isFriend: !!(await this.friendRequestsRepository.isFriend(friendId, userId))};
     }
+
+    async friendsByUser(filter: FriendSearchServiceDto){
+        let page: FriendSearchParametersDto = {
+            limit: +filter.limit,
+            skip: +filter.limit * +filter.page,
+            userId: filter.userId,
+            orderBy: filter.orderBy,
+            sortingType: filter.sortingType,
+        };
+        page.limit = page.limit > 100 ? 100 : page.limit;
+
+        if (page.skip < 0 || (page.skip == 0 && page.limit == 0)) {
+            throw new HttpException(
+                {
+                  status: 404,
+                  error: "Page not found",
+                },
+                404
+            );
+        }
+
+        return this.friendRequestsRepository.friendsByUser(page);
+    }
 }
