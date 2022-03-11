@@ -1,3 +1,4 @@
+import { User } from '@sentry/node';
 import { PostsComments } from 'src/posts/entities/comments.entity';
 import { Posts } from 'src/posts/posts.entity';
 import { Users } from 'src/users/users.entity';
@@ -18,18 +19,19 @@ export class PostCommentReplies extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id : string;
 
-    @OneToOne(type => PostsComments, post => post.id)
+    @ManyToOne(type => PostsComments, post => post.id)
     @JoinColumn({ name: "comment_id" })
-    comment: PostsComments;
-
-    @Column({ name: "comment_id", nullable : false, type: "uuid" })
     commentId: PostsComments;
 
+    @Column({ name: "tagged_user_ids", nullable : true, array: true, type: "uuid" })
+    taggedUserIds: Users[];
+    
     @Column({ nullable : false, type: 'varchar'})
     text : string;
-
-    @Column({ name: "tagged_user", nullable : true, array: true, type: "uuid" })
-    taggedUser: Users[];
+    
+    @ManyToOne(type => Users, users => users.id)
+    @JoinColumn({ name: "comment_user_id" })
+    commentUserId: User;
 
     @Column({ nullable : true })
     deleted : Date;

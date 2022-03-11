@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreatePostCommentRepliesDto } from './dto/create-post-comment-replies.dto';
+import { CreatePostCommentRepliesDto, CreatePostCommentRepliesServiceDto } from './dto/create-post-comment-replies.dto';
 import { GetPostCommentRepliesDto, GetPostCommentRepliesParamsDto } from './dto/get-post-comment-replies.dto';
 import { PostCommentRepliesRepository } from './post-comment-replies.repository';
 
@@ -8,11 +8,11 @@ export class PostCommentRepliesService {
   constructor(
     private readonly postCommentRepliesRepository: PostCommentRepliesRepository
   ){}
-  create(createPostCommentReply: CreatePostCommentRepliesDto) {
+  create(createPostCommentReply: CreatePostCommentRepliesServiceDto) {
     return this.postCommentRepliesRepository.createCommentReply(createPostCommentReply);
   }
 
-  findRepliesByComment(filter: GetPostCommentRepliesDto) {
+  async findRepliesByComment(filter: GetPostCommentRepliesDto) {
     let page: GetPostCommentRepliesParamsDto = {
       commentId: filter.commentId,
       limit: +filter.limit,
@@ -31,7 +31,10 @@ export class PostCommentRepliesService {
     }
     console.log('page', page);
     
-    return this.postCommentRepliesRepository.findRepliesByComment(page);
+    let oi = await this.postCommentRepliesRepository.findRepliesByComment(page);
+    console.log(oi);
+    
+    return oi
   }
 
   findOne(id: number) {

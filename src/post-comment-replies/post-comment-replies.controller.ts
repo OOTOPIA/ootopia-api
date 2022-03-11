@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseInterceptors, UseGuards, Query, Req } from '@nestjs/common';
 import { PostCommentRepliesService } from './post-comment-replies.service';
 import { CreatePostCommentRepliesDto } from './dto/create-post-comment-replies.dto';
 import { SentryInterceptor } from 'src/interceptors/sentry.interceptor';
@@ -22,8 +22,8 @@ export class PostCommentRepliesController {
   @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPostCommentReplyDto: CreatePostCommentRepliesDto) {
-    return this.postCommentReplyService.create(createPostCommentReplyDto);
+  create(@Req() { user },@Body() createPostCommentReplyDto: CreatePostCommentRepliesDto) {
+    return this.postCommentReplyService.create({...createPostCommentReplyDto, commentUserId: user.id});
   }
 
   @UseInterceptors(SentryInterceptor)
