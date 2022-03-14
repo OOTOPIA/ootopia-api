@@ -8,8 +8,10 @@ export class PostCommentRepliesService {
   constructor(
     private readonly postCommentRepliesRepository: PostCommentRepliesRepository
   ){}
-  create(createPostCommentReply: CreatePostCommentRepliesServiceDto) {
-    return this.postCommentRepliesRepository.createCommentReply(createPostCommentReply);
+  async create(createPostCommentReply: CreatePostCommentRepliesServiceDto) {
+    let createCommentReply = await this.postCommentRepliesRepository.createCommentReply(createPostCommentReply);
+    let commentReply = (await this.postCommentRepliesRepository.commentReplyById(createCommentReply.id))[0];
+    return commentReply;
   }
 
   async findRepliesByComment(filter: GetPostCommentRepliesDto) {
