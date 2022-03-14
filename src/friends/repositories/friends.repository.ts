@@ -47,7 +47,66 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             .execute();
     }
 
-    async searchFriends(filter: FriendSearchParametersDto) {
+    async isFriend(friendId, userId) {
+        return this.findOne({
+            where: {
+                userId: userId,
+                friendId: friendId
+            }
+        })
+    }
+    
+    async searchFriends(filter: NonFriendsSearchParametersDto) {
+        let order = this.orderByQueryParams(filter);
+        return {
+            total: (await this.query(`
+            select count(*)::int from users u
+            where 
+            u.id != $1 and 
+            (
+                u.fullname ilike($2) or
+                u.email ilike($2)
+            )`, [filter.userId, `%${filter.name}%`]
+            ))[0].count,
+            friends: camelcaseKeys( 
+                await this.query(`
+                    select
+                    array_to_json(
+                        (
+                            select ARRAY_AGG(
+                                jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+                            )
+                            from (
+                                select "type",thumbnail_url 
+                                from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
+                            )
+                        as "thumbs")
+                    ) as "friendsThumbs",
+                    u.id,
+                    u.fullname,
+                    u.photo_url,
+                    u.created_at,
+                    c.city, 
+                    c.state, 
+                    c.country,
+                    EXISTS(select 1 from friends_circle fc where fc.user_id = $1 and fc.friend_id = u.id) as "is_friend"
+                    from users u
+                    left join addresses a on a.id = u.address_id
+                    left join cities c on c.id = a.city_id
+                    where 
+                        u.id != $1 and 
+                        (
+                            u.fullname ilike($2) or
+                            u.email ilike($2)
+                        )
+                    order by u.${order.orderBy} ${order.sortingType}
+                    offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit]
+                )
+            )
+        };
+    };
+
+    async friendsByUser(filter: FriendSearchParametersDto) {
         let order = this.orderByQueryParams(filter);
         order.orderBy = order.orderBy == 'fullname' ? 'f.fullname' : 'fc.created_at';
         const [friends, total ] = await Promise.all([
@@ -85,43 +144,6 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             total,
             friends
         };
-    }
-    
-    async searchNotFriendsByUser(filter: NonFriendsSearchParametersDto) {
-        let order = this.orderByQueryParams(filter);
-        return camelcaseKeys( 
-            await this.query(`
-            select
-                array_to_json(
-                    (
-                        select ARRAY_AGG(
-                            jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
-                        )
-                        from (
-                            select "type",thumbnail_url 
-                            from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
-                        )
-                    as "thumbs")
-                ) as "friendsThumbs",
-                u.id,
-                u.fullname,
-                u.photo_url,
-                u.created_at ,
-                c.city , c.state , c.country
-            from users u
-            left join addresses a on a.id = u.address_id
-            left join cities c on c.id = a.city_id
-            where 
-                not exists(select 1 from friends_circle fc where fc.user_id = $1 and fc.friend_id = u.id) and
-                u.id != $1 and 
-                (
-                    u.fullname ilike($2) or
-                    u.email ilike($2)
-                )
-            order by u.${order.orderBy} ${order.sortingType}
-            offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit]
-            )
-        );
     }
 
     orderByQueryParams(filter) {

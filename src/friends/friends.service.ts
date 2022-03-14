@@ -34,7 +34,7 @@ export class FriendsService {
         return this.friendRequestsRepository.removeFriend(userId, friendId)
     }
 
-    async searchNotFriends(filter: NonFriendsLookupServiceDto){
+    async searchFriendsByUser(filter: NonFriendsLookupServiceDto){
         let page: NonFriendsSearchParametersDto = {
             limit: +filter.limit,
             skip: +filter.limit * +filter.page,
@@ -55,10 +55,24 @@ export class FriendsService {
             );
         }
         
-        return this.friendRequestsRepository.searchNotFriendsByUser(page);
+        return this.friendRequestsRepository.searchFriends(page);
     }
 
-    async searchFriendsByUser(filter: FriendSearchServiceDto){
+    async isFriend(friendId: string, userId: string ){
+        if (friendId == userId) {
+            throw new HttpException(
+                {
+                  status: 404,
+                  error: "User cannot be friends with himself",
+                },
+                404
+            );
+        }
+        
+        return { isFriend: !!(await this.friendRequestsRepository.isFriend(friendId, userId))};
+    }
+
+    async friendsByUser(filter: FriendSearchServiceDto){
         let page: FriendSearchParametersDto = {
             limit: +filter.limit,
             skip: +filter.limit * +filter.page,
@@ -77,7 +91,7 @@ export class FriendsService {
                 404
             );
         }
-        
-        return this.friendRequestsRepository.searchFriends(page);
+
+        return this.friendRequestsRepository.friendsByUser(page);
     }
 }

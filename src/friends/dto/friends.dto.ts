@@ -138,16 +138,14 @@ export class Friends {
 
     @ApiProperty({ required: true, type: CreatedUserDto })
     friend: CreatedUserDto;
+
+    @ApiProperty({ required: true, example: true })
+    isFriend: boolean;
 }
 
-export class FriendByUser {
-    @ApiProperty({ required: true, example : 1 })
-    @IsNotEmpty()
-    total : number;
-
-    @ApiProperty({ required: true, type: [Friends]})
-    @IsNotEmpty()
-    friends : [Friends];
+export class IsFriend {
+    @ApiProperty({ required: true, example: true })
+    isFriend: boolean;
 }
 
 export class FriendsThumbs {
@@ -183,4 +181,14 @@ export class FriendsWithPosts {
     @ApiProperty({ required: true, example: "Claudio Fake" })
     country: string;
     
+}
+
+export class FriendByUser {
+    @ApiProperty({ required: true, example : 1 })
+    @IsNotEmpty()
+    total : number;
+
+    @ApiProperty({ required: true, type: FriendsWithPosts})
+    @IsNotEmpty()
+    friends : FriendsWithPosts;
 }
