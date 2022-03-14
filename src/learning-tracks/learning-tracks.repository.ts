@@ -46,12 +46,19 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             where += `strapi_id = $${params.length} AND `;
         }
 
-        if (filters.locale) {
-            params.push(filters.locale);
-            where += `locale = $${params.length} AND `;
-        }else{
-            params.push(locale);
-            where += `locale = $${params.length} AND `;
+        if (filters.id) {
+            params.push(filters.id);
+            where += `l.id = $${params.length} AND `;
+        }
+
+        if (!filters.id) {
+            if (filters.locale) {
+                params.push(filters.locale);
+                where += `locale = $${params.length} AND `;
+            }else{
+                params.push(locale);
+                where += `locale = $${params.length} AND `;
+            }
         }
 
         where = where.substring(0, where.length - 5);

@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, Not, IsNull } from "typeorm";
+import { EntityRepository, Repository, Not, IsNull, Any,  } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { UsersDeviceToken } from "./entities/users-device-token.entity";
 
@@ -22,7 +22,8 @@ export class UsersDeviceTokenRepository extends Repository<UsersDeviceToken>{
 
     }
 
-    async getDevicesTokenByUserId(userId: string) {
-        return this.find({where: {userId: userId, deviceToken: Not(IsNull()) }});
+    async getDevicesTokenByUserId(usersId: string|string[] ) {
+        usersId = !Array.isArray(usersId)? [usersId] :usersId;
+        return this.find({where: {userId: Any(usersId), deviceToken: Not(IsNull()) }});
     }
 }

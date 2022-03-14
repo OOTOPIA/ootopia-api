@@ -35,13 +35,11 @@ export class MarketPlaceProductsController {
 
   @UseInterceptors(SentryInterceptor)
   @ApiTags('market-place')
-  @ApiBearerAuth('Bearer')
   @ApiOperation({ summary: "Return Market Place by id" })
   @ApiResponse({ status: 200, type: MarketPlaceDto })
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: 'Internal Server Error', type: HttpResponseDto })
-  @UseGuards(JwtAuthGuard)
   @Get('/:id')
   @HttpCode(200)
   async getMarketPlaceProductById(@Param('id') id : string) {

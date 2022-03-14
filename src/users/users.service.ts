@@ -19,7 +19,7 @@ import { BadgesService } from 'src/badges/badges.service';
 import { UsersTrophiesService } from './services/users-trophies/users-trophies.service';
 import { TrophyType } from './entities/users-trophies.entity';
 
-import { CreateUserDto, JSONType, UserProfileUpdateDto } from './users.dto';
+import { CreateUserDto, FilterSearchUsers, JSONType, UserProfileUpdateDto } from './users.dto';
 import { LinksService } from 'src/links/links.service';
 import { UsersDeviceTokenService } from 'src/users-device-token/users-device-token.service';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
@@ -248,6 +248,72 @@ export class UsersService {
         return Object.assign(currentUser, _userData);
 
     }
+    
+    async updateLinks(value, userId, typeLink: string, create: Boolean = true ) {
+        let currentUser;
+
+        if (userId) {
+            currentUser = await this.getUserById(userId);
+        } else if (value.author) {
+            currentUser = this.jsonDecodeOrEncoderUserLinks(await this.getUserByEmail(value.author), JSONType.encoder);
+        }
+        
+        if (currentUser && currentUser.links) {
+            let existLink = currentUser.links.find( link =>  {
+                let parts = link.URL.split('shared/');
+                return parts[parts.length - 1] == value.id;
+            });
+            
+            if (!existLink && create) {
+                // create link
+                switch (typeLink) {
+                    case 'market-place':
+                        currentUser.links.push({
+                            URL: `${process.env.LINK_SHARING_URL_API}market-place/shared/${value.id}`,
+                            title: `${value.title}`
+                        });
+                        break;
+                    case 'learning-tracks':
+                        currentUser.links.push({
+                            URL: `${process.env.LINK_SHARING_URL_API}learning-tracks/shared/${value.id}`,
+                            title: `${value.title}`
+                        });
+                        break;
+                }
+            }
+            if(existLink && create) {
+                // change title link
+                existLink.title = `${value.title}`;
+                
+            }
+            if (existLink && !create) {
+                // delete link
+                currentUser.links = currentUser.links.filter( link => {
+                    let parts = link.URL.split('shared/');
+                    return parts[parts.length - 1] != value.id;
+                })
+            }
+            
+            if(currentUser.links) {
+                // remove duplicate links
+                let uniqueLinks = [];
+                currentUser.links = currentUser.links.filter((link) => {
+                    let exist = false;
+                    if (!uniqueLinks.find( uniqueLink => link.URL == uniqueLink)) {
+                        uniqueLinks.push(link.URL);
+                        exist = true;
+                    }
+                    return  exist;
+                })
+            }
+
+            await this.usersRepository.createOrUpdateUser({
+                id: currentUser.id,
+                links: currentUser.links,
+            });
+            
+        }
+    }
 
     async resetPassword(userId: string, password: string) {        
         password = bcryptjs.hashSync(password, bcryptjs.genSaltSync(10));
@@ -354,7 +420,7 @@ export class UsersService {
     async updateAccumulatedOOZInDeviceUser(userId: string) {
         let userDailyGoal = await this.getUserDailyGoalStats(userId);
         Object.keys(userDailyGoal).forEach( key => userDailyGoal[key] = typeof userDailyGoal[key] == 'string' ? userDailyGoal[key] : ""+userDailyGoal[key])
-        let allTokensDevices = await this.usersDeviceTokenService.getByUserId(userId);
+        let allTokensDevices = await this.usersDeviceTokenService.getByUsersId(userId);
         let messagesNotification = allTokensDevices.map( device => (
             {
                 token: device.deviceToken,
@@ -374,7 +440,24 @@ export class UsersService {
     getRecoverPasswordLink() {
         return this.linksService.linkForShared({
             title: "Recover Password",
-          });
+        });
+    }
+
+    async getUsersList(filter : FilterSearchUsers) {
+        let skip = (filter.page - 1) * filter.limit;
+        filter.limit = filter.limit  > 100 ? 100 : filter.limit;
+
+        if (skip < 0 || (skip == 0 && filter.limit == 0)) {
+            throw new HttpException(
+                {
+                  status: 404,
+                  error: "Page not found",
+                },
+                404
+              );
+        }
+        
+        return this.usersRepository.usersList(skip ,filter.limit, filter.fullname);
     }
 
     msToTime(duration) {

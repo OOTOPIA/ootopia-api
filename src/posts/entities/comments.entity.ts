@@ -10,7 +10,8 @@ import {
     ManyToMany,
     OneToOne,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    JoinTable
 } from 'typeorm';
 
 import { Users } from '../../users/users.entity';
@@ -32,6 +33,9 @@ export class PostsComments extends BaseEntity {
 
   @Column({ nullable : true, type: 'varchar'})
   text : string;
+
+  @Column({ name: "tagged_user", nullable : true, array: true, type: "uuid" })
+  taggedUser: Users[];
 
   @Column({ nullable : true, type: 'boolean', default: () => "false" })
   deleted : boolean;

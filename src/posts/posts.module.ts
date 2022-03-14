@@ -23,6 +23,7 @@ import { NotificationMessagesService } from 'src/notification-messages/notificat
 import { LinksService } from 'src/links/links.service';
 import { UsersModule } from 'src/users/users.module';
 import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
+import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-token.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
     CitiesModule,
     GeneralConfigModule,
     UsersModule,
+    UsersDeviceTokenModule,
     HttpModule
   ],
   providers: [
