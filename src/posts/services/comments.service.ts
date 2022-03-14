@@ -20,6 +20,7 @@ export class CommentsService {
       let comment = await this.commentsRepository.createComment(commentData);
       
       if(Array.isArray(commentData.taggedUser) && commentData.taggedUser.length) {
+        commentData.taggedUser = [...new Set(commentData.taggedUser)]; //O front enviou ID's iguais e isso vai impedir duplicar notificações
         let [post, userComment, usersToken] = await Promise.all([
           this.postsService.getPostById(<any>comment.postId),
           this.usersService.getUserById(<any>comment.userId),
@@ -38,7 +39,6 @@ export class CommentsService {
             }
           })
         );
-
         if (notifications.length) {
           await this.notificationMessagesService.sendFirebaseMessages(notifications);
         }
