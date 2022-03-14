@@ -60,7 +60,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         let order = this.orderByQueryParams(filter);
         return {
             total: (await this.query(`
-            select count(*) from users u
+            select count(*)::int from users u
             where 
             u.id != $1 and 
             (
