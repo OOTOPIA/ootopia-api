@@ -148,16 +148,6 @@ export class IsFriend {
     isFriend: boolean;
 }
 
-export class FriendByUser {
-    @ApiProperty({ required: true, example : 1 })
-    @IsNotEmpty()
-    total : number;
-
-    @ApiProperty({ required: true, type: [Friends]})
-    @IsNotEmpty()
-    friends : [Friends];
-}
-
 export class FriendsThumbs {
     @ApiProperty({ required: true, enum: ["video", "image"], example: "image" })
     type: string;
@@ -191,4 +181,14 @@ export class FriendsWithPosts {
     @ApiProperty({ required: true, example: "Claudio Fake" })
     country: string;
     
+}
+
+export class FriendByUser {
+    @ApiProperty({ required: true, example : 1 })
+    @IsNotEmpty()
+    total : number;
+
+    @ApiProperty({ required: true, type: FriendsWithPosts})
+    @IsNotEmpty()
+    friends : FriendsWithPosts;
 }
