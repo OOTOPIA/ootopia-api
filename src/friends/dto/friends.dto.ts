@@ -18,6 +18,26 @@ export class SearchFriends {
     sortingType: string;
 }
 
+export class SearchFriendsOfUsers {
+    @ApiProperty({ required: true, example : 1 })
+    @IsNotEmpty()
+    page : number;
+
+    @ApiProperty({ required: true, example : 50 })
+    @IsNotEmpty()
+    limit : number;
+
+    @ApiProperty({ required: true, example : "d651768b-6c9a-45ef-aa18-1d90b9dcc223" })
+    @IsNotEmpty()
+    friendId: string;
+
+    @ApiProperty({ enum: ['created', 'name'], default: "created",example: "created" })
+    orderBy: string;
+
+    @ApiProperty({ enum: ['asc', 'desc'], default: "asc", example: "asc" })
+    sortingType: string;
+}
+
 export class SearchNotFriends {
     @ApiProperty({ required: true, example : 0 })
     @IsNotEmpty()
@@ -34,6 +54,28 @@ export class SearchNotFriends {
     orderBy: string;
 
     @ApiProperty({name: "sortingType", enum: ['asc', 'desc'], default: "asc", example: "asc" })
+    sortingType: string;
+}
+
+export class FriendSearchByUserServiceDto {
+    @ApiProperty({ required: true, example : 1 })
+    @IsNotEmpty()
+    page : number;
+
+    @ApiProperty({ required: true, example : 50 })
+    @IsNotEmpty()
+    limit : number;
+
+    @ApiProperty({ required: false})
+    userId: string;
+
+    @ApiProperty({ required: false})
+    friendId: string;
+
+    @ApiProperty({ enum: ['created', 'name'], default: "created",example: "created" })
+    orderBy: string;
+
+    @ApiProperty({ enum: ['asc', 'desc'], default: "asc", example: "asc" })
     sortingType: string;
 }
 
@@ -89,6 +131,9 @@ export class FriendSearchParametersDto {
 
     @ApiProperty({ required: false})
     userId: string;
+
+    @ApiProperty({ required: false})
+    friendId: string;
 
     @ApiProperty({ enum: ['created', 'name'], default: "created",example: "created" })
     orderBy: string;
@@ -180,6 +225,36 @@ export class FriendsWithPosts {
 
     @ApiProperty({ required: true, example: "Claudio Fake" })
     country: string;
+    
+}
+
+export class FriendsWithPostsAndIsFriend {
+    @ApiProperty({ nullable : true, type: [FriendsThumbs, FriendsThumbs, FriendsThumbs, FriendsThumbs, FriendsThumbs] })
+    friendsThumbs: FriendsThumbs[];
+
+    @ApiProperty({ required: true, example: "d651768b-6c9a-45ef-aa18-1d90b9dcc223" })
+    id: string;
+    
+    @ApiProperty({ required: true, example: "Claudio Fake" })
+    fullname: string;
+    
+    @ApiProperty({ required: true, nullable : true })
+    photoUrl: string;
+
+    @ApiProperty({ required: true, example: "2021-04-09T18:02:59.219Z"})
+    createdAt: Date;
+
+    @ApiProperty({ required: true ,nullable : true, example: "Claudio Fake" })
+    city: string;
+
+    @ApiProperty({ required: true, example: "Claudio Fake" })
+    state: string;
+
+    @ApiProperty({ required: true, example: "Claudio Fake" })
+    country: string;
+
+    @ApiProperty({ required: true, example: false })
+    isFriend: boolean;
     
 }
 

@@ -108,6 +108,14 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
 
     async friendsByUser(filter: FriendSearchParametersDto) {
         let order = this.orderByQueryParams(filter);
+        let params = [filter.userId, filter.skip, filter.limit];
+        let where = '';
+
+        if (filter.friendId) {
+            params.push(filter.friendId);
+            where = ' EXISTS(select 1 from friends_circle fc where fc.user_id = $4 and fc.friend_id = f.id) as "is_friend", '
+        }
+        
         order.orderBy = order.orderBy == 'fullname' ? 'f.fullname' : 'fc.created_at';
         const [friends, total ] = await Promise.all([
             camelcaseKeys( 
@@ -126,6 +134,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 f.id,
                 f.fullname,
                 f.photo_url,
+                ${where}
                 c.city , c.state , c.country
                 from friends_circle fc
                 inner join users as f on f.id = fc.friend_id
@@ -133,7 +142,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 left join cities c on c.id = ua.city_id
                 where fc.user_id = $1 
                 order by ${order.orderBy} ${order.sortingType}
-                offset $2 limit $3`, [filter.userId, filter.skip, filter.limit]
+                offset $2 limit $3`, params
                 )
             ),
             this.count({
