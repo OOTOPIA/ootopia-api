@@ -82,8 +82,10 @@ export class CommentsRepository extends Repository<PostsComments>{
                 array_to_json(
                     (
                         select ARRAY_AGG(
-                            jsonb_build_object('id',id, 'fullname', fullname, 'photoUrl', photo_url)
-                        ) from users where users.id = any(c.tagged_user)
+                            jsonb_build_object('id',u.id, 'fullname', u.fullname, 'photoUrl', u.photo_url)
+                        ) 
+                        from (SELECT unnest(c.tagged_user) as id ) as tagged_users
+                        inner join users u on u.id = tagged_users.id
                     )
                 ) as "users_comments"
             FROM posts_comments c
