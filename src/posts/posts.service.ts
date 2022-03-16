@@ -379,33 +379,32 @@ export class PostsService {
     const media = await this.mediasRepository.getMediaByStreamMediaId(streamMediaId);
     if (media) {
       await this.mediasRepository.updateMedia(media.id, status, duration)
-    }
-
-    if (media.postId) {
-      const post = await this.mediasRepository.getMediasByStreamMediaId(streamMediaId)
-      let verify = await this.mediasRepository.verifyMediasStatus(post.media_ids)
-      if (verify) {
-        await this.postsRepository.updatePostStatus(post.id, 'ready')
+      if (media.postId) {
+        const post = await this.mediasRepository.getMediasByStreamMediaId(streamMediaId)
+        let verify = await this.mediasRepository.verifyMediasStatus(post.media_ids)
+        if (verify) {
+          await this.postsRepository.updatePostStatus(post.id, 'ready')
+        }
       }
-    }
-    return media
-
-    // const post = await this.postsRepository.getPostByStreamMediaId(
-    //   streamMediaId,
-    // );
-    // if (!post) {
-    //   return null;
-    // }
-    // if (post.videoStatus == 'ready') {
-    //   return post;
-    // }
-    // post.videoStatus = status;
-    // post.durationInSecs = duration;
-    // const result = await this.postsRepository.createOrUpdatePost(post);
-    // if (rewardToCreator && status == 'ready') {
-    //   await this.sendRewardToCreatorForPost(post.id);
-    // }
-    // return result;
+      return media
+    } else { 
+      const post = await this.postsRepository.getPostByStreamMediaId(
+        streamMediaId,
+      );
+      if (!post) {
+        return null;
+      }
+      if (post.videoStatus == 'ready') {
+        return post;
+      }
+      post.videoStatus = status;
+      post.durationInSecs = duration;
+      const result = await this.postsRepository.createOrUpdatePost(post);
+      if (rewardToCreator && status == 'ready') {
+        await this.sendRewardToCreatorForPost(post.id);
+      }
+      return result;
+    }    
   }
 
   async calcOOZToTransferForPostVideos() {
