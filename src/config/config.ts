@@ -24,6 +24,7 @@ import { LearningTrackCompletedChapters } from 'src/learning-tracks/entities/lea
 import { PostsUsersRewarded } from 'src/posts/entities/posts-users-rewarded.entity';
 import { UsersDeviceToken } from 'src/users-device-token/entities/users-device-token.entity';
 import { FriendsCircle } from '../friends/entities/friends.entity';
+import { Medias } from '../posts/media.entity';
 
 require('dotenv').config();
 
@@ -68,6 +69,7 @@ class ConfigService {
         },
         synchronize: true,
         entities: [
+          Medias,
           Users,
           Posts,
           PostsLikes,

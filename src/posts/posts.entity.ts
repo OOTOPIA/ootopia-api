@@ -1,5 +1,6 @@
 import { Addresses } from 'src/addresses/addresses.entity';
 import { Users } from 'src/users/users.entity';
+import { Medias } from './media.entity';
 import {
   Entity,
   Column,
@@ -16,7 +17,8 @@ import {
 
 enum PostType {
   Image = "image",
-  Video = "video"
+  Video = "video",
+  Gallery = "gallery"
 }
 
 @Entity()
@@ -34,9 +36,16 @@ export class Posts extends BaseEntity {
 
   @Column({nullable: false, type: 'varchar'})
   type: PostType;
-
+  
   @Column({ nullable: true, name: "image_url" , type: 'varchar' })
   imageUrl : string;
+
+  @OneToMany(type => Medias, media => media.id)
+  @JoinColumn({ name: "medias_ids" })
+  medias: Medias;
+
+  @Column({ nullable: true, name: "media_ids" , type: 'uuid', array: true })
+  mediaIds : string[];
 
   @Column({ nullable: true, name: "video_url", type: 'varchar' })
   videoUrl : string;

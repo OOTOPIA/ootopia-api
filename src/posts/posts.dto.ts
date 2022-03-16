@@ -43,6 +43,50 @@ export class CreatePostsDto {
 
 }
 
+export class CreateGalleryDto {
+
+    @ApiProperty({ required: true})
+    mediaIds: string[];
+
+    @ApiProperty({ required: true, example : "My first awesome post!"})
+    description : string;
+
+    @ApiProperty({ required: false})
+    tagsIds?: string[];
+
+    @ApiProperty({ required: false})
+    addressCountryCode?: string;
+
+    @ApiProperty({ required: false})
+    addressState?: string;
+    
+    @ApiProperty({ required: false})
+    addressCity?: string;
+
+    @ApiProperty({ required: false})
+    addressLatitude?: number;
+
+    @ApiProperty({ required: false})
+    addressLongitude?: number;
+
+    @ApiProperty({ required: false})
+    addressNumber?: string;
+
+}
+
+export class SendFileDto {
+
+    @ApiProperty({ required: true, type: "file" })
+    file : object;
+
+}
+
+export class CreateFileDto {
+
+    @ApiProperty()
+    mediaId : string;
+}
+
 export class PostsTimelineFilterDto {
 
     @ApiProperty({ required: false })
@@ -202,6 +246,9 @@ export class WebhookDto {
 
     @ApiProperty()
     modified : Date;
+
+    @ApiProperty()
+    duration : number;
 
 }
 

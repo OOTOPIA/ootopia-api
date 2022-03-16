@@ -19,11 +19,13 @@ import { PostsUsersRewardedRepository } from './repositories/posts-users-rewarde
 import { LinksService } from 'src/links/links.service';
 import { UsersService } from 'src/users/users.service';
 import * as jimp from 'jimp';
+import { MediasRepository } from './media.repository';
 
 @Injectable()
 export class PostsService {
   constructor(
-    private readonly httpService  : HttpService,
+    private readonly httpService: HttpService,
+    private readonly mediasRepository: MediasRepository,
     private readonly linksService: LinksService,
     private readonly postsRepository: PostsRepository,
     private readonly postsUsersRewardedRepository: PostsUsersRewardedRepository,
@@ -37,7 +39,7 @@ export class PostsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
-  ) {}
+  ) { }
 
   async createPost(file, postData, userId) {
     postData.id = uuidv4();
@@ -47,7 +49,7 @@ export class PostsService {
     await queryRunner.startTransaction();
 
     try {
-      var postResult : any = null;
+      var postResult: any = null;
       if (postData.type === 'image') {
         const imagesAcceptTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/octet-stream'];
         if (imagesAcceptTypes.includes(file.mimetype)) {
@@ -104,7 +106,7 @@ export class PostsService {
         const address = await this.addressesRepository.createOrUpdateAddress(
           addressData,
         );
-        
+
         postResult.addressId = address.id;
 
         await queryRunner.manager.save(address);
@@ -129,18 +131,143 @@ export class PostsService {
     } finally {
       await queryRunner.release();
       if (postResult) {
-        if(postResult.type === 'image'){
+        if (postResult.type === 'image') {
           let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
           postResult.oozGenerated = transfer.balance;
-        }else{
+        } else {
           const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
           postResult.oozGenerated = totalOOZ;
         }
-      }else{
+      } else {
         throw new HttpException("Error when create post", 400);
       }
 
       return postResult;
+    }
+  }
+
+  async createPostGallery(postData, userId) {
+    postData.id = uuidv4();
+    postData.type = 'gallery'
+
+    const queryRunner = getConnection().createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      var postResult: any = null;
+      postData.userId = userId;
+      postResult = await this.postsRepository.createOrUpdatePost(
+        postData,
+      );
+      for (const id of postData.mediaIds) {
+        await this.mediasRepository.updatePostIdInMedia(postData.id, id);
+      }
+      if (
+        postData.addressCountryCode &&
+        postData.addressState &&
+        postData.addressCity
+      ) {
+        let city = await this.citiesService.getCity(
+          postData.addressCity,
+          postData.addressState,
+          postData.addressCountryCode,
+        );
+        if (!city) {
+          city = await this.citiesService.createCity({
+            city: postData.addressCity,
+            state: postData.addressState,
+            country: postData.addressCountryCode,
+          });
+        }
+
+        const addressData: any = {
+          city: city,
+          lat: postData.addressLatitude,
+          lng: postData.addressLongitude,
+          number: postData.addressNumber,
+        };
+
+        const address = await this.addressesRepository.createOrUpdateAddress(
+          addressData,
+        );
+
+        postResult.addressId = address.id;
+
+        await queryRunner.manager.save(address);
+      }
+      await queryRunner.manager.save(postResult);
+      if (postData.tagsIds && postData.tagsIds.length > 0) {
+        await this.interestsTagsService.updatePostTags(
+          postResult.id,
+          postData.tagsIds,
+          queryRunner,
+        );
+      }
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      await this.postsRepository.deletePost(postData.id);
+    } finally {
+      await queryRunner.release();
+      if (postResult) {
+        let verify = await this.mediasRepository.verifyMediasStatus(postData.mediaIds)
+        if (verify) {
+          await this.postsRepository.updatePostStatus(postData.id, 'ready')
+        } else {
+          await this.postsRepository.updatePostStatus(postData.id, 'unready')
+        }
+        if (postResult.type === 'image') {
+          let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
+          postResult.oozGenerated = transfer.balance;
+        } else {
+          const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
+          postResult.oozGenerated = totalOOZ;
+        }
+      } else {
+        throw new HttpException("Error when create post", 400);
+      }
+
+      return postResult;
+
+    }
+  }
+
+  async sendFile(file, user, type) {
+    if (type === 'image') {
+      const imagesAcceptTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/octet-stream'];
+      if (imagesAcceptTypes.includes(file.mimetype)) {
+        let fileUploaded = await this.filesUploadService.uploadFileToS3Minio(
+          file.buffer,
+          file.originalname,
+          user.id,
+        );
+
+        let savedFile = await this.mediasRepository.createOrUpdateMedia(
+          { type: 'image', mediaUrl: fileUploaded, thumbnailUrl: fileUploaded, status: "ready" }
+        )
+        return {mediaId: savedFile.id}
+      } else {
+        throw new HttpException(
+          'When image type is set only .png or .jpeg extensions is accept',
+          400,
+        );
+      }
+    } else {
+      let fileUploaded: any = await this.videoService.uploadVideo(
+        file.buffer,
+        user.id,
+      );
+      let savedFile = await this.mediasRepository.createOrUpdateMedia(
+        {
+          type: 'video',
+          mediaUrl: fileUploaded.playback.hls,
+          thumbnailUrl: fileUploaded.thumbnail,
+          streamMediaId: fileUploaded.uid,
+          status: "unready"
+        }
+      )
+      return {mediaId: savedFile.id}
     }
   }
 
@@ -151,14 +278,14 @@ export class PostsService {
   async getPostShareLink(id: string) {
     let post = await this.postsRepository.getPostById(id);
     let user = await this.usersService.getUserById(<any>post.userId);
-    
+
     return this.linksService.linkForShared({
       title: user.fullname,
       description: post.description,
-      imageUrl : post.thumbnailUrl,
+      imageUrl: post.thumbnailUrl,
       thumbnail: {
-        id: post.type == 'video'? id : null,
-        type: post.type == 'video'? 'posts' : null
+        id: post.type == 'video' ? id : null,
+        type: post.type == 'video' ? 'posts' : null
       }
     });
   }
@@ -167,13 +294,13 @@ export class PostsService {
     let post = await this.postsRepository.getPostById(id);
     const response = await this.httpService.axiosRef({
       url: post.thumbnailUrl,
-      method:"GET",
+      method: "GET",
       responseType: 'arraybuffer'
     });
 
     const image = await jimp.read(response.data);
     const logo = await jimp.read('src/assets/play.png');
-    image.composite(await logo, image.getWidth()/ 2 - 45, image.getHeight() / 2 - 45, {
+    image.composite(await logo, image.getWidth() / 2 - 45, image.getHeight() / 2 - 45, {
       mode: jimp.BLEND_SOURCE_OVER,
       opacityDest: 1,
       opacitySource: 1
@@ -246,27 +373,39 @@ export class PostsService {
   async updatePostVideoStatus(
     streamMediaId: string,
     status: string,
+    duration: number,
     rewardToCreator?: boolean,
   ) {
-    const videoDetails = (
-      await this.videoService.getVideoDetails(streamMediaId)
-    ).result;
-    const post = await this.postsRepository.getPostByStreamMediaId(
-      streamMediaId,
-    );
-    if (!post) {
-      return null;
+    const media = await this.mediasRepository.getMediaByStreamMediaId(streamMediaId);
+    if (media) {
+      await this.mediasRepository.updateMedia(media.id, status, duration)
     }
-    if (post.videoStatus == 'ready') {
-      return post;
+
+    if (media.postId) {
+      const post = await this.mediasRepository.getMediasByStreamMediaId(streamMediaId)
+      let verify = await this.mediasRepository.verifyMediasStatus(post.media_ids)
+      if (verify) {
+        await this.postsRepository.updatePostStatus(post.id, 'ready')
+      }
     }
-    post.videoStatus = status;
-    post.durationInSecs = +videoDetails.duration;
-    const result = await this.postsRepository.createOrUpdatePost(post);
-    if (rewardToCreator && status == 'ready') {
-      await this.sendRewardToCreatorForPost(post.id);
-    }
-    return result;
+    return media
+
+    // const post = await this.postsRepository.getPostByStreamMediaId(
+    //   streamMediaId,
+    // );
+    // if (!post) {
+    //   return null;
+    // }
+    // if (post.videoStatus == 'ready') {
+    //   return post;
+    // }
+    // post.videoStatus = status;
+    // post.durationInSecs = duration;
+    // const result = await this.postsRepository.createOrUpdatePost(post);
+    // if (rewardToCreator && status == 'ready') {
+    //   await this.sendRewardToCreatorForPost(post.id);
+    // }
+    // return result;
   }
 
   async calcOOZToTransferForPostVideos() {
@@ -300,7 +439,7 @@ export class PostsService {
       },
       false,
     );
-    
+
     await this.usersService.updateAccumulatedOOZInDeviceUser(<any>post.userId);
   }
 
@@ -315,7 +454,7 @@ export class PostsService {
       await this.walletsService.getWalletByUserId(post.userId)
     ).id;
 
-      return await this.walletTransfersService.createTransfer(
+    return await this.walletTransfersService.createTransfer(
       post.userId,
       {
         userId: post.userId,
@@ -327,7 +466,7 @@ export class PostsService {
         fromPlatform: true,
       },
       false,
-    ); 
+    );
   }
 
   async getPostsTimeline(filters, userId?: string) {
@@ -336,7 +475,7 @@ export class PostsService {
 
   async deletePost(postId, userId) {
     const result = await this.postsRepository.deletePostByUser(postId, userId);
-    if(result.type === 'video'){
+    if (result.type === 'video') {
       await this.videoService.deleteVideo(result.streamMediaId);
     }
   }
@@ -345,7 +484,7 @@ export class PostsService {
     return this.postsRepository.incrementOOZTotalCollected(balance, postId);
   }
 
-  async countPostUserRewarded(postId : string, userId : string, oozRewarded : number) {
+  async countPostUserRewarded(postId: string, userId: string, oozRewarded: number) {
     return await this.postsUsersRewardedRepository.countReward(postId, userId, oozRewarded);
   }
 }
