@@ -382,7 +382,7 @@ export class PostsService {
       await this.mediasRepository.updateMedia(media.id, status, duration)
       if (media.postId) {
         const post = await this.mediasRepository.getMediasByStreamMediaId(streamMediaId)
-        let verify = await this.mediasRepository.verifyMediasStatus(post.media_ids)
+        let verify = await this.mediasRepository.verifyMediasStatus(post.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(post.id, 'ready')
         }

@@ -46,13 +46,13 @@ export class MediasRepository extends Repository<Medias>{
     }
 
     async getMediasByStreamMediaId(streamMediaId) {
-        let result = await this.query(`
+        let result = camelcaseKeys(await this.query(`
         select
         p.id,
         p.media_ids
         from medias m
         inner join posts p on p.id = m.post_id
-        where m.stream_media_id = $1 ;`, [streamMediaId]);
+        where m.stream_media_id = $1 ;`, [streamMediaId]))
         if(result.length) {
             return result[0];
         }
