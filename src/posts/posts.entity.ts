@@ -18,48 +18,6 @@ enum PostType {
   Image = "image",
   Video = "video"
 }
-
-@Entity()
-export class Medias extends BaseEntity {
-
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
-
-  // @ManyToOne(type => Posts, post => post.id)
-  // @JoinColumn({ name: "post_id" })
-  // post: Posts;
-
-  @Column({ nullable: true, type: 'uuid', name: "post_id" })
-  postId: string;
-
-  @Column({ nullable: false, type: 'varchar' })
-  type: PostType;
-
-  @Column({ nullable: true, name: "media_url", type: 'varchar' })
-  mediaUrl: string;
-
-  @Column({ nullable: true, name: "thumbnail_url", type: 'varchar' })
-  thumbnailUrl: string;
-
-  @Column({ name: "finished", type: 'varchar', default: 'unready'})
-  status: string;
-
-  @Column({ nullable: true, name: "stream_media_id", type: 'varchar' })
-  streamMediaId: string;
-
-  @Column({ nullable: true, name: "duration_in_secs", type: 'numeric', default: () => "0" })
-  durationInSecs: number;
-
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
-
-  @Column({ nullable: true, name: 'deleted_at', type: 'timestamp' })
-  deletedAt: Date;
-
-}
 @Entity()
 export class Posts extends BaseEntity {
 
@@ -84,13 +42,6 @@ export class Posts extends BaseEntity {
 
   @Column({ nullable: true, name: "thumbnail_url", type: 'varchar' })
   thumbnailUrl : string;
-
-  @OneToMany(type => Medias, media => media.id)
-  @JoinColumn({ name: "medias_ids" })
-  medias: Medias;
-
-  @Column({ nullable: true, name: "media_ids" , type: 'uuid', array: true })
-  mediaIds : string[];
 
   @Column({ nullable : true, name: "video_status", type: 'varchar' })
   videoStatus : string;

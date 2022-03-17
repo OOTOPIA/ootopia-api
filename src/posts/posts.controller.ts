@@ -273,10 +273,7 @@ export class PostsController {
     async getComments(@Request() req: Request, @Param('postId') postId, @Query() filters : CommentsFilterDto) {
         try {
 
-            let oi = await this.commentsService.getComments(postId, filters.page);
-            console.log(oi);
-            
-            return oi
+            return this.commentsService.getComments(postId, filters.page);
             
         } catch (error) {
             new ErrorHandling(error);

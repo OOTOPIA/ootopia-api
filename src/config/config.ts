@@ -2,7 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Pool } from 'pg';
 import { PostsCommentsCount } from 'src/posts/entities/comments-count.entity';
 import { PostsComments } from 'src/posts/entities/comments.entity';
-import { Medias, Posts, PostsLikes, PostsLikesCount } from 'src/posts/posts.entity';
+import { Posts, PostsLikes, PostsLikesCount } from 'src/posts/posts.entity';
 import { InterestsTags } from 'src/interests-tags/entities/interests-tags.entity';
 import { Users } from 'src/users/users.entity';
 import { InterestsTagsUsers } from 'src/interests-tags/entities/interests-tags-users.entity';
@@ -70,7 +70,6 @@ class ConfigService {
         synchronize: true,
         entities: [
           Users,
-          Medias,
           Posts,
           PostsLikes,
           PostsLikesCount,
