@@ -57,6 +57,6 @@ import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-toke
     LinksService
   ],
   controllers: [PostsController],
-  exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService]
+  exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService, CommentsService, NotificationMessagesService]
 })
 export class PostsModule {}

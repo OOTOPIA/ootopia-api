@@ -27,29 +27,23 @@ export class PostCommentRepliesRepository extends Repository<PostCommentReplies>
             pcr.comment_id as "commentId",
             pcr.tagged_user_ids as "taggedUserIds",
             pcr.comment_user_id as "commentUserId",
+            pcr.reply_to_user_id as "replyToUserId",
             u.photo_url as "photoCommentUser",
             u.fullname as "fullNameCommentUser",
             array_to_json(
                 (
                     select ARRAY_AGG(
-                        jsonb_build_object('id',uc.id, 'fullname', uc.fullname, 'photoUrl', uc.photo_url)
-                    ) from users uc where uc.id = any(pcr.tagged_user_ids)
+                        jsonb_build_object('id',u2.id, 'fullname', u2.fullname,'email', u2.email,'photoUrl', u2.photo_url)
+                    ) 
+                    from (SELECT unnest(pcr.tagged_user_ids) as id ) as tagged_users
+                    inner join users u2 on u2.id = tagged_users.id
                 )
-            ) as "users_comments"
+            ) as "usersComments"
         from post_comment_replies pcr
         inner join users u on u.id = pcr.comment_user_id 
         where pcr.comment_id = $1 and pcr.deleted is null 
-        order by pcr.created_at asc 
+        order by pcr.created_at desc 
         offset $2 limit $3 ;`, [page.commentId, page.skip, page.limit]);
-        // return this.find({
-        //     select: ['id',"commentId","text", "taggedUserIds","commentUserId"],
-        //     where: {
-        //         commentId: page.commentId,
-        //         deleted: IsNull()
-        //     },
-        //     skip: page.skip,
-        //     take: page.limit,
-        // });
     }
 
     commentReplyById(id: string) {
@@ -60,15 +54,18 @@ export class PostCommentRepliesRepository extends Repository<PostCommentReplies>
             pcr.comment_id as "commentId",
             pcr.tagged_user_ids as "taggedUserIds",
             pcr.comment_user_id as "commentUserId",
+            pcr.reply_to_user_id as "replyToUserId",
             u.photo_url as "photoCommentUser",
             u.fullname as "fullNameCommentUser",
             array_to_json(
                 (
                     select ARRAY_AGG(
-                        jsonb_build_object('id',uc.id, 'fullname', uc.fullname, 'photoUrl', uc.photo_url)
-                    ) from users uc where uc.id = any(pcr.tagged_user_ids)
+                        jsonb_build_object('id',u2.id, 'fullname', u2.fullname,'email', u2.email,'photoUrl', u2.photo_url)
+                    ) 
+                    from (SELECT unnest(pcr.tagged_user_ids) as id ) as tagged_users
+                    inner join users u2 on u2.id = tagged_users.id
                 )
-            ) as "users_comments"
+            ) as "usersComments"
             from post_comment_replies pcr
             inner join users u on u.id = pcr.comment_user_id 
             where pcr.id = $1 and 

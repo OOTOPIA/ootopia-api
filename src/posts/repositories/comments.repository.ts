@@ -23,6 +23,10 @@ export class CommentsRepository extends Repository<PostsComments>{
 
     }
 
+    async findOneCommentById(commentId : string) {
+        return camelcaseKeys((await getConnection().query(`select * from posts_comments where id = $1 and deleted = false;`, [commentId]))[0]);
+    }
+
     private async recalculateCommentCount(postId : string) {
 
         let result = await getConnection().query(`

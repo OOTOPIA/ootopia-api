@@ -11,8 +11,12 @@ export class CreatePostCommentRepliesDto {
     @IsNotEmpty()
     text : string;
 
+    @ApiProperty({ required: true, example : '87945473-616c-4fe5-bfab-ea9f83155d85' })
+    @IsNotEmpty()
+    replyToUserId : string;
+
     @ApiProperty({ required: false, nullable: true, isArray: true })
-    taggedUser : string;
+    taggedUserIds : string;
 }
 
 export class CreatePostCommentRepliesServiceDto {
@@ -25,9 +29,13 @@ export class CreatePostCommentRepliesServiceDto {
     @IsNotEmpty()
     text : string;
 
+    @ApiProperty({ required: true, example : '87945473-616c-4fe5-bfab-ea9f83155d85'  })
+    @IsNotEmpty()
+    replyToUserId : string;
+
     @ApiProperty({ required: true, example : '87945473-616c-4fe5-bfab-ea9f83155d85' })
     commentUserId : string;
 
     @ApiProperty({ required: false, nullable: true, isArray: true })
-    taggedUser : string;
+    taggedUserIds: string;
 }

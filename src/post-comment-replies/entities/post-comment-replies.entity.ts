@@ -33,6 +33,13 @@ export class PostCommentReplies extends BaseEntity {
     @JoinColumn({ name: "comment_user_id" })
     commentUserId: User;
 
+    @ManyToOne(type => Users, users => users.id)
+    @JoinColumn({ name: "reply_to_user_id" })
+    replyToUser: User;
+
+    @Column({ nullable : false, name: "reply_to_user_id", type: "uuid"})
+    replyToUserId: string;
+
     @Column({ nullable : true })
     deleted : Date;
 

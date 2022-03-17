@@ -28,13 +28,11 @@ export class PostCommentRepliesController {
 
   @UseInterceptors(SentryInterceptor)
   @ApiTags('comment-reply')
-  @ApiBearerAuth('Bearer')
   @ApiOperation({ summary: 'List all friends of user' })
   @ApiResponse({ status: 200, description: 'Successfully List', type: [PostCommentReplyDto]})
   @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
   @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
   @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-  @UseGuards(JwtAuthGuard)
   @Get()
   findReplysByComment(
       @Query() filter: GetPostCommentRepliesDto
