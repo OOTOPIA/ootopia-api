@@ -217,13 +217,14 @@ export class PostsService {
         } else {
           await this.postsRepository.updatePostStatus(postData.id, 'unready')
         }
-        if (postResult.type === 'image') {
-          let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
-          postResult.oozGenerated = transfer.balance;
-        } else {
-          const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
-          postResult.oozGenerated = totalOOZ;
-        }
+        // if (postResult.type === 'image') {
+        // } else {
+        //   await this.sendRewardToCreatorForPostPhoto(postResult.id);
+        //   const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
+        //   postResult.oozGenerated = totalOOZ;
+        // }
+        let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
+        postResult.oozGenerated = transfer.balance;
       } else {
         throw new HttpException("Error when create post", 400);
       }
