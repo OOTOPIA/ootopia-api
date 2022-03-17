@@ -24,11 +24,13 @@ import { LinksService } from 'src/links/links.service';
 import { UsersModule } from 'src/users/users.module';
 import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-token.module';
+import { MediasRepository } from './media.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       PostsRepository,
+      MediasRepository,
       CommentsRepository,
       UsersRepository,
       AddressesRepository,

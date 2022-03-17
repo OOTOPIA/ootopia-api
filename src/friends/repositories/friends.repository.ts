@@ -128,7 +128,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                         )
                     from (
                         select "type",thumbnail_url 
-                        from posts pt where pt.user_id = fc.friend_id order by pt.created_at desc limit 5
+                        from posts pt where pt.user_id = fc.friend_id and pt.deleted_at is null order by pt.created_at desc limit 5
                     ) as "thumbs")
                 ) as "friendsThumbs",
                 f.id,
