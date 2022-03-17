@@ -38,7 +38,8 @@ export class PostCommentRepliesService {
     ]);
 
     let notifications = []; 
-    if(commentReply.replyToUserId && commentReply.replyToUserId != commentReply.commentUserI) {
+    
+    if(commentReply.replyToUserId && commentReply.replyToUserId != commentReply.commentUserId) {
         notifications = usersTokenReply.filter( user => !!user).map( (user: any) => 
         ({
           token: user.deviceToken,
