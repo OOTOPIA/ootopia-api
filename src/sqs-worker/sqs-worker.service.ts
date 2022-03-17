@@ -29,6 +29,7 @@ export class SqsWorkerService {
         data : {
             streamMediaId: string,
             status: string,
+            duration: number
         }
     ) {
         return await this.sqsService.send('update-post-video-status', {

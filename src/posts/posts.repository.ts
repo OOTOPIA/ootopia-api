@@ -17,6 +17,12 @@ export class PostsRepository extends Repository<Posts>{
         return this.save(post);
     }
 
+    async updatePostStatus(postId, status) {
+        return await this.update(postId, {
+            videoStatus: status
+        })
+    }
+
     async deletePostByUser(postId, userId) {
         const post = await this.findOne({
             where : {
@@ -139,7 +145,7 @@ export class PostsRepository extends Repository<Posts>{
 
     async getPostsTimeline(filters, userId? : string) {
 
-        let where = "(video_status = 'ready' OR (video_status is null AND type = 'image')) AND deleted_at is null AND ";
+        let where = "(video_status = 'ready' OR (video_status is null AND type = 'image')) AND deleted_at is null AND type != 'gallery' AND ";
         const params = [];
         const perPage = 10;
         let limit = 'LIMIT ' + perPage;
