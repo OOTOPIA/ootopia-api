@@ -51,6 +51,10 @@ export class CommentsService {
       return this.commentsRepository.getCommentsFromPostId(postId, page);
     }
 
+    getCommentById(commentId: string) {
+      return this.commentsRepository.findOneCommentById(commentId);
+    }
+
     async deleteComments(userId, postId, commentsIds) {
       let post = await this.postsService.getPostById(postId);
       if (!post) {

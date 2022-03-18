@@ -68,6 +68,9 @@ export class CommentsListDto {
     createdAt : Date;
 
     @ApiProperty()
+    totalReplies: number;
+
+    @ApiProperty()
     taggedUser: any;
 
     @ApiProperty()

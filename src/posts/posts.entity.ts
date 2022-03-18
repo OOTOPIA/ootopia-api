@@ -20,7 +20,6 @@ enum PostType {
   Video = "video",
   Gallery = "gallery"
 }
-
 @Entity()
 export class Posts extends BaseEntity {
 

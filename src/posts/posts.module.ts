@@ -59,6 +59,6 @@ import { MediasRepository } from './media.repository';
     LinksService
   ],
   controllers: [PostsController],
-  exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService]
+  exports: [PostsService, PostsWatchedVideotimeService, PostsTimelineViewTimeService, CommentsService, NotificationMessagesService]
 })
 export class PostsModule {}

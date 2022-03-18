@@ -23,6 +23,10 @@ export class CommentsRepository extends Repository<PostsComments>{
 
     }
 
+    async findOneCommentById(commentId : string) {
+        return camelcaseKeys((await getConnection().query(`select * from posts_comments where id = $1 and deleted = false;`, [commentId]))[0]);
+    }
+
     private async recalculateCommentCount(postId : string) {
 
         let result = await getConnection().query(`
@@ -52,7 +56,7 @@ export class CommentsRepository extends Repository<PostsComments>{
         }
 
         let where = "c.deleted = false AND ", params = [];
-        let perPage = 10, limit = 'LIMIT ' + perPage;
+        let perPage = 10,  limit = 'LIMIT ' + perPage;
         let columns = [
             'c.id', 'c.post_id', 'c.user_id', 'c.text', 'c.deleted', 'c.created_at', 'c.updated_at',
             'users.photo_url', 'users.fullname as username'
@@ -72,6 +76,13 @@ export class CommentsRepository extends Repository<PostsComments>{
         return camelcaseKeys(await getConnection().query(`
             SELECT 
                 ${columns},
+                ( 
+                    select count(*) 
+                    from post_comment_replies pcr 
+                    where 
+                        c.id = pcr.comment_id and
+                        pcr.deleted is null
+                )::int as "total_replies",
                 array_to_json(
                     (
                         select ARRAY_AGG(
