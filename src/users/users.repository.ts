@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection, ILike } from "typeorm";
+import { EntityRepository, Repository, UpdateResult, getConnection, ILike, Not, In } from 'typeorm';
 import * as camelcaseKeys from 'camelcase-keys';
 import { Users } from "./users.entity";
 
@@ -164,13 +164,14 @@ export class UsersRepository extends Repository<Users>{
 
     }
 
-    async usersList(skip: number, limit: number, fullname: string) {
+    async usersList(skip: number, limit: number, fullname: string, excludedUsers: string[]) {
+        console.log(excludedUsers)
         return this.find({
             select: [ "id","email","fullname", "photoUrl"],
-            where: { fullname: ILike(`%${fullname}%`)},
+            where: { fullname: ILike(`%${fullname}%`) , ...(excludedUsers && {id: Not(In(excludedUsers))})},
             skip: skip,
             take: limit,
-            order: {createdAt: "ASC"}
+            order: {createdAt: "ASC"},
         });
     }
 
