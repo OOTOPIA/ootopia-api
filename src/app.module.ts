@@ -1,3 +1,4 @@
+import { FriendsModule } from './friends/friends.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -27,6 +28,7 @@ import { NotificationMessagesService } from './notification-messages/notificatio
 import { UsersDeviceTokenModule } from './users-device-token/users-device-token.module';
 import { LinksService } from './links/links.service';
 import { AppleAppSiteAssociationModule } from './apple-app-site-association/apple-app-site-association.module';
+import { PostCommentRepliesModule } from './post-comment-replies/post-comment-replies.module';
 import * as AWS from 'aws-sdk';
 
 const sqs = new AWS.SQS({
@@ -43,22 +45,22 @@ const sqs = new AWS.SQS({
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     SqsModule.registerAsync({
-      useFactory:() =>{
+      useFactory: () => {
         return {
           consumers: [{
             name: "daily_goal_distribution",
             queueUrl: process.env.SQS_DAILY_GOAL_DISTRIBUTION_QUEUE,
-            sqs : sqs,
+            sqs: sqs,
           },
           {
             name: "strapi_webhook",
             queueUrl: process.env.SQS_STRAPI_WEBHOOK_QUEUE,
-            sqs : sqs,
+            sqs: sqs,
           },
           {
             name: "update-post-video-status",
             queueUrl: process.env.SQS_CLOUDFLARE_WEBHOOK_QUEUE,
-            sqs : sqs,
+            sqs: sqs,
           }],
           producers: [{
             name: "daily_goal_distribution",
@@ -100,8 +102,10 @@ const sqs = new AWS.SQS({
     MarketPlaceModule,
     UsersDeviceTokenModule,
     AppleAppSiteAssociationModule,
+    FriendsModule,
+    PostCommentRepliesModule
   ],
-  controllers: [AppController],
+  controllers: [ AppController ],
   providers: [AppService, CronService, NotificationMessagesService, LinksService],
 })
-export class AppModule {}
+export class AppModule { }

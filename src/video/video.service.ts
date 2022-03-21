@@ -71,6 +71,10 @@ export class VideoService {
     }
 
     async setWebhookAddress(url : string) {
+      //TODO: BLOQUEAR URL ALEATORIAS
+      if(url != 'https://api-ootopia.devmagic.com.br/posts/video/webhook' && url != 'https://api.ootopia.org/posts/video/webhook') {
+        throw new HttpException('INVALID URL', 401)
+      }
       let result = await axios.put(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/webhook`, {
         notificationUrl : url
       }, {

@@ -461,7 +461,6 @@ export class UsersService {
                 404
               );
         }
-        
         return this.usersRepository.usersList(skip ,filter.limit, filter.fullname, excludedUsers);
     }
 

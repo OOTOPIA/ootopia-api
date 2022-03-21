@@ -12,11 +12,10 @@ export class UpdatePostVideoStatusHandlerService {
     @SqsMessageHandler('update-post-video-status', false)
     public async handleMessage(message: AWS.SQS.Message) {
         try {
-
             let videoStatus : any = JSON.parse(message.Body);
-            await this.postsService.updatePostVideoStatus(videoStatus.streamMediaId, videoStatus.status, true)
-           
+            await this.postsService.updatePostVideoStatus(videoStatus.streamMediaId, videoStatus.status, videoStatus.duration, true)        
         }catch(err) {
+            console.log(err)
             throw err;
         }
     }
