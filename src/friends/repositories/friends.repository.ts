@@ -65,8 +65,8 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             u.id != $1 and 
             (
                 u.fullname ilike($2) or
-                u.email ilike($2)
-            )`, [filter.userId, `%${filter.name}%`]
+                u.email = $3
+            )`, [filter.userId, `%${filter.name}%`, filter.name]
             ))[0].count,
             friends: camelcaseKeys( 
                 await this.query(`
@@ -97,10 +97,10 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                         u.id != $1 and 
                         (
                             u.fullname ilike($2) or
-                            u.email ilike($2)
+                            u.email = $5
                         )
                     order by u.${order.orderBy} ${order.sortingType}
-                    offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit]
+                    offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit, filter.name]
                 )
             )
         };
