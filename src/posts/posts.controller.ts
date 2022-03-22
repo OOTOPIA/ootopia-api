@@ -154,6 +154,29 @@ export class PostsController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
+    @ApiOperation({ summary: 'Returns a list of posts for the timeline in v2' })
+    @ApiBearerAuth('Bearer')
+    @ApiQuery({ name : "limit", type: "number", description: "Limit of posts (50 max.)", required: false })
+    @ApiQuery({ name : "offset", type: "number", required: false })
+    @ApiQuery({ name : "locale", type: "enum", enum: ['pt-BR', 'en'], required: false })
+    @ApiResponse({ status: 200, type: PostTimelineDto, isArray: true })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
+    @Get('/v2')
+    async getPostsV2(@Req() req, @Query() filters : PostsTimelineFilterDto) {
+        try {
+
+            return await this.postsService.getPostsTimelineV2(filters, req.user ? req.user.id : null);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Get details for a specific post' })
     @ApiBearerAuth('Bearer')
     @ApiParam({name : "id", type: "string", description: "Post ID" })
@@ -171,6 +194,32 @@ export class PostsController {
             };
 
             let posts = await this.postsService.getPostsTimeline(filters, req.user ? req.user.id : null);
+            
+            return posts.length ? posts[0] : null;
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Get details for a specific post in v2' })
+    @ApiBearerAuth('Bearer')
+    @ApiParam({name : "id", type: "string", description: "Post ID" })
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
+    @Get('/v2/:id')
+    async getPostDetailsV2(@Req() req, @Param('id') id) {
+        try {
+
+            let filters = {
+                postId : id
+            };
+
+            let posts = await this.postsService.getPostsTimelineV2(filters, req.user ? req.user.id : null);
             
             return posts.length ? posts[0] : null;
             

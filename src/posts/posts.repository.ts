@@ -142,6 +142,14 @@ export class PostsRepository extends Repository<Posts>{
             where: { streamMediaId }
         });
     }
+    async getMediasFromPostId(postId) {
+        let post = await this.find({
+            where: {
+                postId
+            },
+            relations: []
+        })
+    }
 
     async getPostsTimeline(filters, userId? : string) {
 
@@ -218,7 +226,14 @@ export class PostsRepository extends Repository<Posts>{
                         from user_badges
                         inner join badges b ON b.id = user_badges.badges_id
                         where user_badges.user_id = p.user_id
-                    ) as badges
+                    ) as badges,
+                    array(
+                        select 
+                        json_build_object('mediaUrl', m.media_url, 'thumbUrl', m.thumbnail_url, 'type', m.type) as medias
+                        from medias m
+                        INNER JOIN posts pp on pp.id = m.post_id 
+                        where pp.id = p.id
+                    ) as medias
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
