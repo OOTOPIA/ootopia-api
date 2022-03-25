@@ -59,7 +59,7 @@ export class FriendsService {
         let totalFriends = await this.friendRequestsRepository.totalFriends(page);
         
         return {
-            friends: searchFriends, alreadyFriends, total: totalFriends
+            searchFriends, alreadyFriends, total: totalFriends
         }
     }
 
