@@ -54,8 +54,13 @@ export class FriendsService {
                 404
             );
         }
+        let searchFriends = await this.friendRequestsRepository.searchFriends(page);
+        let alreadyFriends = await this.friendRequestsRepository.alreadyFriends(page);
+        let totalFriends = await this.friendRequestsRepository.totalFriends(page);
         
-        return this.friendRequestsRepository.searchFriends(page);
+        return {
+            friends: searchFriends, alreadyFriends, total: totalFriends
+        }
     }
 
     async isFriend(friendId: string, userId: string ){

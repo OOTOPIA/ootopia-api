@@ -55,55 +55,98 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             }
         })
     }
+    async alreadyFriends (filter: NonFriendsSearchParametersDto) {
+        let order = this.orderByQueryParams(filter);
+        return (await this.query(`
+        select 
+        array_to_json(
+            (
+                select ARRAY_AGG(
+                    jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+                )
+                from (
+                    select "type",thumbnail_url 
+                    from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
+                )
+            as "thumbs")
+        ) as "friendsThumbs",
+        u.id,
+        u.fullname,
+        u.photo_url,
+        c.city, 
+        c.state, 
+        c.country
+        from friends_circle fc 
+        inner join users u on fc.friend_id = u.id
+        left join addresses a on a.id = u.address_id
+        left join cities c on c.id = a.city_id
+        where 
+        fc.user_id = $1 and 
+        (
+            u.fullname ilike($2) or
+            u.email = $3
+        )
+        order by u.${order.orderBy} ${order.sortingType}`, [filter.userId, `%${filter.name}%`, filter.name])
+        )
+    } 
+    
+
+    async totalFriends (filter: NonFriendsSearchParametersDto) {
+        return (await this.query(`
+        select count(*)::int from users u
+        where 
+        u.id != $1 and 
+        (
+            u.fullname ilike($2) or
+            u.email = $3
+        )`, [filter.userId, `%${filter.name}%`, filter.name]
+        ))[0].count
+    }
     
     async searchFriends(filter: NonFriendsSearchParametersDto) {
         let order = this.orderByQueryParams(filter);
-        return {
-            total: (await this.query(`
-            select count(*)::int from users u
-            where 
-            u.id != $1 and 
-            (
-                u.fullname ilike($2) or
-                u.email = $3
-            )`, [filter.userId, `%${filter.name}%`, filter.name]
-            ))[0].count,
-            friends: camelcaseKeys( 
-                await this.query(`
-                    select
-                    array_to_json(
-                        (
-                            select ARRAY_AGG(
-                                jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
-                            )
-                            from (
-                                select "type",thumbnail_url 
-                                from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
-                            )
-                        as "thumbs")
-                    ) as "friendsThumbs",
-                    u.id,
-                    u.fullname,
-                    u.photo_url,
-                    u.created_at,
-                    c.city, 
-                    c.state, 
-                    c.country,
-                    EXISTS(select 1 from friends_circle fc where fc.user_id = $1 and fc.friend_id = u.id) as "is_friend"
-                    from users u
-                    left join addresses a on a.id = u.address_id
-                    left join cities c on c.id = a.city_id
-                    where 
-                        u.id != $1 and 
-                        (
-                            u.fullname ilike($2) or
-                            u.email = $5
+        return camelcaseKeys( 
+            await this.query(`
+                select
+                array_to_json(
+                    (
+                        select ARRAY_AGG(
+                            jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
                         )
-                    order by u.${order.orderBy} ${order.sortingType}
-                    offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit, filter.name]
-                )
+                        from (
+                            select "type",thumbnail_url 
+                            from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
+                        )
+                    as "thumbs")
+                ) as "friendsThumbs",
+                u.id,
+                u.fullname,
+                u.photo_url,
+                u.created_at,
+                c.city, 
+                c.state, 
+                c.country
+                from users u
+                left join addresses a on a.id = u.address_id
+                left join cities c on c.id = a.city_id
+                where 
+                    u.id != $1 and 
+                    (
+                        u.fullname ilike($2) or
+                        u.email = $5
+                    ) and 
+                    u.id not in(
+                        select 
+                        fc.friend_id
+                        from friends_circle fc
+                        inner join users fu on fc.friend_id = fu.id
+                        where
+                        fc.user_id = $1
+                         )
+                order by u.${order.orderBy} ${order.sortingType}
+                offset $3 limit $4;`, [filter.userId, `%${filter.name}%`, filter.skip, filter.limit, filter.name]
             )
-        };
+        )
     };
 
     async friendsByUser(filter: FriendSearchParametersDto) {
