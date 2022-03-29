@@ -470,6 +470,23 @@ export class PostsService {
   }
 
   async getPostsTimeline(filters, userId?: string) {
+    return (await this.postsRepository.getPostsTimeline(filters, userId)).map(post => {
+      if(post.type == 'gallery') {
+        let media = post.medias[0];
+        if(media.type == 'image') {
+          post.imageUrl = media.mediaUrl
+        }
+        if(media.type == 'video') {
+          post.videoUrl = media.mediaUrl
+          post.thumbnailUrl = media.thumbUrl
+        }
+        post.type = media.type
+      }
+      return post
+    })
+  }
+
+  async getPostsTimelineV2(filters, userId?: string) {
     return this.postsRepository.getPostsTimeline(filters, userId);
   }
 
