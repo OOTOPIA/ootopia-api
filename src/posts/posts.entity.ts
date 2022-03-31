@@ -46,6 +46,9 @@ export class Posts extends BaseEntity {
   @Column({ nullable: true, name: "media_ids" , type: 'uuid', array: true })
   mediaIds : string[];
 
+  @Column({ name: "tagged_users_id", nullable : true, array: true, type: "uuid" })
+  taggedUsersId: string[];
+
   @Column({ nullable: true, name: "video_url", type: 'varchar' })
   videoUrl : string;
 

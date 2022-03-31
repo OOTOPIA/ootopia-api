@@ -233,7 +233,16 @@ export class PostsRepository extends Repository<Posts>{
                         from medias m
                         INNER JOIN posts pp on pp.id = m.post_id 
                         where pp.id = p.id
-                    ) as medias
+                    ) as medias,
+                    array_to_json(
+                        (
+                            select ARRAY_AGG(
+                                jsonb_build_object('id',u2.id, 'fullname', u2.fullname)
+                            ) 
+                            from (SELECT unnest(p.tagged_users_id) as id ) as tagged_users
+                            inner join users u2 on u2.id = tagged_users.id
+                        )
+                    ) as "usersTagged"
             FROM posts p
             INNER JOIN users ON users.id = p.user_id
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
