@@ -5,7 +5,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@ne
 import { HttpResponseDto } from '../config/http-response.dto';
 import { JwtOptionalAuthGuard } from '../auth/jwt-optional-auth.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { FriendByUser, FriendsWithPosts, IsFriend, SearchFriends, SearchNotFriends } from './dto/friends.dto';
+import { FriendByUser, FriendsWithPosts, FriendsWithPostsAndIsFriend, IsFriend, SearchFriends, SearchFriendsOfUsers, SearchNotFriends } from './dto/friends.dto';
 
 @UseGuards(JwtOptionalAuthGuard)
 @Controller('friends')
@@ -75,6 +75,22 @@ export class FriendsController {
         @Query() filter: SearchFriends
     ) {
         return await this.friendService.friendsByUser({userId ,...filter});
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('friends')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'List all friends of user' })
+    @ApiResponse({ status: 200, description: 'Successfully List', type: FriendsWithPostsAndIsFriend})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Get("/search-by-friends")
+    async searchFriendsByFriends(
+        @Req() { user },
+        @Query() filter: SearchFriendsOfUsers
+    ) {
+        return await this.friendService.friendsByfriends({...filter, userId: filter.friendId, friendId: user.id});
     }
 
     @UseInterceptors(SentryInterceptor)

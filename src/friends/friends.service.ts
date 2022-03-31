@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { FriendRequestsRepository } from './repositories/friends.repository';
 import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
-import { FriendSearchParametersDto, FriendSearchServiceDto, NonFriendsLookupServiceDto, NonFriendsSearchParametersDto } from './dto/friends.dto';
+import { FriendSearchByUserServiceDto, FriendSearchParametersDto, FriendSearchServiceDto, NonFriendsLookupServiceDto, NonFriendsSearchParametersDto } from './dto/friends.dto';
 
 @Injectable()
 export class FriendsService {
@@ -54,8 +54,13 @@ export class FriendsService {
                 404
             );
         }
+        let searchFriends = await this.friendRequestsRepository.searchFriends(page);
+        let alreadyFriends = await this.friendRequestsRepository.alreadyFriends(page);
+        let totalFriends = await this.friendRequestsRepository.totalFriends(page);
         
-        return this.friendRequestsRepository.searchFriends(page);
+        return {
+            searchFriends, alreadyFriends, total: totalFriends
+        }
     }
 
     async isFriend(friendId: string, userId: string ){
@@ -72,6 +77,30 @@ export class FriendsService {
         return { isFriend: !!(await this.friendRequestsRepository.isFriend(friendId, userId))};
     }
 
+    friendsByfriends(filter: FriendSearchByUserServiceDto){
+        let page: FriendSearchParametersDto = {
+            limit: +filter.limit,
+            skip: +filter.limit * +filter.page,
+            userId: filter.userId,
+            orderBy: filter.orderBy,
+            sortingType: filter.sortingType,
+            friendId: filter.friendId,
+        };
+        page.limit = page.limit > 100 ? 100 : page.limit;
+
+        if (page.skip < 0 || (page.skip == 0 && page.limit == 0)) {
+            throw new HttpException(
+                {
+                  status: 404,
+                  error: "Page not found",
+                },
+                404
+            );
+        }
+
+        return this.friendRequestsRepository.friendsByUser(page);
+    }
+
     async friendsByUser(filter: FriendSearchServiceDto){
         let page: FriendSearchParametersDto = {
             limit: +filter.limit,
@@ -79,6 +108,7 @@ export class FriendsService {
             userId: filter.userId,
             orderBy: filter.orderBy,
             sortingType: filter.sortingType,
+            friendId: null,
         };
         page.limit = page.limit > 100 ? 100 : page.limit;
 

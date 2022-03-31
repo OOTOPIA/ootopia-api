@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile,
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto, SendFileDto, CreateFileDto, CreateGalleryDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import path, { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -59,6 +59,53 @@ export class PostsController {
             new ErrorHandling(error);
         }
     }
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Upload a video or image' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: SendFileDto })
+    @ApiResponse({ status: 201, description: 'Video or image uploaded successfully', type : CreateFileDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @ApiConsumes('multipart/form-data')
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage(),
+    }))
+    @Post('/file')
+    async sendFile(@UploadedFile() file, @Req() { user }, @Query('type') type: string) {
+        try {
+            if (!file) {
+                throw new HttpException("Video file is not sent", 400);
+            }
+
+            return await this.postsService.sendFile(file, user, type);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Create post with multiple files' })
+    @ApiBearerAuth('Bearer')
+    @ApiBody({ type: CreateGalleryDto })
+    @ApiResponse({ status: 201, description: 'Video or Image uploaded successfully', type : CreateGalleryDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Post('/gallery')
+    async createGallery(@Req() { user }, @Body() post: CreateGalleryDto) {
+        try {
+            return await this.postsService.createPostGallery(post,user.id);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
@@ -107,6 +154,29 @@ export class PostsController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('posts')
+    @ApiOperation({ summary: 'Returns a list of posts for the timeline in v2' })
+    @ApiBearerAuth('Bearer')
+    @ApiQuery({ name : "limit", type: "number", description: "Limit of posts (50 max.)", required: false })
+    @ApiQuery({ name : "offset", type: "number", required: false })
+    @ApiQuery({ name : "locale", type: "enum", enum: ['pt-BR', 'en'], required: false })
+    @ApiResponse({ status: 200, type: PostTimelineDto, isArray: true })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
+    @Get('/v2')
+    async getPostsV2(@Req() req, @Query() filters : PostsTimelineFilterDto) {
+        try {
+
+            return await this.postsService.getPostsTimelineV2(filters, req.user ? req.user.id : null);
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
     @ApiOperation({ summary: 'Get details for a specific post' })
     @ApiBearerAuth('Bearer')
     @ApiParam({name : "id", type: "string", description: "Post ID" })
@@ -124,6 +194,32 @@ export class PostsController {
             };
 
             let posts = await this.postsService.getPostsTimeline(filters, req.user ? req.user.id : null);
+            
+            return posts.length ? posts[0] : null;
+            
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('posts')
+    @ApiOperation({ summary: 'Get details for a specific post in v2' })
+    @ApiBearerAuth('Bearer')
+    @ApiParam({name : "id", type: "string", description: "Post ID" })
+    @ApiResponse({ status: 200, type: PostTimelineDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtOptionalAuthGuard)
+    @Get('/v2/:id')
+    async getPostDetailsV2(@Req() req, @Param('id') id) {
+        try {
+
+            let filters = {
+                postId : id
+            };
+
+            let posts = await this.postsService.getPostsTimelineV2(filters, req.user ? req.user.id : null);
             
             return posts.length ? posts[0] : null;
             
@@ -214,7 +310,7 @@ export class PostsController {
             }
 
             //await this.videoService.validateWebhookSignature(webhookSignature, req.body);
-            await this.sqsWorkerService.sendUpdatePostVideoStatusMessage({streamMediaId: data.uid, status: data.status.state});
+            await this.sqsWorkerService.sendUpdatePostVideoStatusMessage({streamMediaId: data.uid, status: data.status.state, duration: data.duration});
             
         } catch (error) {
             new ErrorHandling(error);
@@ -273,7 +369,7 @@ export class PostsController {
     async getComments(@Request() req: Request, @Param('postId') postId, @Query() filters : CommentsFilterDto) {
         try {
 
-            return await this.commentsService.getComments(postId, filters.page);
+            return this.commentsService.getComments(postId, filters.page);
             
         } catch (error) {
             new ErrorHandling(error);

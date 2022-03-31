@@ -162,7 +162,11 @@ export class FilterSearchUsers {
     @ApiProperty({ required: true, example : "joão" })
     @IsNotEmpty()
     fullname: string;
+
+    @ApiProperty({required: false})
+    excludedUsers?: string;
 }
+
 
 export class ResetPasswordDto {
            

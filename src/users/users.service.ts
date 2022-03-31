@@ -444,6 +444,11 @@ export class UsersService {
     }
 
     async getUsersList(filter : FilterSearchUsers) {
+        let excludedUsers;
+        console.log(filter.excludedUsers)
+        if(filter.excludedUsers) {
+            excludedUsers = filter.excludedUsers.split(',')
+        }
         let skip = (filter.page - 1) * filter.limit;
         filter.limit = filter.limit  > 100 ? 100 : filter.limit;
 
@@ -456,8 +461,7 @@ export class UsersService {
                 404
               );
         }
-        
-        return this.usersRepository.usersList(skip ,filter.limit, filter.fullname);
+        return this.usersRepository.usersList(skip ,filter.limit, filter.fullname, excludedUsers);
     }
 
     msToTime(duration) {
