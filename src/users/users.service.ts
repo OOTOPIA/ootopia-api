@@ -445,7 +445,6 @@ export class UsersService {
 
     async getUsersList(filter : FilterSearchUsers) {
         let excludedUsers;
-        console.log(filter.excludedUsers)
         if(filter.excludedUsers) {
             excludedUsers = filter.excludedUsers.split(',')
         }

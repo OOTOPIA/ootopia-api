@@ -48,6 +48,9 @@ export class CreateGalleryDto {
     @ApiProperty({ required: true})
     mediaIds: string[];
 
+    @ApiProperty({ required: true})
+    taggedUsersId: string[]
+
     @ApiProperty({ required: true, example : "My first awesome post!"})
     description : string;
 

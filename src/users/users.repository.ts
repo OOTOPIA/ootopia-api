@@ -165,7 +165,6 @@ export class UsersRepository extends Repository<Users>{
     }
 
     async usersList(skip: number, limit: number, fullname: string, excludedUsers: string[]) {
-        console.log(excludedUsers)
         return this.find({
             select: [ "id","email","fullname", "photoUrl"],
             where: { fullname: ILike(`%${fullname}%`) , ...(excludedUsers && {id: Not(In(excludedUsers))})},

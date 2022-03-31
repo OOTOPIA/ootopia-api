@@ -20,6 +20,8 @@ import { LinksService } from 'src/links/links.service';
 import { UsersService } from 'src/users/users.service';
 import * as jimp from 'jimp';
 import { MediasRepository } from './media.repository';
+import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
+import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
 
 @Injectable()
 export class PostsService {
@@ -37,6 +39,8 @@ export class PostsService {
     private readonly generalConfigService: GeneralConfigService,
     private readonly walletsService: WalletsService,
     private readonly usersService: UsersService,
+    private readonly usersDeviceTokenService: UsersDeviceTokenService,
+    private readonly notificationMessagesService: NotificationMessagesService,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
   ) { }
@@ -214,6 +218,10 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(postData.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(postData.id, 'ready')
+          if(postData.taggedUsersId && postData.taggedUsersId.length) {
+            await this.sendNotificationToTaggedUser(postData.id, postData.userId, postData.taggedUsersId)
+          }
+          
         } else {
           await this.postsRepository.updatePostStatus(postData.id, 'unready')
         }
@@ -385,6 +393,9 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(post.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(post.id, 'ready')
+          if(post.taggedUsersId && post.taggedUsersId.length) {
+            await this.sendNotificationToTaggedUser(post.id, post.userId, post.taggedUsersId)
+          }
         }
       }
       return media
@@ -503,5 +514,26 @@ export class PostsService {
 
   async countPostUserRewarded(postId: string, userId: string, oozRewarded: number) {
     return await this.postsUsersRewardedRepository.countReward(postId, userId, oozRewarded);
+  }
+
+  async sendNotificationToTaggedUser(postId, postUserId, usersTaggedsId) {
+    let [userPost, usersTokenTagged] = await Promise.all([
+      this.usersService.getUserById(postUserId),
+      this.usersDeviceTokenService.getByUsersId(usersTaggedsId),
+    ]);
+    let notifications = usersTokenTagged.filter( user => !!user)
+    .map( (user: any) =>  
+      ({
+        token: user.deviceToken,
+        data: {
+          type: "user-tagged-in-post",
+          postId: postId,
+          usersName: <any>JSON.stringify([userPost.fullname])
+        }
+      })
+    )
+    if (notifications.length) {
+      await this.notificationMessagesService.sendFirebaseMessages(notifications);
+    }
   }
 }
