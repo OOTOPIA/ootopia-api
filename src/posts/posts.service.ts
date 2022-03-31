@@ -218,8 +218,8 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(postData.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(postData.id, 'ready')
-          if(postData.taggedUsersId.length > 0) {
-            await this.sendNotificationToTaggedUser(postData)
+          if(postData.taggedUsersId && postData.taggedUsersId.length) {
+            await this.sendNotificationToTaggedUser(postData.id, postData.userId, postData.taggedUsersId)
           }
           
         } else {
@@ -393,8 +393,8 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(post.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(post.id, 'ready')
-          if(post.taggedUsersId.length > 0) {
-            await this.sendNotificationToTaggedUser(post)
+          if(post.taggedUsersId && post.taggedUsersId.length) {
+            await this.sendNotificationToTaggedUser(post.id, post.userId, post.taggedUsersId)
           }
         }
       }
@@ -516,10 +516,10 @@ export class PostsService {
     return await this.postsUsersRewardedRepository.countReward(postId, userId, oozRewarded);
   }
 
-  async sendNotificationToTaggedUser(postData) {
+  async sendNotificationToTaggedUser(postId, postUserId, usersTaggedsId) {
     let [userPost, usersTokenTagged] = await Promise.all([
-      this.usersService.getUserById(postData.userId),
-      this.usersDeviceTokenService.getByUsersId(postData.taggedUsersId),
+      this.usersService.getUserById(postUserId),
+      this.usersDeviceTokenService.getByUsersId(usersTaggedsId),
     ]);
     let notifications = usersTokenTagged.filter( user => !!user)
     .map( (user: any) =>  
@@ -527,7 +527,7 @@ export class PostsService {
         token: user.deviceToken,
         data: {
           type: "user-tagged-in-post",
-          postId: postData.id,
+          postId: postId,
           usersName: <any>JSON.stringify([userPost.fullname])
         }
       })
