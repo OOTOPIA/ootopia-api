@@ -485,11 +485,12 @@ export class PostsService {
       if(post.type == 'gallery') {
         let media = post.medias[0];
         if(media.type == 'image') {
-          post.imageUrl = media.mediaUrl
+          post.imageUrl = media.mediaUrl;
+          post.thumbnailUrl = media.mediaUrl;
         }
         if(media.type == 'video') {
-          post.videoUrl = media.mediaUrl
-          post.thumbnailUrl = media.thumbUrl
+          post.videoUrl = media.mediaUrl;
+          post.thumbnailUrl = media.thumbUrl;
         }
         post.type = media.type
       }
