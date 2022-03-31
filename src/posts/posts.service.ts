@@ -218,23 +218,8 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(postData.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(postData.id, 'ready')
-          let [userPost, usersTokenTagged] = await Promise.all([
-            this.usersService.getUserById(postData.userId),
-            this.usersDeviceTokenService.getByUsersId(postData.taggedUsersId),
-          ]);
-          let notifications = usersTokenTagged.filter( user => !!user)
-          .map( (user: any) =>  
-            ({
-              token: user.deviceToken,
-              data: {
-                type: "user-tagged-in-post",
-                postId: postData.id,
-                usersName: <any>JSON.stringify([userPost.fullname])
-              }
-            })
-          )
-          if (notifications.length) {
-            await this.notificationMessagesService.sendFirebaseMessages(notifications);
+          if(postData.taggedUsersId.length > 0) {
+            await this.sendNotificationToTaggedUser(postData)
           }
           
         } else {
@@ -408,23 +393,8 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(post.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(post.id, 'ready')
-          let [userPost, usersTokenTagged] = await Promise.all([
-            this.usersService.getUserById(post.userId),
-            this.usersDeviceTokenService.getByUsersId(post.taggedUsersId),
-          ]);
-          let notifications = usersTokenTagged.filter( user => !!user)
-          .map( (user: any) =>  
-            ({
-              token: user.deviceToken,
-              data: {
-                type: "user-tagged-in-post",
-                postId: media.postId,
-                usersName: <any>JSON.stringify([userPost.fullname])
-              }
-            })
-          )
-          if (notifications.length) {
-            await this.notificationMessagesService.sendFirebaseMessages(notifications);
+          if(post.taggedUsersId.length > 0) {
+            await this.sendNotificationToTaggedUser(post)
           }
         }
       }
@@ -544,5 +514,26 @@ export class PostsService {
 
   async countPostUserRewarded(postId: string, userId: string, oozRewarded: number) {
     return await this.postsUsersRewardedRepository.countReward(postId, userId, oozRewarded);
+  }
+
+  async sendNotificationToTaggedUser(postData) {
+    let [userPost, usersTokenTagged] = await Promise.all([
+      this.usersService.getUserById(postData.userId),
+      this.usersDeviceTokenService.getByUsersId(postData.taggedUsersId),
+    ]);
+    let notifications = usersTokenTagged.filter( user => !!user)
+    .map( (user: any) =>  
+      ({
+        token: user.deviceToken,
+        data: {
+          type: "user-tagged-in-post",
+          postId: postData.id,
+          usersName: <any>JSON.stringify([userPost.fullname])
+        }
+      })
+    )
+    if (notifications.length) {
+      await this.notificationMessagesService.sendFirebaseMessages(notifications);
+    }
   }
 }
