@@ -280,8 +280,12 @@ export class PostsService {
     }
   }
 
-  getPostById(id: string) {
-    return this.postsRepository.getPostById(id);
+  async getPostById(id: string) {
+    let post = await this.postsRepository.getPostById(id);
+    if(!post.thumbnailUrl) {
+      post.thumbnailUrl = post.medias[0].thumbUrl
+    }
+    return post
   }
 
   async getPostShareLink(id: string) {
