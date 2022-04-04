@@ -130,7 +130,14 @@ export class PostsRepository extends Repository<Posts>{
     async getPostById(id) : Promise<Posts> {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
-                p.*
+                p.*,
+                array(
+                    select 
+                    json_build_object('mediaUrl', m.media_url, 'thumbUrl', m.thumbnail_url, 'type', m.type) as medias
+                    from medias m
+                    INNER JOIN posts pp on pp.id = m.post_id 
+                    where pp.id = p.id
+                ) as medias
             FROM posts p
             WHERE p.id = $1 and deleted_at is null
         `, [id]), { deep : true });
