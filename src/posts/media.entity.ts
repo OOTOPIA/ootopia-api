@@ -26,8 +26,12 @@ export class Medias extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Posts, post => post.id)
-    @JoinColumn({ name: "post_id" })
+    @ManyToOne(type => Posts, post => post.id, {
+        cascade: true,
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+    })
+    @JoinColumn({ name: "post_id"})
     post: Posts;
 
     @Column({ nullable: true, type: 'varchar', name: "post_id" })
