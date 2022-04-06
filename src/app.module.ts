@@ -1,4 +1,3 @@
-import { FriendsModule } from './friends/friends.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -20,13 +19,14 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SqsModule } from '@ssut/nestjs-sqs';
 import { SqsWorkerModule } from './sqs-worker/sqs-worker.module';
 import { BadgesModule } from './badges/badges.module';
-import { InvitationsCodesModule } from './invitations-codes/invitations-codes.module'
+import { InvitationsCodesModule } from './invitations-codes/invitations-codes.module';
 import { LearningTracksModule } from './learning-tracks/learning-tracks.module';
 import { StrapiModule } from './strapi/strapi.module';
 import { MarketPlaceModule } from './market-place/market-place.module';
 import { NotificationMessagesService } from './notification-messages/notification-messages.service';
 import { UsersDeviceTokenModule } from './users-device-token/users-device-token.module';
 import { LinksService } from './links/links.service';
+import { FriendsModule } from './friends/friends.module';
 import { AppleAppSiteAssociationModule } from './apple-app-site-association/apple-app-site-association.module';
 import { PostCommentRepliesModule } from './post-comment-replies/post-comment-replies.module';
 import * as AWS from 'aws-sdk';
