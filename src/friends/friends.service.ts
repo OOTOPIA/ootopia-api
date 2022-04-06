@@ -3,6 +3,7 @@ import { FriendRequestsRepository } from './repositories/friends.repository';
 import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
 import { FriendSearchByUserServiceDto, FriendSearchParametersDto, FriendSearchServiceDto, NonFriendsLookupServiceDto, NonFriendsSearchParametersDto } from './dto/friends.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class FriendsService {
@@ -10,18 +11,22 @@ export class FriendsService {
     constructor(
         private readonly friendRequestsRepository: FriendRequestsRepository,
         private readonly notificationService: NotificationMessagesService,
-        private readonly userDeviceToken: UsersDeviceTokenService
+        private readonly userDeviceToken: UsersDeviceTokenService,
+        private readonly usersService: UsersService,
     ) { }
 
     async addFriend(userId: string, friendId: string) {
         let friend = this.friendRequestsRepository.addFriend(userId, friendId)
-
+        let user = await this.usersService.getUserById(userId);
         let allTokensDevices = await this.userDeviceToken.getByUsersId(friendId);
         let messagesNotification = allTokensDevices.map(device => (
             {
                 token: device.deviceToken,
                 data: {
                     type: 'new-follower',
+                    photoUrl: user.photoUrl || '',
+                    usersName: <any>JSON.stringify([user.fullname]),
+                    userId: user.id,
                 }
             }
         ));
