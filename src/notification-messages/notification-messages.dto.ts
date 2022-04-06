@@ -24,7 +24,7 @@ export class NotificationDataDTO {
     commentId?: string;
 
     @ApiProperty()
-    usersId?: string;
+    userId?: string;
     
     @ApiProperty()
     photoUrl?: string;

@@ -26,7 +26,7 @@ export class FriendsService {
                     type: 'new-follower',
                     photoUrl: user.photoUrl || '',
                     usersName: <any>JSON.stringify([user.fullname]),
-                    usersId: user.id,
+                    userId: user.id,
                 }
             }
         ));
