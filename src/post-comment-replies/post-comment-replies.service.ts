@@ -46,7 +46,7 @@ export class PostCommentRepliesService {
           data: {
             type: "user-tagged-in-comment-reply",
             postId: post.id,
-            photoUrl : post.thumbnailUrl,
+            photoURL : post.thumbnailUrl,
             commentId : commentReply.commentId,
             usersName: <any>JSON.stringify([userComment.fullname]),
           }
@@ -62,7 +62,7 @@ export class PostCommentRepliesService {
           data: {
             type: "user-tagged-in-comment",
             postId: post.id,
-            photoUrl : post.thumbnailUrl,
+            photoURL : post.thumbnailUrl,
             commentId : commentReply.commentId,
             usersName: <any>JSON.stringify([userComment.fullname])
           }

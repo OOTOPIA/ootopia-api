@@ -24,7 +24,7 @@ export class FriendsService {
                 token: device.deviceToken,
                 data: {
                     type: 'new-follower',
-                    photoUrl: user.photoUrl || '',
+                    photoURL: user.photoUrl || '',
                     usersName: <any>JSON.stringify([user.fullname]),
                     userId: user.id,
                 }
