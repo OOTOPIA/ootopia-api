@@ -2,6 +2,7 @@ import { IsNotEmpty, min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Double } from 'typeorm';
+import { FriendsThumbs } from 'src/friends/dto/friends.dto';
 
 class UserLinks {
     @ApiProperty({ required: false, example : "www.google.com.br"})
@@ -174,6 +175,88 @@ export class ResetPasswordDto {
     @IsNotEmpty()
     password : string;   
   
+}
+
+export class UserOfContact {
+    @ApiProperty({ required: true, example: true })
+    isMarketPlace: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    isLearningTracks: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    hasNumberPhone: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    hasEmail: boolean;
+
+    @ApiProperty({ required: true, nullable : true, example: 50 })
+    totalPosts: number;
+
+    @ApiProperty({ nullable : true, type: [FriendsThumbs, FriendsThumbs, FriendsThumbs, FriendsThumbs, FriendsThumbs] })
+    friendsThumbs: FriendsThumbs[];
+
+    @ApiProperty({ required: true, example: "d651768b-6c9a-45ef-aa18-1d90b9dcc223" })
+    id: string;
+    
+    @ApiProperty({ required: true, example: "Claudio Fake" })
+    fullname: string;
+    
+    @ApiProperty({ required: true, nullable : true })
+    photoUrl: string;
+
+    @ApiProperty({ required: true, example: "2021-04-09T18:02:59.219Z"})
+    createdAt: Date;
+
+    @ApiProperty({ required: true ,nullable : true, example: "Bertioga" })
+    city: string;
+
+    @ApiProperty({ required: true, example: "São Paulo" })
+    state: string;
+
+    @ApiProperty({ required: true, example: "BR" })
+    country: string;
+}
+
+export class FriendByUser {
+    @ApiProperty({ required: true, type: UserOfContact})
+    @IsNotEmpty()
+    friends : UserOfContact;
+}
+
+export class SuggestedFriendsDto {
+    @ApiProperty({ required: false })
+    importedContactNumbers? : string[];
+    
+    @ApiProperty({ required: false })
+    importedContactEmails? : string[];
+
+    @ApiProperty({ required: true, example: 100})
+    @IsNotEmpty()
+    limit : number;
+
+    @ApiProperty({ required: true, example: 1 })
+    @IsNotEmpty()
+    page : number;
+}
+
+export class SuggestedFriendsRepositoryDto {
+    @ApiProperty({ required: false })
+    id: string;
+           
+    @ApiProperty({ required: false })
+    importedContactNumbers : string[];
+    
+    @ApiProperty({ required: false })
+    importedContactEmails : string[];
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    offset : number;
+
+    @ApiProperty({ required: true })
+    @IsNotEmpty()
+    limit : number;
 }
 
 export class ResetPasswordResponseDto {

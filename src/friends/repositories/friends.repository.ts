@@ -65,7 +65,14 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                     jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
                 )
                 from (
-                    select "type",thumbnail_url 
+                    select "type",
+                    (
+                        CASE 
+                            when thumbnail_url is not null
+                            then thumbnail_url
+                            else (select m.thumbnail_url from medias m where m.id = any(pt.media_ids) limit 1 )
+                        end
+                    ) as "thumbnail_url"
                     from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
                 )
             as "thumbs")
@@ -114,7 +121,14 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                             jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
                         )
                         from (
-                            select "type",thumbnail_url 
+                            select "type",
+                            (
+                                CASE 
+                                    when thumbnail_url is not null
+                                    then thumbnail_url
+                                    else (select m.thumbnail_url from medias m where m.id = any(pt.media_ids) limit 1 )
+                                end
+                            ) as "thumbnail_url" 
                             from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
                         )
                     as "thumbs")
@@ -170,7 +184,14 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                             jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
                         )
                     from (
-                        select "type",thumbnail_url 
+                        select "type",
+                        (
+                            CASE 
+                                when thumbnail_url is not null
+                                then thumbnail_url
+                                else (select m.thumbnail_url from medias m where m.id = any(pt.media_ids) limit 1 ) 
+                            end 
+                        ) as "thumbnail_url" 
                         from posts pt where pt.user_id = fc.friend_id and pt.deleted_at is null order by pt.created_at desc limit 5
                     ) as "thumbs")
                 ) as "friendsThumbs",

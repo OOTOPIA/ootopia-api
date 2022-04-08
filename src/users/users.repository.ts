@@ -2,6 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection, ILike, Not, In } from 'typeorm';
 import * as camelcaseKeys from 'camelcase-keys';
 import { Users } from "./users.entity";
+import { SuggestedFriendsRepositoryDto } from "./users.dto";
 
 @Injectable()
 @EntityRepository(Users)
@@ -181,6 +182,107 @@ export class UsersRepository extends Repository<Users>{
             .set({ dontAskAgainToConfirmGratitudeReward : true })
             .where("id = :id", { id })
             .execute();
+    }
+
+    async retrieveSuggestedFriends(suggestedFriends: SuggestedFriendsRepositoryDto) {
+        return camelcaseKeys(
+            await getConnection().query(
+                `select 
+                ((select id from market_place_products mpp where mpp.user_id = u.id limit 1) is not null) as "isMarketPlace",
+                ((select id from learning_tracks lt where lt.user_id = u.id limit 1) is not null) as "isLearningTracks",
+                (u.phone = any($3) is true)  as "hasNumberPhone",
+                (u.email = any($2) is true)  as "hasEmail",
+                CASE 
+                    WHEN (u.id = any(
+                            select "posts".id 
+                            from (
+                                select 
+                                u.id, 
+                                (
+                                    select count(*) 
+                                    from posts p 
+                                    where p.user_id = u.id and 
+                                    now() - INTERVAL '1 MONTH' >= p.created_at 
+                                ) as "total_posts" 
+                                from users u 
+                                order by "total_posts" desc limit 5
+                            ) as "posts"
+                        ))
+                    then (
+                                    select count(*) 
+                                    from posts p 
+                                    where p.user_id = u.id and 
+                                    now() - INTERVAL '1 MONTH' >= p.created_at 
+                                ) 
+                    else null 
+                end "totalPosts",
+                array_to_json(
+                    (
+                        select ARRAY_AGG(
+                            jsonb_build_object('thumbnailUrl',"thumbs".thumbnail_url, 'type',"thumbs"."type")
+                        )
+                        from (
+                            select "type",
+                            (
+                                CASE 
+                                    when thumbnail_url is not null
+                                    then thumbnail_url
+                                    else (select m.thumbnail_url from medias m where m.id = any(pt.media_ids) limit 1 )
+                                end
+                            ) as "thumbnail_url" 
+                            from posts pt where pt.user_id = u.id  and pt.deleted_at is null order by pt.created_at desc limit 5
+                        )
+                    as "thumbs")
+                ) as "friendsThumbs",
+                u.id,
+                u.fullname,
+                u.photo_url,
+                u.created_at,
+                c.city, 
+                c.state, 
+                c.country
+                from users u
+                left join addresses a on a.id = u.address_id
+                left join cities c on c.id = a.city_id
+                where 
+                    u.id != $1 and 
+                    (
+                        (
+                            ((select id from friends_circle fc where fc.friend_id = u.id and fc.id = $1) is not null and
+                            (
+                                (select id from market_place_products mpp where mpp.user_id = u.id limit 1) is null or
+                                (select id from learning_tracks lt where lt.user_id = u.id limit 1) is not null) or
+                                u.id = any(
+                                    select "posts".id 
+                                    from (
+                                        select 
+                                        u.id, 
+                                        (
+                                            select count(*) 
+                                            from posts p 
+                                            where p.user_id = u.id and 
+                                            now() - INTERVAL '1 MONTH' >= p.created_at 
+                                        ) as "total_posts" 
+                                        from users u 
+                                        order by "total_posts" desc limit 5
+                                    ) as "posts"
+                                )
+                                or
+                                (
+                                    u.phone = any($3)
+                                )
+                                or
+                                (
+                                    u.email = any($2)
+                                )
+                            )
+                        ) or 
+                        (select id from friends_circle fc where fc.friend_id = u.id and fc.id = $1) is null
+                    ) order by "hasNumberPhone" desc, "hasEmail" desc, "isMarketPlace" desc, "isLearningTracks" desc, "totalPosts" desc limit $5 offset $4;`,
+                [suggestedFriends.id, suggestedFriends.importedContactEmails, suggestedFriends.importedContactNumbers, suggestedFriends.offset, suggestedFriends.limit],
+            )
+        );
+
     }
 
 }
