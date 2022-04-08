@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, FilterSearchUsers} from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, FilterSearchUsers, SuggestedFriendsDto} from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -130,6 +130,25 @@ export class UsersController {
     async getUsersList(@Query() filter: FilterSearchUsers) {
         try {
             return this.usersService.getUsersList(filter);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'users seggested' })
+    @ApiResponse({ status: 200, description: 'return list users suggested' })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(200)
+    @Post('/retrieve-suggested-friends')
+    async retrieveSuggestedFriends(@Req() { user }, @Body() suggestedFriends : SuggestedFriendsDto) {
+        try {
+            return this.usersService.retrieveSuggestedFriends(user.id, suggestedFriends);
         } catch (error) {
             new ErrorHandling(error);
         }
