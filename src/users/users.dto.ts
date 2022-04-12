@@ -218,8 +218,64 @@ export class UserOfContact {
     country: string;
 }
 
+export class SuggestedByUserInProfile {
+    @ApiProperty({ required: true, example: true })
+    isContact: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    sentOOzOfPosts: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    recevedOOzOfPosts: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    usersCommentedOnPosts: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    commentsReceivedOnthePosts: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    usersWithMoreFriends: boolean;
+    
+    @ApiProperty({ required: true, example: true })
+    usersWithMarketPlace: boolean;
+
+    @ApiProperty({ required: true, example: true })
+    usersWithLearningTrack: boolean;
+
+    @ApiProperty({ nullable : true, type: [FriendsThumbs, FriendsThumbs, FriendsThumbs, FriendsThumbs, FriendsThumbs] })
+    friendsThumbs: FriendsThumbs[];
+
+    @ApiProperty({ required: true, example: "d651768b-6c9a-45ef-aa18-1d90b9dcc223" })
+    id: string;
+    
+    @ApiProperty({ required: true, example: "Claudio Fake" })
+    fullname: string;
+    
+    @ApiProperty({ required: true, nullable : true })
+    photoUrl: string;
+
+    @ApiProperty({ required: true, example: "2021-04-09T18:02:59.219Z"})
+    createdAt: Date;
+
+    @ApiProperty({ required: true ,nullable : true, example: "Bertioga" })
+    city: string;
+
+    @ApiProperty({ required: true, example: "São Paulo" })
+    state: string;
+
+    @ApiProperty({ required: true, example: "BR" })
+    country: string;
+}
+
 export class FriendByUser {
     @ApiProperty({ required: true, type: UserOfContact})
+    @IsNotEmpty()
+    friends : UserOfContact;
+}
+
+export class FriendSuggestedByUserInProfile {
+    @ApiProperty({ required: true, type: SuggestedByUserInProfile})
     @IsNotEmpty()
     friends : UserOfContact;
 }

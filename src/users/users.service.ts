@@ -359,12 +359,24 @@ export class UsersService {
         let suggestedFriendsRepositor: SuggestedFriendsRepositoryDto = {
             id,
             offset: (suggestedFriends.page - 1) * suggestedFriends.limit,
-            importedContactEmails: suggestedFriends.importedContactEmails,
-            importedContactNumbers: suggestedFriends.importedContactNumbers,
+            importedContactEmails: suggestedFriends.importedContactEmails || null,
+            importedContactNumbers: suggestedFriends.importedContactNumbers || null,
             limit: suggestedFriends.limit  > 100 ? 100 : suggestedFriends.limit,
         }
         
         return {friends: (await this.usersRepository.retrieveSuggestedFriends(suggestedFriendsRepositor))};
+    }
+
+    async friendsSuggestedProfile(id, suggestedFriends: SuggestedFriendsDto) {
+        let suggestedFriendsRepositor: SuggestedFriendsRepositoryDto = {
+            id,
+            offset: (suggestedFriends.page - 1) * suggestedFriends.limit,
+            importedContactEmails: suggestedFriends.importedContactEmails || null,
+            importedContactNumbers: suggestedFriends.importedContactNumbers || null,
+            limit: suggestedFriends.limit  > 100 ? 100 : suggestedFriends.limit,
+        }
+        
+        return {friends: (await this.usersRepository.friendsSuggestedProfile(suggestedFriendsRepositor))};
     }
 
     async getUserDailyGoalStats(id : string, dailyGoalStartTime? : Date, dailyGoalEndTime? : Date) {
