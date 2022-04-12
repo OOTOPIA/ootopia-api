@@ -82,7 +82,24 @@ export class CronService {
             while (!pagination.finished) {
                 let comments = await getConnection().query(`
                 select udt.device_token as "token", 
-                json_build_object('type','comments', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'postUser', u.fullname) as "data"
+                json_build_object(
+                    'type',
+                    'comments',
+                    'postId',
+                    p.id,
+                    'photoURL',
+                    (
+                        CASE 
+                            when p.thumbnail_url is not null
+                            then p.thumbnail_url
+                            else (select m.thumbnail_url from medias m where m.id = any(p.media_ids) limit 1 )
+                        end 
+                    ),
+                    'usersName', 
+                    array_to_json(array_agg(DISTINCT ou.fullname)), 
+                    'postUser', 
+                    u.fullname
+                ) as "data"
                 from posts_comments pc
                 inner join posts p on p.id = pc.post_id 
                 inner join users ou on ou.id = pc.user_id
@@ -135,7 +152,25 @@ export class CronService {
             while (!pagination.finished) {
                 let gratitudeReward = await getConnection().query(`
                 select udt.device_token as "token",
-                json_build_object('type','gratitude_reward', 'postId', p.id, 'photoURL', p.thumbnail_url,'usersName', array_to_json(array_agg(DISTINCT ou.fullname)), 'oozAmount', sum(wt.balance), 'postUser', u.fullname) as "data"
+                json_build_object(
+                    'type',
+                    'gratitude_reward',
+                    'postId',
+                    p.id,
+                    'photoURL',
+                    (
+                        CASE 
+                            when p.thumbnail_url is not null
+                            then p.thumbnail_url
+                            else (select m.thumbnail_url from medias m where m.id = any(p.media_ids) limit 1 )
+                        end 
+                    ),
+                    'usersName',
+                    array_to_json(array_agg(DISTINCT ou.fullname)),
+                    'oozAmount',
+                    sum(wt.balance),
+                    'postUser',
+                    u.fullname) as "data"
                 from wallet_transfers wt 
                 inner join posts p on p.id = wt.post_id 
                 inner join users ou on ou.id = wt.other_user_id 
