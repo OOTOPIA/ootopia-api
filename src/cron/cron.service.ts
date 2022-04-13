@@ -26,45 +26,45 @@ export class CronService {
         @Inject(forwardRef(() => SqsWorkerService)) private readonly sqsWorkerService : SqsWorkerService,
     ){}
 
-    @Cron(CronExpression.EVERY_DAY_AT_11PM)
-    async cronDailyGoalDistribution() {
+    // @Cron(CronExpression.EVERY_DAY_AT_11PM)
+    // async cronDailyGoalDistribution() {
 
-        try {
+    //     try {
 
-            this.allUsersUsedAppIsLoading = true;
-            let allUsersIds = [];
+    //         this.allUsersUsedAppIsLoading = true;
+    //         let allUsersIds = [];
 
-            let globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
-            let dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
+    //         let globalGoalLimitTimeConfig = await this.generalConfigService.getConfig(ConfigName.GLOBAL_GOAL_LIMIT_TIME_IN_UTC);
+    //         let dailyGoalStartTime = this.generalConfigService.getDailyGoalStartTime(globalGoalLimitTimeConfig.value);
 
-            while(this.allUsersUsedAppIsLoading) {
+    //         while(this.allUsersUsedAppIsLoading) {
 
-                let usersIds = (await this.usersAppUsageTimeService.getUsersIdsWhoUsedAppInThisPeriod(dailyGoalStartTime, this.allUsersUsedAppPage)).map((user) => user.userId);
+    //             let usersIds = (await this.usersAppUsageTimeService.getUsersIdsWhoUsedAppInThisPeriod(dailyGoalStartTime, this.allUsersUsedAppPage)).map((user) => user.userId);
 
-                if (!usersIds || !usersIds.length) {
-                    this.allUsersUsedAppIsLoading = false;
-                    this.allUsersUsedAppPage = 1;
-                    console.log("<<< end cronDailyGoalDistribution #1");
-                    break;
-                }
+    //             if (!usersIds || !usersIds.length) {
+    //                 this.allUsersUsedAppIsLoading = false;
+    //                 this.allUsersUsedAppPage = 1;
+    //                 console.log("<<< end cronDailyGoalDistribution #1");
+    //                 break;
+    //             }
 
-                usersIds.forEach((id) => {
-                    if (allUsersIds.indexOf(id) == -1) {
-                        allUsersIds.push(id);
-                    }
-                });
+    //             usersIds.forEach((id) => {
+    //                 if (allUsersIds.indexOf(id) == -1) {
+    //                     allUsersIds.push(id);
+    //                 }
+    //             });
 
-                this.allUsersUsedAppPage++;
+    //             this.allUsersUsedAppPage++;
 
-            }
+    //         }
 
-            await this.sqsWorkerService.sendDailyGoalUsersIdsMessage({ usersIds : allUsersIds });
+    //         await this.sqsWorkerService.sendDailyGoalUsersIdsMessage({ usersIds : allUsersIds });
 
-        }catch(err) {
-            console.log('ERROR: cronDailyGoalDistribution >>>>', err);
-        }
+    //     }catch(err) {
+    //         console.log('ERROR: cronDailyGoalDistribution >>>>', err);
+    //     }
 
-    }
+    // }
 
     @Cron(CronExpression.EVERY_DAY_AT_5PM)
     async cronPushNotificationComments() {        

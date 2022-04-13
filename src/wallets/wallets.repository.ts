@@ -64,6 +64,7 @@ export class WalletsRepository extends Repository<Wallets>{
             throw new Exception("balance is invalid");
         }
         wallet.totalBalance = +(+wallet.totalBalance + +balance).toFixed(2);
+        this.save(wallet)
         return wallet;
     }
 
@@ -79,6 +80,7 @@ export class WalletsRepository extends Repository<Wallets>{
         }else{
             wallet.totalBalance = 0;
         }
+        this.save(wallet)
         return wallet;
     }
 
