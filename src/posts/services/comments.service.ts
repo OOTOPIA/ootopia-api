@@ -26,7 +26,7 @@ export class CommentsService {
     let notifications = []
 
     let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId)
-    notifications.concat(userTokenPost.filter(user => !!user).map((user: any) =>
+    notifications = notifications.concat(userTokenPost.filter(user => !!user).map((user: any) =>
     ({
       token: user.deviceToken,
       data: {
@@ -40,7 +40,7 @@ export class CommentsService {
     ))
     if (Array.isArray(commentData.taggedUser) && commentData.taggedUser.length) {
       commentData.taggedUser = [...new Set(commentData.taggedUser)]; //O front enviou ID's iguais e isso vai impedir duplicar notificações
-      notifications.concat(usersToken.filter(user => !!user).map((user: any) =>
+      notifications = notifications.concat(usersToken.filter(user => !!user).map((user: any) =>
       ({
         token: user.deviceToken,
         data: {
