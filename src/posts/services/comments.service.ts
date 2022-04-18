@@ -23,9 +23,10 @@ export class CommentsService {
       this.usersService.getUserById(<any>comment.userId),
       this.usersDeviceTokenService.getByUsersId(commentData.taggedUser),
     ]);
+    let notifications = []
 
     let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId)
-    let notificationsOwnerPost = userTokenPost.filter(user => !!user).map((user: any) =>
+    notifications.concat(userTokenPost.filter(user => !!user).map((user: any) =>
     ({
       token: user.deviceToken,
       data: {
@@ -36,11 +37,10 @@ export class CommentsService {
         usersName: <any>JSON.stringify([userComment.fullname])
       }
     })
-    )
-    await this.notificationMessagesService.sendFirebaseMessages(notificationsOwnerPost);
+    ))
     if (Array.isArray(commentData.taggedUser) && commentData.taggedUser.length) {
       commentData.taggedUser = [...new Set(commentData.taggedUser)]; //O front enviou ID's iguais e isso vai impedir duplicar notificações
-      let notifications = usersToken.filter(user => !!user).map((user: any) =>
+      notifications.concat(usersToken.filter(user => !!user).map((user: any) =>
       ({
         token: user.deviceToken,
         data: {
@@ -51,10 +51,10 @@ export class CommentsService {
           usersName: <any>JSON.stringify([userComment.fullname])
         }
       })
-      );
-      if (notifications.length) {
-        await this.notificationMessagesService.sendFirebaseMessages(notifications);
-      }
+      ));
+    }
+    if (notifications.length) {
+      await this.notificationMessagesService.sendFirebaseMessages(notifications);
     }
 
     return comment;
