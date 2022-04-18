@@ -328,9 +328,7 @@ export class PostsService {
     if (likeResult.liked) {
       let formatOOz = await this.sendRewardToCreatorForWoowReceived(postId);
       let post = await this.getPostById(postId)
-      console.log(post)
       let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId)
-      console.log(userTokenPost)
       let userlikedPost = await this.usersService.getUserById(userId)
       let notifications = userTokenPost.filter(user => !!user).map((user: any) =>
       ({
@@ -345,8 +343,7 @@ export class PostsService {
       }))
 
       if(notifications.length) {
-        let notifi = await this.notificationMessagesService.sendFirebaseMessages(notifications);
-        console.log(notifi)
+        await this.notificationMessagesService.sendFirebaseMessages(notifications);
       }
 
     }

@@ -37,8 +37,7 @@ export class CommentsService {
       }
     })
     )
-    let notifi = await this.notificationMessagesService.sendFirebaseMessages(notificationsOwnerPost);
-    console.log(notifi);
+    await this.notificationMessagesService.sendFirebaseMessages(notificationsOwnerPost);
     if (Array.isArray(commentData.taggedUser) && commentData.taggedUser.length) {
       commentData.taggedUser = [...new Set(commentData.taggedUser)]; //O front enviou ID's iguais e isso vai impedir duplicar notificações
       let notifications = usersToken.filter(user => !!user).map((user: any) =>
@@ -54,7 +53,7 @@ export class CommentsService {
       })
       );
       if (notifications.length) {
-        await this.notificationMessagesService.sendFirebaseMessages(notifications );
+        await this.notificationMessagesService.sendFirebaseMessages(notifications);
       }
     }
 
