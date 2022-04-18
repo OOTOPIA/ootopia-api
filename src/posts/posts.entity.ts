@@ -28,7 +28,7 @@ export class Posts extends BaseEntity {
 
   @ManyToOne(type => Users, user => user.id)
   @JoinColumn({ name: "user_id" })
-  userId : Users;
+  userId : string;
 
   @Column({ nullable: true, type: 'varchar' })
   description : string;
