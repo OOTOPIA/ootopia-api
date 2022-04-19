@@ -228,7 +228,7 @@ export class PostsService {
           postResult.oozGenerated = 0
         }
         // if (postResult.type === 'gallery') {
-          
+
         // }
         //else {
         //   await this.sendRewardToCreatorForPostPhoto(postResult.id);
@@ -326,7 +326,26 @@ export class PostsService {
   async likePost(postId, userId) {
     const likeResult = await this.postsRepository.likePost(postId, userId);
     if (likeResult.liked) {
-      await this.sendRewardToCreatorForWoowReceived(postId);
+      let formatOOz = await this.sendRewardToCreatorForWoowReceived(postId);
+      let post = await this.getPostById(postId)
+      let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId)
+      let userlikedPost = await this.usersService.getUserById(userId)
+      let notifications = userTokenPost.filter(user => !!user).map((user: any) =>
+      ({
+        token: user.deviceToken,
+        data: {
+          type: "gratitude_reward",
+          postId: post.id,
+          photoURL: post?.thumbnailUrl,
+          oozAmount: String(formatOOz),
+          usersName: <any>JSON.stringify([userlikedPost.fullname])
+        }
+      }))
+
+      if(notifications.length) {
+        await this.notificationMessagesService.sendFirebaseMessages(notifications);
+      }
+
     }
     return likeResult;
   }
@@ -375,12 +394,14 @@ export class PostsService {
       );
 
       await queryRunner.commitTransaction();
+      return oozToReward
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
       await queryRunner.release();
     }
+    
   }
 
   //Se rewardToCreator for true, uma recompensa em OOZ será transferida ao criador a cada 60 segundos do vídeo postado se o novo status do video for "ready"
