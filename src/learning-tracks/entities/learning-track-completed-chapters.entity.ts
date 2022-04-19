@@ -29,6 +29,9 @@ export class LearningTrackCompletedChapters extends BaseEntity {
     @Column({ nullable: false, type: 'numeric', name: "chapter_id" })
     chapterId : number;
 
+    @Column({ nullable: true, type: 'numeric', array: true, name: "hashtags_strapi_id" })
+    hashtagsStrapiId : number;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

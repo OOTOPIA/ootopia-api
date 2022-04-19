@@ -31,6 +31,9 @@ export class InterestsTags extends BaseEntity {
     @Column({ nullable : false, type: 'boolean', default: () => "false" })
     active : boolean;
 
+    @Column({ nullable: true, name: 'strapi_id', type: 'numeric' })
+    strapiId : number;
+
     @Column({ nullable: false, name: 'tag_order', type: 'numeric', default: () => "1" })
     tagOrder : number;
 
