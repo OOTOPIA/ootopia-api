@@ -218,21 +218,23 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(postData.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(postData.id, 'ready')
-          if(postData.taggedUsersId && postData.taggedUsersId.length) {
+          if (postData.taggedUsersId && postData.taggedUsersId.length) {
             await this.sendNotificationToTaggedUser(postData.id, postData.userId, postData.taggedUsersId)
           }
-          
+          let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
+          postResult.oozGenerated = transfer.balance;
         } else {
           await this.postsRepository.updatePostStatus(postData.id, 'unready')
+          postResult.oozGenerated = 0
         }
-        // if (postResult.type === 'image') {
-        // } else {
+        // if (postResult.type === 'gallery') {
+
+        // }
+        //else {
         //   await this.sendRewardToCreatorForPostPhoto(postResult.id);
         //   const totalOOZ = (await this.calcOOZToTransferForPostVideos()).toFixed(1);
         //   postResult.oozGenerated = totalOOZ;
         // }
-        let transfer = await this.sendRewardToCreatorForPostPhoto(postResult.id);
-        postResult.oozGenerated = transfer.balance;
       } else {
         throw new HttpException("Error when create post", 400);
       }
@@ -255,7 +257,7 @@ export class PostsService {
         let savedFile = await this.mediasRepository.createOrUpdateMedia(
           { type: 'image', mediaUrl: fileUploaded, thumbnailUrl: fileUploaded, status: "ready" }
         )
-        return {mediaId: savedFile.id}
+        return { mediaId: savedFile.id }
       } else {
         throw new HttpException(
           'When image type is set only .png or .jpeg extensions is accept',
@@ -276,13 +278,13 @@ export class PostsService {
           status: "unready"
         }
       )
-      return {mediaId: savedFile.id}
+      return { mediaId: savedFile.id }
     }
   }
 
   async getPostById(id: string) {
     let post = await this.postsRepository.getPostById(id);
-    if(!post.thumbnailUrl) {
+    if (!post.thumbnailUrl) {
       post.thumbnailUrl = post.medias[0].thumbUrl
     }
     return post
@@ -324,7 +326,26 @@ export class PostsService {
   async likePost(postId, userId) {
     const likeResult = await this.postsRepository.likePost(postId, userId);
     if (likeResult.liked) {
-      await this.sendRewardToCreatorForWoowReceived(postId);
+      let formatOOz = await this.sendRewardToCreatorForWoowReceived(postId);
+      let post = await this.getPostById(postId)
+      let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId)
+      let userlikedPost = await this.usersService.getUserById(userId)
+      let notifications = userTokenPost.filter(user => !!user).map((user: any) =>
+      ({
+        token: user.deviceToken,
+        data: {
+          type: "gratitude_reward",
+          postId: post.id,
+          photoURL: post?.thumbnailUrl,
+          oozAmount: String(formatOOz),
+          usersName: <any>JSON.stringify([userlikedPost.fullname])
+        }
+      }))
+
+      if(notifications.length) {
+        await this.notificationMessagesService.sendFirebaseMessages(notifications);
+      }
+
     }
     return likeResult;
   }
@@ -373,12 +394,14 @@ export class PostsService {
       );
 
       await queryRunner.commitTransaction();
+      return oozToReward
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
       await queryRunner.release();
     }
+    
   }
 
   //Se rewardToCreator for true, uma recompensa em OOZ será transferida ao criador a cada 60 segundos do vídeo postado se o novo status do video for "ready"
@@ -397,13 +420,14 @@ export class PostsService {
         let verify = await this.mediasRepository.verifyMediasStatus(post.mediaIds)
         if (verify) {
           await this.postsRepository.updatePostStatus(post.id, 'ready')
-          if(post.taggedUsersId && post.taggedUsersId.length) {
+          await this.sendRewardToCreatorForPostPhoto(media.postId);
+          if (post.taggedUsersId && post.taggedUsersId.length) {
             await this.sendNotificationToTaggedUser(post.id, post.userId, post.taggedUsersId)
           }
         }
       }
       return media
-    } else { 
+    } else {
       const post = await this.postsRepository.getPostByStreamMediaId(
         streamMediaId,
       );
@@ -420,7 +444,7 @@ export class PostsService {
         await this.sendRewardToCreatorForPost(post.id);
       }
       return result;
-    }    
+    }
   }
 
   async calcOOZToTransferForPostVideos() {
@@ -462,7 +486,7 @@ export class PostsService {
     const post = await this.getPostById(postId);
     const oozToReward = +(
       await this.generalConfigService.getConfig(
-        ConfigName.CREATOR_REWARD_FOR_POSTED_PHOTO,
+        ConfigName.OOZ_BY_POST,
       )
     ).value;
     const receiverUserWalletId = (
@@ -486,13 +510,13 @@ export class PostsService {
 
   async getPostsTimeline(filters, userId?: string) {
     return (await this.postsRepository.getPostsTimeline(filters, userId)).map(post => {
-      if(post.type == 'gallery') {
+      if (post.type == 'gallery') {
         let media = post.medias[0];
-        if(media.type == 'image') {
+        if (media.type == 'image') {
           post.imageUrl = media.mediaUrl;
           post.thumbnailUrl = media.mediaUrl;
         }
-        if(media.type == 'video') {
+        if (media.type == 'video') {
           post.videoUrl = media.mediaUrl;
           post.thumbnailUrl = media.thumbUrl;
         }
@@ -526,8 +550,8 @@ export class PostsService {
       this.usersService.getUserById(postUserId),
       this.usersDeviceTokenService.getByUsersId(usersTaggedsId),
     ]);
-    let notifications = usersTokenTagged.filter( user => !!user)
-    .map( (user: any) =>  
+    let notifications = usersTokenTagged.filter(user => !!user)
+      .map((user: any) =>
       ({
         token: user.deviceToken,
         data: {
@@ -536,7 +560,7 @@ export class PostsService {
           usersName: <any>JSON.stringify([userPost.fullname])
         }
       })
-    )
+      )
     if (notifications.length) {
       await this.notificationMessagesService.sendFirebaseMessages(notifications);
     }

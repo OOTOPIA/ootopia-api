@@ -190,7 +190,7 @@ export class UsersRepository extends Repository<Users>{
                 `select 
                 ((select id from market_place_products mpp where mpp.user_id = u.id limit 1) is not null) as "isMarketPlace",
                 ((select id from learning_tracks lt where lt.user_id = u.id limit 1) is not null) as "isLearningTracks",
-                (u.phone = any($3) is true)  as "hasNumberPhone",
+                (concat(u.dial_code, replace(replace(u.phone, '-', ''),' ', '')) = any($3) is true)  as "hasNumberPhone",
                 (u.email = any($2) is true)  as "hasEmail",
                 CASE 
                     WHEN (u.id = any(
@@ -269,7 +269,7 @@ export class UsersRepository extends Repository<Users>{
                                 )
                                 or
                                 (
-                                    u.phone = any($3)
+                                    concat(u.dial_code, replace(replace(u.phone, '-', ''),' ', '')) = any($3)
                                 )
                                 or
                                 (
@@ -289,7 +289,7 @@ export class UsersRepository extends Repository<Users>{
         return camelcaseKeys(
             await getConnection().query(
                 `select 
-                (u.phone = any($3) is true or u.email = any($2) is true) as "isContact",
+                (concat(u.dial_code, replace(replace(u.phone, '-', ''),' ', '')) = any($3) is true or u.email = any($2) is true) as "isContact",
                 (	
                     (
                         select pur.id
@@ -398,76 +398,75 @@ export class UsersRepository extends Repository<Users>{
                 where u.id != $1 and 
                 (
                         (select id from friends_circle fc where fc.friend_id = u.id and fc.user_id = $1) is null and
-                        (	
-                            
+                        (
+                            -- contacts
+                            (concat(u.dial_code, replace(replace(u.phone, '-', ''),' ', '')) = any($3) is true or u.email = any($2) is true)
+                            or
                             (-- posts that user sent ooz
-                                (u.phone = any($3) is true or u.email = any($2) is true)
-                                or
-                                (
-                                    select pur.id
-                                    from posts_users_rewarded pur
-                                    inner join posts p on p.id = pur.post_id
-                                    where pur.user_id = $1 and p.user_id = u.id limit 1
-                                ) is not null 
-                                or -- posts that user received ooz
-                                (
-                                    select pur.id
-                                    from posts_users_rewarded pur
-                                    inner join posts p on p.id = pur.post_id
-                                    where pur.user_id = u.id and p.user_id = $1 limit 1
-                                ) is not null 
-                                or -- posts that user has commented on
-                                (
-                                    select pc.id from posts_comments pc
-                                    inner join posts p on p.id = pc.post_id
-                                    where pc.user_id = u.id and p.user_id = $1 limit 1
-                                ) is not null 
-                                or -- comments the user received on the post
-                                (
-                                    select pc.id
-                                    from posts_comments pc
-                                    inner join posts p on p.id = pc.post_id
-                                    where pc.user_id = $1 and p.user_id = u.id limit 1
-                                ) is not null 
-                                or -- five users with the most friends
-                                (
+                                select pur.id
+                                from posts_users_rewarded pur
+                                inner join posts p on p.id = pur.post_id
+                                where pur.user_id = $1 and p.user_id = u.id limit 1
+                            ) is not null 
+                            or 
+                            ( -- posts that user received ooz
+                                select pur.id
+                                from posts_users_rewarded pur
+                                inner join posts p on p.id = pur.post_id
+                                where pur.user_id = u.id and p.user_id = $1 limit 1
+                            ) is not null 
+                            or
+                            ( -- posts that user has commented on
+                                select pc.id from posts_comments pc
+                                inner join posts p on p.id = pc.post_id
+                                where pc.user_id = u.id and p.user_id = $1 limit 1
+                            ) is not null 
+                            or
+                            ( -- comments the user received on the post
+                                select pc.id
+                                from posts_comments pc
+                                inner join posts p on p.id = pc.post_id
+                                where pc.user_id = $1 and p.user_id = u.id limit 1
+                            ) is not null 
+                            or
+                            (  -- five users with the most friends
+                                select 
+                                    "usersWithMoreFriends".user_id
+                                from (
                                     select 
-                                        "usersWithMoreFriends".user_id
-                                    from (
-                                        select 
-                                            distinct user_id, 
-                                            count(*) as "totalFriends" 
-                                        from friends_circle fc 
-                                        where user_id = u.id
-                                        group by fc.user_id 
-                                        order by "totalFriends" desc
-                                        limit 5
-                                    ) "usersWithMoreFriends" 
-                                    where u.id = "usersWithMoreFriends".user_id
-                                ) is not null
-                                or -- five users with the most friends
-                                (
-                                    select 
-                                        json_extract_path_text(cast(market_place_data AS json),'userId') as "userId"
-                                    from wallet_transfers wt 
-                                    where 
-                                    json_extract_path_text(cast(market_place_data AS json),'userId') is not null and
-                                    json_extract_path_text(cast(market_place_data AS json),'userId')::text != 'ootopia'::text and
-                                    json_extract_path_text(cast(market_place_data AS json),'userId')::text != $1::text and
-                                    wt.user_id = u.id and
-                                        wt."action" = 'sent' and
-                                        wt.processed is true and 
-                                        wt.removed is false and
-                                        wt.origin = 'market_place_transfer' limit 1
-                                ) is not null 
-                                or -- owners of learning tracks the user watched
-                                (
-                                    select distinct lt.id from learning_track_completed_chapters ltcc 
-                                        inner join learning_tracks lt on lt.id = ltcc.learning_track_id 
-                                        where ltcc.user_id = $1 and lt.user_id = u.id limit 1
-                                ) is not null 
-                            )
+                                        distinct user_id, 
+                                        count(*) as "totalFriends" 
+                                    from friends_circle fc 
+                                    where user_id = u.id
+                                    group by fc.user_id 
+                                    order by "totalFriends" desc
+                                    limit 5
+                                ) "usersWithMoreFriends" 
+                                where u.id = "usersWithMoreFriends".user_id
+                            ) is not null
+                            or
+                            ( -- five users with the most friends
+                                select 
+                                    json_extract_path_text(cast(market_place_data AS json),'userId') as "userId"
+                                from wallet_transfers wt 
+                                where 
+                                json_extract_path_text(cast(market_place_data AS json),'userId') is not null and
+                                json_extract_path_text(cast(market_place_data AS json),'userId')::text != 'ootopia'::text and
+                                json_extract_path_text(cast(market_place_data AS json),'userId')::text != $1::text and
+                                wt.user_id = u.id and
+                                    wt."action" = 'sent' and
+                                    wt.processed is true and 
+                                    wt.removed is false and
+                                    wt.origin = 'market_place_transfer' limit 1
+                            ) is not null 
+                            or
+                            ( -- owners of learning tracks the user watched
+                                select distinct lt.id from learning_track_completed_chapters ltcc 
+                                    inner join learning_tracks lt on lt.id = ltcc.learning_track_id 
+                                    where ltcc.user_id = $1 and lt.user_id = u.id limit 1
+                            ) is not null 
                         )
+                        
                     ) order by 
                            "isContact" desc, 
                            "sentOOzOfPosts" desc,
