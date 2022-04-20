@@ -41,7 +41,14 @@ export class WalletTransfersRepository extends Repository<WalletTransfers>{
         let columns = [
             'w.id', 'w.user_id', 'w.wallet_id', 'w.other_user_id', 'w.post_id', 'w.origin', 'w.action', 'w.balance', 'w.from_platform', 'w.created_at', 'w.updated_at',
             'w.description', 'w.market_place_data', 'w.learning_track_id',
-            'users.photo_url', 'users.fullname as other_username', 'posts.thumbnail_url as icon', 'learning_tracks.image_url as l_image_url'
+            'users.photo_url', 'users.fullname as other_username', 
+            `(
+                CASE 
+                    when posts.thumbnail_url is not null
+                        then posts.thumbnail_url
+                        else (select m.thumbnail_url from medias m where m.id = any(posts.media_ids) limit 1)
+                    end
+            ) as icon`, 'learning_tracks.image_url as l_image_url'
         ];
 
         params.push(filters.walletId);

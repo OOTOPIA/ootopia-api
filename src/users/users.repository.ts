@@ -278,7 +278,7 @@ export class UsersRepository extends Repository<Users>{
                             )
                         ) or 
                         (select id from friends_circle fc where fc.friend_id = u.id and fc.id = $1) is null
-                    ) order by "hasNumberPhone" desc, "hasEmail" desc, "isMarketPlace" desc, "isLearningTracks" desc, "totalPosts" desc limit $5 offset $4;`,
+                    ) order by "hasNumberPhone" desc, "hasEmail" desc, "totalPosts" desc nulls last , "isMarketPlace" desc, "isLearningTracks" limit $5 offset $4;`,
                 [suggestedFriends.id, suggestedFriends.importedContactEmails, suggestedFriends.importedContactNumbers, suggestedFriends.offset, suggestedFriends.limit],
             )
         );
