@@ -326,28 +326,31 @@ export class PostsService {
   async likePost(postId, userId) {
     const likeResult = await this.postsRepository.likePost(postId, userId);
     if (likeResult.liked) {
-      let formatOOz = await this.sendRewardToCreatorForWoowReceived(postId);
-      let post = await this.getPostById(postId)
-      let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId)
-      let userlikedPost = await this.usersService.getUserById(userId)
-      let notifications = userTokenPost.filter(user => !!user).map((user: any) =>
-      ({
-        token: user.deviceToken,
-        data: {
-          type: "gratitude_reward",
-          postId: post.id,
-          photoURL: post?.thumbnailUrl,
-          oozAmount: String(formatOOz),
-          usersName: <any>JSON.stringify([userlikedPost.fullname])
-        }
-      }))
-
-      if(notifications.length) {
-        await this.notificationMessagesService.sendFirebaseMessages(notifications);
-      }
-
+      await this.sendRewardToCreatorForWoowReceived(postId);
     }
     return likeResult;
+  }
+
+  async sendNotificationRewardToPostCreator(postId, userId, ooz) {
+    let post = await this.getPostById(postId)
+    let userTokenPost = await this.usersDeviceTokenService.getByUsersId(post.userId);
+    let userlikedPost = await this.usersService.getUserById(userId);
+    let notifications = userTokenPost.filter(user => !!user).map((user: any) =>
+    ({
+      token: user.deviceToken,
+      data: {
+        type: "gratitude_reward",
+        postId: post.id,
+        photoURL: post?.thumbnailUrl,
+        oozAmount: `${ooz}`,
+        usersName: <any>JSON.stringify([userlikedPost.fullname])
+      }
+    }))
+
+    if(notifications.length) {
+       await this.notificationMessagesService.sendFirebaseMessages(notifications);
+    }
+
   }
 
   private async sendRewardToCreatorForWoowReceived(postId) {

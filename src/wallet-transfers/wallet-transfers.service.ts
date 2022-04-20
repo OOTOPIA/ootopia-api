@@ -121,7 +121,7 @@ export class WalletTransfersService {
         var transferResult = await this.transferOOZBetweenUsers(userId, postAuthorId, balance, Origin.GRATITUDE_REWARD, postId);
 
         await this.postsService.countPostUserRewarded(postId, userId, balance);
-
+        await this.postsService.sendNotificationRewardToPostCreator(postId, userId, balance);
         return transferResult;
 
     }
