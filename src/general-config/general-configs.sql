@@ -10,6 +10,7 @@ INSERT INTO general_config (name, value) VALUES ('user_received_sower_invitation
 INSERT INTO general_config (name, value) VALUES ('user_sent_default_invitation_code_ooz', '15');
 INSERT INTO general_config (name, value) VALUES ('user_received_default_invitation_code_ooz', '25');
 INSERT INTO general_config (name, value) VALUES ('learning_track_per_minute_of_watched_video', '1');
+INSERT INTO public.general_config (value, "name") VALUES('30', 'ooz_by_post');
 
 --update after Marcelo send new values
 
