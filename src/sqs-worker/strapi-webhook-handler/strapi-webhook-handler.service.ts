@@ -20,7 +20,7 @@ export class StrapiWebhookHandlerService {
         try {
 
             let data : any = JSON.parse(message.Body);
-            console.log('testeste do teste',data.entry);
+            console.log('testeste do teste',data);
             
             switch(data.model) {
                 case "learning-tracks":
@@ -98,7 +98,7 @@ export class StrapiWebhookHandlerService {
 
     convertHashTagsToId(modal) {
         if(Array.isArray(modal.hashtags) && modal.hashtags.length) {
-            modal.hashtagsStrapiId = modal.hashtags.map( hashtag => hashtag.id); 
+            modal.hashtagsStrapiId = modal.hashtags.map( hashtag => +hashtag.id); 
         }
         console.log(modal.hashtagsStrapiId,'mudou');
         

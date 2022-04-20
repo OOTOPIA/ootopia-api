@@ -39,7 +39,7 @@ export class MarketPlaceProducts extends BaseEntity {
     imageUpdatedAt : string;
 
     @Column({ nullable: true, type: 'numeric', array: true, name: "hashtags_strapi_id" })
-    hashtagsStrapiId : number;
+    hashtagsStrapiId : number[]
 
     @Column({ nullable: true, type: 'numeric' })
     price : number;

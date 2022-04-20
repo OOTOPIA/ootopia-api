@@ -109,9 +109,8 @@ export class InterestsTagsService {
         try {
             let idTag = (await this.interestsTagsRepository.tagByStrapiId(tag.strapiId)) || null;
             if(!!idTag) tag.id = idTag.id;
-            console.log(await this.interestsTagsRepository.createOrUpdateHashtag(tag));
         } catch (error) {
-            console.log("asddddddd", error)
+            console.log(error)
         }
     }
 
