@@ -392,7 +392,7 @@ export class UsersService {
         let remainingTimeUntilEndOfGameInMs = moment(dailyGoalEndTime).diff(moment.utc(), 'milliseconds');
         let remainingTimeUntilEndOfGame = this.msToTime(remainingTimeUntilEndOfGameInMs);
 
-        if (!+user.dailyLearningGoalInMinutes) {
+        if (!+user.dailyLearningGoalInMinutes || !user.dailyLearningGoalInMinutes) {
             return {
                 id,
                 dailyGoalInMinutes : 0,
@@ -403,7 +403,7 @@ export class UsersService {
                 accumulatedOOZ : 0,
                 remainingTimeUntilEndOfGame : remainingTimeUntilEndOfGame,
                 remainingTimeUntilEndOfGameInMs : remainingTimeUntilEndOfGameInMs,
-                percentageOfDailyGoalAchieved : 0
+                percentageOfDailyGoalAchieved : 0,
             };
         }
 
