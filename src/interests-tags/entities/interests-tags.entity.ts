@@ -37,6 +37,9 @@ export class InterestsTags extends BaseEntity {
     @Column({ nullable: false, type: 'varchar' })
     language : string;
 
+    @Column({ nullable: true, name: 'strapi_id', type: 'numeric' })
+    strapiId : number;
+
     @Column({ nullable: true, type: 'varchar', name : 'related_id' })
     relatedId : string;
 

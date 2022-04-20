@@ -27,6 +27,7 @@ export enum Origin {
   WATCHED_VIDEOS = "watched_videos",
   POSTED_VIDEOS = "posted_videos",
   POSTED_PHOTOS = "posted_photos",
+  POSTED_GALLERY = "posted_gallery",
   TOTAL_GAME_COMPLETED = "total_game_completed",
   PERSONAL_GOAL_ACHIEVED = "personal_goal_achieved",
   GRATITUDE_REWARD = "gratitude_reward",
