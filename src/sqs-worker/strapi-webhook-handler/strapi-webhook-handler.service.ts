@@ -20,8 +20,8 @@ export class StrapiWebhookHandlerService {
         try {
 
             let data : any = JSON.parse(message.Body);
-            console.log('testeste do teste',data);
-            
+            console.log(data)
+
             switch(data.model) {
                 case "learning-tracks":
                     if (data.event == "entry.publish" || data.event == "entry.update") {
@@ -64,7 +64,6 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
-                            entry = this.convertHashTagsToId(entry)
                             let marketPlaces: any = await this.deleteMarketPlaces(entry.id);
                             marketPlaces.author = entry.seller;
                             await this.createLinkInUserProfile(marketPlaces, 'market-place', false);
@@ -100,7 +99,6 @@ export class StrapiWebhookHandlerService {
         if(Array.isArray(modal.hashtags) && modal.hashtags.length) {
             modal.hashtagsStrapiId = modal.hashtags.map( hashtag => +hashtag.id); 
         }
-        console.log(modal.hashtagsStrapiId,'mudou');
         
         return modal;
     }
