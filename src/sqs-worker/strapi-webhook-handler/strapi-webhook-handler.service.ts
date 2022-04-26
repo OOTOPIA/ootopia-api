@@ -20,7 +20,6 @@ export class StrapiWebhookHandlerService {
         try {
 
             let data : any = JSON.parse(message.Body);
-            console.log(data)
 
             switch(data.model) {
                 case "learning-tracks":
