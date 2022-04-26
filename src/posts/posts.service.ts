@@ -548,27 +548,4 @@ export class PostsService {
       await this.notificationMessagesService.sendFirebaseMessages(notifications);
     }
   }
-
-  async atualize() {
-    let getHashTags = await this.interestsTagsRepository.find({
-     select: ['language', 'name', 'id'] 
-    })
-    for (const hash of getHashTags) {
-      try {
-        if(hash.language == 'en-US') hash.language = 'en'
-      let response = await axios.post('http://localhost:1341/hashtags', {
-        name: hash.name,
-        locale: hash.language
-      }, {
-        headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjUwNDYxNDI5LCJleHAiOjE2NTMwNTM0Mjl9.lMKLhBK8RGl6G4FngMlKM97Vk6bV_GKXfR4gkJ8HNzA'
-        }
-      })
-      await this.interestsTagsRepository.updateStrapiIdByHashtag(response.data.id, hash.id)
-      } catch (error) {
-        console.log(`error de atualização:`,error.message)
-      }
-    }
-      
-  }
 }

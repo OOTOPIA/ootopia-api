@@ -27,16 +27,6 @@ export class InterestsTagsRepository extends Repository<InterestsTags>{
             where: { strapiId: id }
         });
     }
-    
-    async updateStrapiIdByHashtag(strapiId: number, hashtagId: string) {
-        let hashtag = await this.findOne({
-            where: { id: hashtagId }
-        })
-        if(hashtag) {
-            hashtag.strapiId = strapiId
-            await this.save(hashtag)   
-        }
-    }
 
     createOrUpdateHashtag(hashTagData) {
         const hashTag = this.create();

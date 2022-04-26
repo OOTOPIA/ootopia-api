@@ -443,16 +443,4 @@ export class PostsController {
         }
     }
 
-    @UseInterceptors(SentryInterceptor)
-    @ApiTags('posts')
-    @ApiOperation({ summary: 'Record posts timeline view time' })
-    @ApiResponse({ status: 201, description: 'Successfully registered' })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
-    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @Post('/atualize')
-    async atualize() {
-        return await this.postsService.atualize()
-    }
-
 }
