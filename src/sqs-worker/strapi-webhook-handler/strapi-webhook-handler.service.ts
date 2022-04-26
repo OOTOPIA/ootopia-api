@@ -39,7 +39,6 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
-                            entry = this.convertHashTagsToId(entry)
                             let learningTrack: any = await this.deleteLearningTrack(entry.id);
                             learningTrack.author = entry.author;
                             await this.createLinkInUserProfile(learningTrack, 'learning-tracks', false);
