@@ -22,6 +22,9 @@ export class StrapiService {
                 case "market-place":
                         await this.sqsWorkerService.sendStrapiWebhookMessage(data);
                 break;
+                case "hashtags" : 
+                    await this.sqsWorkerService.sendStrapiWebhookMessage(data);
+                break;
             }
         }
         return { "status" : "success" };

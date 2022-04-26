@@ -52,7 +52,13 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
         where = where.substring(0, where.length - 5);
 
         return camelcaseKeys(await getConnection().query(`
-            SELECT ${columns} FROM market_place_products m
+            SELECT ${columns},
+            array(
+                select json_build_object('id', it.id, 'name', it.name , 'language', it.language) as medias
+              from interests_tags it
+              where it.strapi_id = any(m.hashtags_strapi_id)
+            ) as hashtags 
+            FROM market_place_products m
             LEFT JOIN users u ON u.id = m.user_id
             WHERE ${where}
             ORDER BY m.strapi_id DESC

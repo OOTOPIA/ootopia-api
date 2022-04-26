@@ -12,6 +12,7 @@ import { MarketPlaceModule } from 'src/market-place/market-place.module';
 import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-token.module';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 import { UpdatePostVideoStatusHandlerService } from './update-post-video-status/update-post-video-status';
+import { InterestsTagsModule } from 'src/interests-tags/interests-tags.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UpdatePostVideoStatusHandlerService } from './update-post-video-status/
     forwardRef(() => LearningTracksModule),
     forwardRef(() => MarketPlaceModule),
     forwardRef(() => PostsModule),
+    forwardRef(() => InterestsTagsModule),
   ],
   providers: [SqsWorkerService, DailyGoalDistributionHandlerService, StrapiWebhookHandlerService, NotificationMessagesService, UpdatePostVideoStatusHandlerService],
   exports: [SqsWorkerService, DailyGoalDistributionHandlerService]

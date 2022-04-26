@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs/axios": "^0.0.7",
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/jwt": "^7.2.0",
@@ -32,8 +33,9 @@
     "@sentry/node": "^6.2.5",
     "@sentry/tracing": "^6.13.3",
     "@ssut/nestjs-sqs": "^1.0.0",
+    "@types/axios": "^0.14.0",
     "aws-sdk": "^2.947.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "camelcase-keys": "^6.2.2",

@@ -22,4 +22,16 @@ export class InterestsTagsRepository extends Repository<InterestsTags>{
         });
     }
 
+    tagByStrapiId(id) {
+        return this.findOne({
+            where: { strapiId: id }
+        });
+    }
+
+    createOrUpdateHashtag(hashTagData) {
+        const hashTag = this.create();
+        Object.assign(hashTag, hashTagData);
+        return this.save(hashTag);
+    }
+
 }

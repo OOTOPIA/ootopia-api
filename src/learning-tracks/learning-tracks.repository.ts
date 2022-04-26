@@ -20,16 +20,16 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
 
     async getLearningTracks(filters) {
 
-        let limit = 50, 
-            offset = 0, 
-            where = 'deleted_at IS NULL AND ', 
+        let limit = 50,
+            offset = 0,
+            where = 'deleted_at IS NULL AND ',
             locale = "en",
             orderBy = filters.showAtTimeline ? " (CASE WHEN l.show_at_timeline THEN  1 else 2 END), l.updated_at " : " l.strapi_id ",
             params = [];
 
         let columns = [
-            'l.*', 
-            'u.fullname as user_name', 
+            'l.*',
+            'u.fullname as user_name',
             'u.photo_url as user_photo_url',
         ];
 
@@ -55,7 +55,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             if (filters.locale) {
                 params.push(filters.locale);
                 where += `locale = $${params.length} AND `;
-            }else{
+            } else {
                 params.push(locale);
                 where += `locale = $${params.length} AND `;
             }
@@ -64,24 +64,30 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         where = where.substring(0, where.length - 5);
 
         return camelcaseKeys(await getConnection().query(`
-            SELECT ${columns} FROM learning_tracks l
+            SELECT ${columns}, 
+            array(
+                select json_build_object('id', it.id, 'name', it.name , 'language', it.language) as tags
+              from interests_tags it
+              where it.strapi_id = any(l.hashtags_strapi_id)
+            ) as hashtags 
+            FROM learning_tracks l
             LEFT JOIN users u ON u.id = l.user_id
             WHERE ${where}
             ORDER BY ${orderBy} DESC
             LIMIT ${limit} OFFSET ${offset}
-        `, params), { deep : true }).map(this.mapper);
+        `, params), { deep: true }).map(this.mapper);
 
     }
 
     getByStrapiId(strapiId) {
         return this.findOne({
-            where :{ strapiId }
+            where: { strapiId }
         });
     }
 
-    async getById(learningTrackId : string) {
+    async getById(learningTrackId: string) {
         return await this.findOne({
-            where :{ id : learningTrackId, deletedAt : IsNull() }
+            where: { id: learningTrackId, deletedAt: IsNull() }
         });
     }
 
@@ -90,7 +96,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             throw new HttpException("Permission denied (id not found)", 403);
         }
         const data = await this.findOne({
-            where : {
+            where: {
                 strapiId
             }
         });

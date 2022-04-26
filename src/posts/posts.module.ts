@@ -25,6 +25,7 @@ import { UsersModule } from 'src/users/users.module';
 import { SqsWorkerModule } from 'src/sqs-worker/sqs-worker.module';
 import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-token.module';
 import { MediasRepository } from './media.repository';
+import { InterestsTagsRepository } from '../interests-tags/repositories/interests-tags.repository';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { MediasRepository } from './media.repository';
       PostsWatchedVideotimeRepository,
       PostsTimelineViewTimeRepository,
       PostsUsersRewardedRepository,
+      InterestsTagsRepository
     ]),
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),

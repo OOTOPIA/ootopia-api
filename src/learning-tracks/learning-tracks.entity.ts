@@ -25,6 +25,9 @@ export class LearningTracks extends BaseEntity {
 
     @Column({ nullable: true, type: 'varchar' })
     title : string;
+    
+    @Column({ nullable: true, type: 'numeric', array: true, name: "hashtags_strapi_id" })
+    hashtagsStrapiId : number[]
 
     @Column({ nullable: true, type: 'varchar' })
     description : string;

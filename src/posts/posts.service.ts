@@ -22,6 +22,9 @@ import * as jimp from 'jimp';
 import { MediasRepository } from './media.repository';
 import { UsersDeviceTokenService } from '../users-device-token/users-device-token.service';
 import { NotificationMessagesService } from '../notification-messages/notification-messages.service';
+import { InterestsTagsRepository } from '../interests-tags/repositories/interests-tags.repository';
+
+import axios from 'axios';
 
 @Injectable()
 export class PostsService {
@@ -41,6 +44,7 @@ export class PostsService {
     private readonly usersService: UsersService,
     private readonly usersDeviceTokenService: UsersDeviceTokenService,
     private readonly notificationMessagesService: NotificationMessagesService,
+    private readonly interestsTagsRepository : InterestsTagsRepository,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
   ) { }
