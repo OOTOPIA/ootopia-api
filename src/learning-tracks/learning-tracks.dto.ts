@@ -17,6 +17,9 @@ export class ChapterDto {
     videoThumbUrl : string;
 
     @ApiProperty()
+    video?: string;
+
+    @ApiProperty()
     time : string;
 
     @ApiProperty()
@@ -36,13 +39,19 @@ export class ChapterDto {
 export class LearningTrackDto {
 
     @ApiProperty()
-    id : number;
+    id : string;
 
     @ApiProperty()
-    userPhotoUrl : string;
+    strapiId: number;
 
     @ApiProperty()
-    userName : string;
+    userPhotoUrl?: string;
+
+    @ApiProperty()
+    userName?: string;
+
+    @ApiProperty()
+    hashtagsStrapiId: number;
 
     @ApiProperty()
     title : string;
@@ -57,19 +66,39 @@ export class LearningTrackDto {
     ooz : number;
 
     @ApiProperty()
-    totalTimeInMinutes : number;
+    totalTimeInMinutes?: number;
 
     @ApiProperty()
     location? : string;
 
     @ApiProperty({isArray : true, type: ChapterDto})
-    chapters : ChapterDto;
+    chapters: ChapterDto[];
 
     @ApiProperty()
-    createdAt : Date;
+    createdAt: Date;
 
     @ApiProperty()
-    updatedAt : Date;
+    updatedAt: Date;
+
+    @ApiProperty()
+    deletedAt?: Date
+
+    @ApiProperty()
+    userId?: string;
+
+    @ApiProperty()
+    time?: string;
+
+    @ApiProperty()
+    locale?: string
+
+    @ApiProperty()
+    imageUpdatedAt?: string
+
+    @ApiProperty()
+    showAtTimeline?: boolean
+
+    
 
 }
 
@@ -87,6 +116,9 @@ export class LearningTracksFilterDto {
     @ApiProperty({ type: "number", required: false })
     offset? : number;
 
+    strapiId?: string;
+
+    id?: string;
 }
 
 export class LastLearningTracksFilterDto {
