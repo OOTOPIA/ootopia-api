@@ -36,7 +36,6 @@ export enum Origin {
   INVITATION_CODE_ACCEPTED = "invitation_code_accepted",
   MARKET_PLACE_TRANSFER = "market_place_transfer",
   LEARNING_TRACK = "learning_track",
-  POSTED_GALLERY = "posted_gallery",
 };
 
 export enum WalletTransferAction {

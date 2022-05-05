@@ -23,7 +23,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         let limit = 50,
             offset = 0,
             where = 'deleted_at IS NULL AND ',
-            locale = "en",
+            // locale = "en",
             orderBy = filters.showAtTimeline ? " (CASE WHEN l.show_at_timeline THEN  1 else 2 END), l.updated_at " : " l.strapi_id ",
             params = [];
 
@@ -51,15 +51,15 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             where += `l.id = $${params.length} AND `;
         }
 
-        if (!filters.id) {
-            if (filters.locale) {
-                params.push(filters.locale);
-                where += `locale = $${params.length} AND `;
-            } else {
-                params.push(locale);
-                where += `locale = $${params.length} AND `;
-            }
-        }
+        // if (!filters.id) {
+        //     if (filters.locale) {
+        //         params.push(filters.locale);
+        //         where += `locale = $${params.length} AND `;
+        //     } else {
+        //         params.push(locale);
+        //         where += `locale = $${params.length} AND `;
+        //     }
+        // }
 
         where = where.substring(0, where.length - 5);
 
