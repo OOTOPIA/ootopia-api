@@ -17,7 +17,6 @@ export class LearningTracksController {
     @ApiTags('learning-tracks')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Returns a list of Learning Tracks" })
-    @ApiQuery({ name : "locale", type: "string", enum: ["en", "pt-BR"], required: true })
     @ApiQuery({ name : "limit", type: "number", description: "Limit of entries (50 max.)", required: false })
     @ApiQuery({ name : "offset", type: "number", required: false })
     @ApiResponse({ status: 200, type: LearningTrackDto, isArray: true })
@@ -67,7 +66,7 @@ export class LearningTracksController {
     @Get('/last')
     async getLastLearningTrack(@Req() req, @Query() filters : LastLearningTracksFilterDto) {
         try {
-            return this.learningTracksService.getLastLearningTrack(filters.locale, req.user ? req.user.id : null);
+            return this.learningTracksService.getLastLearningTrack(req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
         }
