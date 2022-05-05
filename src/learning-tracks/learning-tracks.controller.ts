@@ -67,7 +67,7 @@ export class LearningTracksController {
     @Get('/last')
     async getLastLearningTrack(@Req() req, @Query() filters : LastLearningTracksFilterDto) {
         try {
-            return this.learningTracksService.getLastLearningTrack(req.user ? req.user.id : null);
+            return this.learningTracksService.getLastLearningTrack(filters.locale, req.user ? req.user.id : null);
         } catch (error) {
             new ErrorHandling(error);
         }
