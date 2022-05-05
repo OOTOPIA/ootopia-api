@@ -17,6 +17,7 @@ export class LearningTracksController {
     @ApiTags('learning-tracks')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Returns a list of Learning Tracks" })
+    @ApiQuery({ name : "locale", type: "string", enum: ["en", "pt-BR"], required: false })
     @ApiQuery({ name : "limit", type: "number", description: "Limit of entries (50 max.)", required: false })
     @ApiQuery({ name : "offset", type: "number", required: false })
     @ApiResponse({ status: 200, type: LearningTrackDto, isArray: true })

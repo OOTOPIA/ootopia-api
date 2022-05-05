@@ -104,8 +104,8 @@ export class LearningTrackDto {
 
 export class LearningTracksFilterDto {
     
-    // @ApiProperty({ type: "string", required: false, enum: ["en", "pt-BR"] })
-    // locale? : string;
+    @ApiProperty({ type: "string", required: false, enum: ["en", "pt-BR"] })
+    locale? : string;
 
     @ApiProperty({required: false, default: false })
     showAtTimeline? : boolean;

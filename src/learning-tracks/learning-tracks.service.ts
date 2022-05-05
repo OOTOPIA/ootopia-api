@@ -173,12 +173,13 @@ export class LearningTracksService {
 
     async getWelcomeGuideLearningTrack(locale : string, userId : string) {
         let strapiId = locale == "en" ? "4" : "18";
-        return (await this.getLearningTracks({ strapiId}, userId))[0];
+        return (await this.getLearningTracks({ strapiId, locale }, userId))[0];
     }
 
-    async getLastLearningTrack(userId? : string) {
+    async getLastLearningTrack(locale : string, userId? : string) {
         let filters : LearningTracksFilterDto = {
             limit: 1,
+            locale,
         };
         let learningTracks : any = await this.getLearningTracks(filters, userId);
         return (learningTracks.length ? learningTracks.map(this.mapper)[0] : null);
