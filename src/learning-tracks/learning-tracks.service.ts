@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { LearningTracksFilterDto } from './learning-tracks.dto';
+import { LearningTracksFilterDto, LearningTrackDto, ChapterDto } from './learning-tracks.dto';
 import { LearningTracksRepository } from './learning-tracks.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
@@ -14,6 +14,7 @@ import { WalletsService } from 'src/wallets/wallets.service';
 import { UsersService } from 'src/users/users.service';
 import * as Sentry from '@sentry/node';
 import { LinksService } from 'src/links/links.service';
+import { LearningTracks } from './learning-tracks.entity';
 
 const axios = Axios.default;
 
@@ -33,7 +34,7 @@ export class LearningTracksService {
         ) {
 
     }
-
+    
     async createOrUpdate(learningTrackData, strapiEvent : string) {
 
         let findLearningTrack = await this.learningTracksRepository.getByStrapiId(learningTrackData.id);
@@ -69,7 +70,7 @@ export class LearningTracksService {
             imageUrl = await this.filesUploadService.uploadLearningTrackImageToS3(fileBuffer, imageUrl);
         }
 
-        let learningTrack : any = {
+        let learningTrack : LearningTrackDto = {
             id : learningTrackData.id,
             strapiId : learningTrackData.strapiId,
             title : learningTrackData.title,
@@ -80,6 +81,7 @@ export class LearningTracksService {
             chapters : learningTrackData.episode || [],
             createdAt : learningTrackData.created_at,
             updatedAt : learningTrackData.updated_at,
+            hashtagsStrapiId: learningTrackData.hashtagsStrapiId,
             location : learningTrackData.location || "",
             time : "",
             ooz : 0,
@@ -96,7 +98,7 @@ export class LearningTracksService {
                     let videoDetails = (
                         await this.videoService.getVideoDetails(chapter.video)
                     ).result;
-                    delete chapter.tittle;
+                    delete chapter.title;
                     chapter.videoUrl = videoDetails.playback.hls;
                     chapter.videoThumbUrl = videoDetails.thumbnail;
                     chapter.time = this.msToTime(videoDetails.duration * 1000).replace("m ", "min "); //convert duration to ms and get formatted time
@@ -133,7 +135,7 @@ export class LearningTracksService {
 
     }
 
-    async getLearningTracks(filters, userId? : string) {
+    async getLearningTracks(filters: LearningTracksFilterDto, userId? : string) {
         let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
 
         let learningTracksIds : string[] = learningTracks.map((data) => data.id);
@@ -183,7 +185,7 @@ export class LearningTracksService {
         return (learningTracks.length ? learningTracks.map(this.mapper)[0] : null);
     }
 
-    private mapper(learningTrack) {
+    private mapper(learningTrack: LearningTrackDto) {
         if (!learningTrack.userId) {
             learningTrack.userId = "ootopia";
             learningTrack.userName = "OOTOPIA";
@@ -194,11 +196,11 @@ export class LearningTracksService {
         return learningTrack;
     }
 
-    async deleteLearningTrack(strapiId) {
+    async deleteLearningTrack(strapiId: number) {
         return await this.learningTracksRepository.deleteLearningTrack(strapiId);
     }
 
-    private msToTime(duration) {
+    private msToTime(duration: number) {
 
         var seconds : any = Math.floor((duration / 1000) % 60),
           minutes : any = Math.floor((duration / (1000 * 60)) % 60),
@@ -212,7 +214,7 @@ export class LearningTracksService {
 
     }
 
-    async calcOOZToTransferForChapter(durationInSecs) {
+    async calcOOZToTransferForChapter(durationInSecs: number) {
         const oozToReward = +(
             await this.generalConfigService.getConfig(
                 ConfigName.LEARNING_TRACK_PER_MINUTE_OF_WATCHED_VIDEO,
@@ -222,7 +224,7 @@ export class LearningTracksService {
         return +((oozToReward * (duration / 60)).toFixed(2));
     }
 
-    private mapperChapter(chapter) {
+    private mapperChapter(chapter: ChapterDto) {
         return {
             id : chapter.id,
             title : chapter.title,

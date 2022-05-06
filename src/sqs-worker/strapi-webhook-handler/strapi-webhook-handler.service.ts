@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { SqsMessageHandler } from "@ssut/nestjs-sqs";
+import { InterestsTagsService } from 'src/interests-tags/services/interests-tags.service';
 import { LearningTracksService } from 'src/learning-tracks/learning-tracks.service';
 import { MarketPlaceService } from 'src/market-place/market-place.service';
 import { UsersService } from 'src/users/users.service';
@@ -10,7 +11,8 @@ export class StrapiWebhookHandlerService {
     constructor(
         private readonly usersService : UsersService,
         private readonly learningTracksService : LearningTracksService,
-        private readonly marketPlaceService : MarketPlaceService
+        private readonly marketPlaceService : MarketPlaceService,
+        private readonly interestsTagsService : InterestsTagsService,
     ){}
 
     @SqsMessageHandler('strapi_webhook', false)
@@ -27,6 +29,7 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
+                            entry = this.convertHashTagsToId(entry)
                             let learningTrack = await this.createOrUpdateLearningTrack(entry, data.event);
                             if(learningTrack) await this.createLinkInUserProfile(learningTrack, 'learning-tracks');
                         }
@@ -49,6 +52,7 @@ export class StrapiWebhookHandlerService {
                         }
                         for (let i = 0; i < data.entry.length; i++) {
                             let entry = data.entry[i];
+                            entry = this.convertHashTagsToId(entry)
                             let marketPlaces = await this.createOrUpdateMarketPlaces(entry, data.event);
                             if(marketPlaces) await this.createLinkInUserProfile(marketPlaces, 'market-place');
                         }
@@ -64,12 +68,37 @@ export class StrapiWebhookHandlerService {
                         }
                     }
                 break;
+                case 'hashtags':
+                    if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
+                        
+                        if (!data.entry.push) {
+                            data.entry = [data.entry];
+                        }
+                        for (let i = 0; i < data.entry.length; i++) {
+                            let entry = data.entry[i];
+                            entry.language = entry.locale == 'en' ? 'en-US' : 'pt-BR';
+                            entry.strapiId = entry.id;
+                            delete entry.id;
+                            entry.active = data.event == "entry.publish" || data.event == "entry.update";
+                            entry.type = 'top';
+                            await this.createOrUpdateHashtags(entry);
+                        }
+                    }
+                break;
             }
 
         }catch(err) {
             console.log("SQS 'strapi_webhook' Error:", err);
             throw err;
         }
+    }
+
+    convertHashTagsToId(modal) {
+        if(Array.isArray(modal.hashtags) && modal.hashtags.length) {
+            modal.hashtagsStrapiId = modal.hashtags.map( hashtag => +hashtag.id); 
+        }
+        
+        return modal;
     }
 
     async createOrUpdateLearningTrack(entry, event : string) {
@@ -90,6 +119,10 @@ export class StrapiWebhookHandlerService {
 
     async deleteMarketPlaces(entryId) {
         return this.marketPlaceService.deleteMarketPlaces(entryId);
+    }
+
+    async createOrUpdateHashtags(entry) {
+        return this.interestsTagsService.createOrUpdateHashTags(entry);
     }
 
 }

@@ -72,6 +72,7 @@ export class MarketPlaceService {
       imageUrl : imageUrl,
       imageUpdatedAt  : marketPlaceData.photo ? marketPlaceData.photo.updated_at : null,
       price : marketPlaceData.price,
+      hashtagsStrapiId: marketPlaceData.hashtagsStrapiId,
       location : marketPlaceData.location || "",
       deletedAt : null,
       createdAt : marketPlaceData.created_at,
