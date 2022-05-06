@@ -62,7 +62,6 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         // }
         if(usersLang.length) {
             where += `(`
-            console.log(where)
             for (const lang of usersLang) {
                 where += `locale = '${lang}' OR `;
             }
@@ -72,7 +71,6 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
             where = where.substring(0, where.length - 5);
         }
         
-        console.log(where)
         return camelcaseKeys(await getConnection().query(`
             SELECT ${columns}, 
             array(
