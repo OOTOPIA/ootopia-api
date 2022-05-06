@@ -511,3 +511,9 @@ export class UsersAppUsageTimeDto {
     timeInMilliseconds : number;
 
 }
+
+export enum LangsEnum {
+    ptbr = "pt-BR",
+    en = "en",
+    fr = "fr"
+}
