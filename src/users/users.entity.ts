@@ -93,9 +93,6 @@ export class Users extends BaseEntity {
     @Column({ nullable: true, name : 'global_dialog_opened', type: 'boolean', default: () => "false" })
     globalDialogOpened : boolean;
 
-    @Column({ nullable: true, type: 'varchar', array: true })
-    languages : LangsEnum[];
-
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
@@ -104,4 +101,7 @@ export class Users extends BaseEntity {
 
     @Column({ nullable: true, array: true, type: 'varchar', name : 'links' })
     links: string;
+
+    @Column({ nullable: true, array: true, type: 'varchar', name : 'languages' })
+    languages: string;
 }

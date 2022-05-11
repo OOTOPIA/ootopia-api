@@ -60,7 +60,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         //         where += `locale = $${params.length} AND `;
         //     }
         // }
-        if(usersLang.length) {
+        if(usersLang && usersLang.length) {
             where += `(`
             for (const lang of usersLang) {
                 where += `locale = '${lang}' OR `;

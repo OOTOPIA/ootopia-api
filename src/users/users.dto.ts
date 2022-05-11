@@ -38,6 +38,9 @@ export class CreateUserDto {
     countryCode: string;
 
     @ApiProperty()
+    languages: string
+
+    @ApiProperty()
     dialCode: string;
 
     @ApiProperty()
@@ -463,6 +466,9 @@ export class UserProfileUpdateDto {
 
     @ApiProperty()
     countryCode: string;
+
+    @ApiProperty()
+    languages: string
 
     @ApiProperty()
     dialCode: string;
