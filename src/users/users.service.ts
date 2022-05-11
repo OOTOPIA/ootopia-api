@@ -69,7 +69,7 @@ export class UsersService {
         userData.invitationCodeAccepted = !!userData.invitationCode ? userData.invitationCode : null;
         userData.birthdate = !!userData.birthdate ? userData.birthdate : null;
 
-        let user = {
+        let user: any = {
             id: null,
             photoUrl: null,
             invitationCodeAccepted: userData.invitationCodeAccepted,
@@ -78,11 +78,14 @@ export class UsersService {
             password: null,
         };
 
+        if(userData.languages) {
+            userData.languages = userData.languages.split(",");
+        }
+
         let wallet;
 		let invitation;
 
         try {
-
             user = await this.usersRepository.createOrUpdateUser(userData);
             wallet = await this.walletsService.createOrUpdateWallet({userId : user.id});
             
@@ -182,9 +185,7 @@ export class UsersService {
         await queryRunner.startTransaction();
 
         let currentUser = await this.getUserById(userData.id);
-        
         userData = this.jsonDecodeOrEncoderUserLinks(userData, JSONType.decode);
-        
         let _userData: any = {
             id: userData.id,
             fullname: userData.fullname,
@@ -194,12 +195,17 @@ export class UsersService {
             birthdate : userData.birthdate || null,
             dailyLearningGoalInMinutes : userData.dailyLearningGoalInMinutes,
             dialCode : userData.dialCode,
-            links: userData.links || null
+            links: userData.links || null,
+            languages: userData.languages || []
         };  
 
         if (photoFile != null) {
             let fileUrl = await this.filesUploadService.uploadFileToS3(photoFile.buffer, photoFile.originalname, currentUser.id);
             _userData.photoUrl = fileUrl;
+        }
+
+        if(userData.languages) {
+            _userData.languages = userData.languages.split(",");
         }
 
         if (currentUser.registerPhase == 1) {
