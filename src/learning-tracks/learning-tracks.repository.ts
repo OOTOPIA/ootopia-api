@@ -66,7 +66,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
                 where += `locale = '${lang}' OR `;
             }
             where = where.substring(0, where.length - 4);
-            where += `)`
+            where += `)`;
         } else {
             where = where.substring(0, where.length - 5);
         }

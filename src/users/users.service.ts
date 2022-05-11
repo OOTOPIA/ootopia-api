@@ -79,8 +79,7 @@ export class UsersService {
         };
 
         if(userData.languages) {
-            let langs =  userData.languages.split(",")
-            userData.languages = langs
+            userData.languages = userData.languages.split(",");
         }
 
         let wallet;
@@ -206,8 +205,7 @@ export class UsersService {
         }
 
         if(userData.languages) {
-            let langs =  userData.languages.split(",")
-            _userData.languages = langs
+            _userData.languages = userData.languages.split(",");
         }
 
         if (currentUser.registerPhase == 1) {
