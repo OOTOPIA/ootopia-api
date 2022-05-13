@@ -78,8 +78,10 @@ export class UsersService {
             password: null,
         };
 
-        if(userData.languages) {
-            userData.languages = userData.languages.split(",");
+        if(userData.languages && userData.languages.length >= 2) {
+            userData.languages = userData.languages.split(",")
+        } else {
+            userData.languages = []
         }
 
         let wallet;
