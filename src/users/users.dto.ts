@@ -37,7 +37,7 @@ export class CreateUserDto {
     @ApiProperty({required: false})
     countryCode: string;
 
-    @ApiProperty()
+    @ApiProperty({required: false})
     languages: string
 
     @ApiProperty()
