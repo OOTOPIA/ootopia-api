@@ -23,11 +23,11 @@ export class PostsRepository extends Repository<Posts>{
         })
     }
 
-    async deletePostByUser(postId, userId) {
+    async deletePostByUser(postId: string, userId?: string) {
         const post = await this.findOne({
             where : {
-                id : postId, 
-                userId : userId
+                id : postId,
+                ...(userId && {userId: userId})
             }
         });
         if (!post) {

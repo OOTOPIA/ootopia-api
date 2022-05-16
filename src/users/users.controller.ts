@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef, Header } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Request, Param, Headers, Query, HttpCode, HttpStatus, UseGuards, UseInterceptors, UploadedFile, Req, Inject, forwardRef, Header, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
@@ -395,19 +395,22 @@ export class UsersController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
-    @ApiOperation({ summary: 'Validate if email code exists' })
-    @ApiParam({name : "email", type: "string", description: "email to validate" })
-    @ApiResponse({ status: 200, type: InvitationCodeValidateDto })
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'Admin delete user' })
+    @ApiParam({name : "id", type: "string", description: "userId to delete" })
+    @ApiResponse({ status: 200 })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @Get('/email-exist/:email')
-    async validateEmailExists(@Param('email') email) {
+    @Delete('/:id')
+    async deleteUser(@Param('id') id, @Req() { user }) {
         try {
-            return await this.usersService.validationEmail(email);
+            return await this.usersService.deleteUser(user.id, id);
         } catch (error) {
             new ErrorHandling(error);
         }
     }
+
+
 
 }

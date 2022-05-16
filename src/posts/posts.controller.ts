@@ -280,7 +280,6 @@ export class PostsController {
     @Delete('/:postId')
     async deletePost(@Req() { user }, @Param('postId') postId) {
         try {
-
             return await this.postsService.deletePost(postId, user.id);
 
         } catch (error) {

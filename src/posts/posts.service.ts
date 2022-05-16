@@ -25,6 +25,7 @@ import { NotificationMessagesService } from '../notification-messages/notificati
 import { InterestsTagsRepository } from '../interests-tags/repositories/interests-tags.repository';
 
 import axios from 'axios';
+import { AdminUserRepository } from '../users/repositories/admin-user.repository';
 
 @Injectable()
 export class PostsService {
@@ -44,9 +45,10 @@ export class PostsService {
     private readonly usersService: UsersService,
     private readonly usersDeviceTokenService: UsersDeviceTokenService,
     private readonly notificationMessagesService: NotificationMessagesService,
-    private readonly interestsTagsRepository : InterestsTagsRepository,
+    private readonly interestsTagsRepository: InterestsTagsRepository,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
+    private readonly adminUserRepository: AdminUserRepository
   ) { }
 
   async createPost(file, postData, userId) {
@@ -351,8 +353,8 @@ export class PostsService {
       }
     }))
 
-    if(notifications.length) {
-       await this.notificationMessagesService.sendFirebaseMessages(notifications);
+    if (notifications.length) {
+      await this.notificationMessagesService.sendFirebaseMessages(notifications);
     }
 
   }
@@ -408,7 +410,7 @@ export class PostsService {
     } finally {
       await queryRunner.release();
     }
-    
+
   }
 
   //Se rewardToCreator for true, uma recompensa em OOZ será transferida ao criador a cada 60 segundos do vídeo postado se o novo status do video for "ready"
@@ -538,11 +540,29 @@ export class PostsService {
     return this.postsRepository.getPostsTimeline(filters, userId);
   }
 
-  async deletePost(postId, userId) {
-    const result = await this.postsRepository.deletePostByUser(postId, userId);
-    if (result.type === 'video') {
-      await this.videoService.deleteVideo(result.streamMediaId);
+  async deletePost(postId: string, userId: string) {
+    let userAdmin = await this.adminUserRepository.getAdminById(userId);
+    let post = await this.postsRepository.getPostById(postId);
+    if (post.userId == userId) {
+      const result = await this.postsRepository.deletePostByUser(postId, userId);
+      if (result.type === 'video') {
+        await this.videoService.deleteVideo(result.streamMediaId);
+      }
+    } else if (userAdmin && post.userId != userId) {
+      const result = await this.postsRepository.deletePostByUser(postId);
+      if (result.type === 'video') {
+        await this.videoService.deleteVideo(result.streamMediaId);
+      }
+    } else {
+      throw new HttpException(
+        {
+          status: 403,
+          error: "User not admin",
+        },
+        403
+      );
     }
+
   }
 
   incrementOOZTotalCollected(balance: number, postId: string) {

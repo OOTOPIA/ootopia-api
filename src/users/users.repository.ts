@@ -84,7 +84,8 @@ export class UsersRepository extends Repository<Users>{
     async getUserById(id: string) {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
-                u.*, 
+                u.*,
+                EXISTS(select 1 from admin_users au where au.user_id = $1) as "is_admin",
                 array (
                     select 
                     json_build_object('Icon', b.icon, 'Name', b.name) as bdg

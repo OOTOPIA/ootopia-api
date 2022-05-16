@@ -26,6 +26,7 @@ import { UsersDeviceToken } from 'src/users-device-token/entities/users-device-t
 import { FriendsCircle } from '../friends/entities/friends.entity';
 import { PostCommentReplies } from 'src/post-comment-replies/entities/post-comment-replies.entity';
 import { Medias } from '../posts/media.entity';
+import { AdminUsers } from '../users/entities/admin-user.entity';
 
 require('dotenv').config();
 
@@ -97,7 +98,8 @@ class ConfigService {
           MarketPlaceProducts,
           LearningTrackCompletedChapters,
           PostsUsersRewarded,
-          FriendsCircle
+          FriendsCircle,
+          AdminUsers
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
