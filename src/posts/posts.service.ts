@@ -543,17 +543,11 @@ export class PostsService {
   async deletePost(postId: string, userId: string) {
     let userAdmin = await this.adminUserRepository.getAdminById(userId);
     let post = await this.postsRepository.getPostById(postId);
-    if (post.userId == userId) {
-      const result = await this.postsRepository.deletePostByUser(postId, userId);
-      if (result.type === 'video') {
-        await this.videoService.deleteVideo(result.streamMediaId);
-      }
-    } else if (userAdmin && post.userId != userId) {
-      const result = await this.postsRepository.deletePostByUser(postId);
-      if (result.type === 'video') {
-        await this.videoService.deleteVideo(result.streamMediaId);
-      }
-    } else {
+
+    const isAdmin = userAdmin && post.userId != userId;
+    const isOwnerPost = post.userId == userId
+    userId = userAdmin ? null : userId;
+    if (!isOwnerPost && !isAdmin) {
       throw new HttpException(
         {
           status: 403,
@@ -561,6 +555,11 @@ export class PostsService {
         },
         403
       );
+    }
+
+    const result = await this.postsRepository.deletePostByUser(postId, userId);
+    if (result.type === 'video') {
+      await this.videoService.deleteVideo(result.streamMediaId);
     }
 
   }

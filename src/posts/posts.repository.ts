@@ -27,7 +27,7 @@ export class PostsRepository extends Repository<Posts>{
         const post = await this.findOne({
             where : {
                 id : postId,
-                ...(userId && {userId: userId})
+                ...(userId && {userId})
             }
         });
         if (!post) {
