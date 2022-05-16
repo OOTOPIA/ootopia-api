@@ -22,10 +22,11 @@ import { UsersTrophiesRepository } from './repositories/users-trophies.repositor
 import { LinksService } from 'src/links/links.service';
 import { NotificationMessagesService } from 'src/notification-messages/notification-messages.service';
 import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-token.module';
+import { AdminUserRepository } from './repositories/admin-user.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersRepository, UsersAppUsageTimeRepository]),
+    TypeOrmModule.forFeature([UsersRepository, UsersAppUsageTimeRepository, AdminUserRepository]),
     TypeOrmModule.forFeature([AddressesRepository, UsersTrophiesRepository]),
     forwardRef(() => AuthModule),
     FilesUploadModule,
