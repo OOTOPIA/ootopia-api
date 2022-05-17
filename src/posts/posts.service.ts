@@ -231,7 +231,7 @@ export class PostsService {
           postResult.oozGenerated = transfer.balance;
         } else {
           await this.postsRepository.updatePostStatus(postData.id, 'unready')
-          postResult.oozGenerated = 0
+          postResult.oozGenerated = "0"
         }
         // if (postResult.type === 'gallery') {
 
