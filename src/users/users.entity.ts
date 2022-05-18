@@ -13,6 +13,7 @@ import {
     OneToMany
 } from 'typeorm';
 import { Addresses } from '../addresses/addresses.entity';
+import { LangsEnum } from './users.dto';
   
 @Entity()
 export class Users extends BaseEntity {
@@ -100,4 +101,7 @@ export class Users extends BaseEntity {
 
     @Column({ nullable: true, array: true, type: 'varchar', name : 'links' })
     links: string;
+
+    @Column({ nullable: true, array: true, type: 'varchar', name : 'languages' })
+    languages: string;
 }

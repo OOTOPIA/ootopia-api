@@ -37,6 +37,9 @@ export class CreateUserDto {
     @ApiProperty({required: false})
     countryCode: string;
 
+    @ApiProperty({required: false})
+    languages: string
+
     @ApiProperty()
     dialCode: string;
 
@@ -465,6 +468,9 @@ export class UserProfileUpdateDto {
     countryCode: string;
 
     @ApiProperty()
+    languages: string
+
+    @ApiProperty()
     dialCode: string;
 
     @ApiProperty()
@@ -510,4 +516,10 @@ export class UsersAppUsageTimeDto {
     @IsNotEmpty()
     timeInMilliseconds : number;
 
+}
+
+export enum LangsEnum {
+    ptbr = "pt-BR",
+    en = "en",
+    fr = "fr"
 }

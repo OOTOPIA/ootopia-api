@@ -18,7 +18,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         return this.save(learningTrack);
     }
 
-    async getLearningTracks(filters) {
+    async getLearningTracks(filters, usersLang?: string[]) {
 
         let limit = 50,
             offset = 0,
@@ -60,9 +60,17 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         //         where += `locale = $${params.length} AND `;
         //     }
         // }
-
-        where = where.substring(0, where.length - 5);
-
+        if(usersLang && usersLang.length) {
+            where += `(`
+            for (const lang of usersLang) {
+                where += `locale = '${lang}' OR `;
+            }
+            where = where.substring(0, where.length - 4);
+            where += `)`;
+        } else {
+            where = where.substring(0, where.length - 5);
+        }
+        
         return camelcaseKeys(await getConnection().query(`
             SELECT ${columns}, 
             array(

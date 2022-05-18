@@ -84,7 +84,8 @@ export class UsersRepository extends Repository<Users>{
     async getUserById(id: string) {
         let results = camelcaseKeys(await getConnection().query(`
             SELECT 
-                u.*, 
+                u.*,
+                EXISTS(select 1 from admin_users au where au.user_id = $1) as "is_admin",
                 array (
                     select 
                     json_build_object('Icon', b.icon, 'Name', b.name) as bdg
@@ -321,22 +322,26 @@ export class UsersRepository extends Repository<Users>{
                         where pc.user_id = $1 and p.user_id = u.id limit 1
                     ) is not null
                 ) as "commentsReceivedOnthePosts",
-                (
-                    ( -- five users with the most friends
-                        select 
-                            "usersWithMoreFriends".user_id
-                        from (
-                            select 
-                                distinct user_id, 
-                                count(*) as "totalFriends" 
-                            from friends_circle fc 
-                            where user_id = u.id
-                            group by fc.user_id 
-                            order by "totalFriends" desc
-                            limit 5
-                        ) "usersWithMoreFriends" 
-                        where u.id = "usersWithMoreFriends".user_id
-                    ) is not null
+                ( -- five users with the most friends
+				       u.id = any(
+					       select distinct fc2.friend_id from friends_circle fc2 
+							where 
+							fc2.user_id = any(
+								select 
+									fc.friend_id 
+								from friends_circle fc 
+								where fc.user_id = $1 
+								limit 10
+							) and
+							(
+								select 
+									fc.friend_id 
+								from friends_circle fc 
+								where fc.user_id = $1 and 
+								fc2.friend_id = fc.friend_id
+							) is null
+							limit 3
+						)
                 ) as "usersWithMoreFriends",
                 (
                     (-- five users with the most friends
@@ -429,21 +434,25 @@ export class UsersRepository extends Repository<Users>{
                                 where pc.user_id = $1 and p.user_id = u.id limit 1
                             ) is not null 
                             or
-                            (  -- five users with the most friends
-                                select 
-                                    "usersWithMoreFriends".user_id
-                                from (
-                                    select 
-                                        distinct user_id, 
-                                        count(*) as "totalFriends" 
-                                    from friends_circle fc 
-                                    where user_id = u.id
-                                    group by fc.user_id 
-                                    order by "totalFriends" desc
-                                    limit 5
-                                ) "usersWithMoreFriends" 
-                                where u.id = "usersWithMoreFriends".user_id
-                            ) is not null
+                            u.id = any( -- five users with the most friends
+						       select distinct fc2.friend_id from friends_circle fc2 
+								where 
+								fc2.user_id = any(
+									select 
+										fc.friend_id 
+									from friends_circle fc 
+									where fc.user_id = $1 
+									limit 10
+								) and
+								(
+									select 
+										fc.friend_id 
+									from friends_circle fc 
+									where fc.user_id = $1 and 
+									fc2.friend_id = fc.friend_id
+								) is null
+								limit 3
+							)
                             or
                             ( -- five users with the most friends
                                 select 

@@ -136,7 +136,11 @@ export class LearningTracksService {
     }
 
     async getLearningTracks(filters: LearningTracksFilterDto, userId? : string) {
-        let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters);
+        let user;
+        if(userId) {
+            user = await this.usersService.getUserById(userId);
+        }
+        let learningTracks : any = await this.learningTracksRepository.getLearningTracks(filters, user?.languages);
 
         let learningTracksIds : string[] = learningTracks.map((data) => data.id);
 
