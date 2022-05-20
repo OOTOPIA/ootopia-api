@@ -1,11 +1,9 @@
-import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
-import * as camelcaseKeys from 'camelcase-keys';
-import { UsersAppUsageTime } from "../entities/users-app-usage-time.entity";
+import { Injectable } from "@nestjs/common";
+import { EntityRepository, Repository } from "typeorm";
 import { AdminUsers } from '../entities/admin-user.entity';
 
 @Injectable()
-@EntityRepository(UsersAppUsageTime)
+@EntityRepository(AdminUsers)
 export class AdminUserRepository extends Repository<AdminUsers>{
 
     constructor() {

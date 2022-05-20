@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ErrorHandling } from 'src/config/error-handling';
 import { HttpResponseDto } from 'src/config/http-response.dto';
-import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, FilterSearchUsers, SuggestedFriendsDto, FriendByUser, FriendSuggestedByUserInProfile} from './users.dto';
+import { CreatedUserDto, CreateUserDto, LoggedUserDto, RecoverPasswordDto, ResetPasswordDto, UserDailyGoalStatsDto, UserLoginDto, UserProfileDto, UserProfileUpdateDto, UsersAppUsageTimeDto, UserInvitationsCodes, InvitationCodeValidateDto, DeviceTokenDTO, JSONType, FilterSearchUsers, SuggestedFriendsDto, FriendByUser, FriendSuggestedByUserInProfile } from './users.dto';
 import { UsersService } from './users.service';
 import { memoryStorage } from 'multer';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -20,19 +20,19 @@ import { InvitationsCodesService } from 'src/invitations-codes/invitations-codes
 export class UsersController {
 
     constructor(
-        private readonly usersService : UsersService,
-        private readonly authService : AuthService,
-        private readonly usersAppUsageTimeService : UsersAppUsageTimeService,
-        private readonly invitationsCodesService : InvitationsCodesService,
-        @Inject(forwardRef(() => DailyGoalDistributionHandlerService)) private readonly dailyGoalDistributionHandlerService : DailyGoalDistributionHandlerService,
-        ) {}
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
+        private readonly usersAppUsageTimeService: UsersAppUsageTimeService,
+        private readonly invitationsCodesService: InvitationsCodesService,
+        @Inject(forwardRef(() => DailyGoalDistributionHandlerService)) private readonly dailyGoalDistributionHandlerService: DailyGoalDistributionHandlerService,
+    ) { }
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Create a new user account' })
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({ status: 201, description: 'Successfully registered', type: CreatedUserDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @ApiConsumes('multipart/form-data')
@@ -40,7 +40,7 @@ export class UsersController {
         storage: memoryStorage(),
     }))
     @Post()
-    async createUser( @UploadedFile() file, @Body() user : CreateUserDto) {
+    async createUser(@UploadedFile() file, @Body() user: CreateUserDto) {
         try {
             return await this.usersService.createUser(user, file);
         } catch (error) {
@@ -58,7 +58,7 @@ export class UsersController {
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Post('/login')
     @HttpCode(200)
-    async login(@Body() loginData : UserLoginDto) {
+    async login(@Body() loginData: UserLoginDto) {
         try {
 
             if (!loginData) {
@@ -76,13 +76,13 @@ export class UsersController {
     @ApiTags('users')
     @ApiOperation({ summary: 'Send reset password email' })
     @ApiBody({ type: RecoverPasswordDto })
-    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 200, description: 'Successfully logged in ' })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Post('/recover-password')
     @HttpCode(200)
-    async recoverPassword(@Body() recoverPasswordData : RecoverPasswordDto) {
+    async recoverPassword(@Body() recoverPasswordData: RecoverPasswordDto) {
         try {
 
             if (!recoverPasswordData) {
@@ -100,7 +100,7 @@ export class UsersController {
     @ApiTags('users')
     @ApiOperation({ summary: 'Send reset password email' })
     @ApiBody({ type: RecoverPasswordDto })
-    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiResponse({ status: 200, description: 'Successfully logged in ' })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
@@ -118,10 +118,10 @@ export class UsersController {
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'get list of users' })
-    @ApiQuery({ name : "page", type: "number", description: "1" })
-    @ApiQuery({ name : "limit", type: "number", description: "2" })
-    @ApiQuery({ name : "fullname", type: "string", description: "Jão" })
-    @ApiResponse({ status: 200, description: 'Successfully logged in '})
+    @ApiQuery({ name: "page", type: "number", description: "1" })
+    @ApiQuery({ name: "limit", type: "number", description: "2" })
+    @ApiQuery({ name: "fullname", type: "string", description: "Jão" })
+    @ApiResponse({ status: 200, description: 'Successfully logged in ' })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
@@ -139,14 +139,14 @@ export class UsersController {
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: 'retrieve suggested friends' })
-    @ApiResponse({ status: 200, description: 'return list users suggested', type:  FriendByUser})
+    @ApiResponse({ status: 200, description: 'return list users suggested', type: FriendByUser })
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
     @HttpCode(200)
     @Post('/retrieve-suggested-friends')
-    async retrieveSuggestedFriends(@Req() { user }, @Body() suggestedFriends : SuggestedFriendsDto) {
+    async retrieveSuggestedFriends(@Req() { user }, @Body() suggestedFriends: SuggestedFriendsDto) {
         try {
             return this.usersService.retrieveSuggestedFriends(user.id, suggestedFriends);
         } catch (error) {
@@ -165,7 +165,7 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @HttpCode(200)
     @Post('/friends-suggested-profile')
-    async friendsSuggestedProfile(@Req() { user }, @Body() suggestedFriends : SuggestedFriendsDto) {
+    async friendsSuggestedProfile(@Req() { user }, @Body() suggestedFriends: SuggestedFriendsDto) {
         try {
             return this.usersService.friendsSuggestedProfile(user.id, suggestedFriends);
         } catch (error) {
@@ -179,21 +179,21 @@ export class UsersController {
     @ApiBearerAuth('Bearer')
     @ApiBody({ type: ResetPasswordDto })
     @ApiResponse({ status: 200, description: 'Successfully updated', type: ResetPasswordDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })    
-    @UseGuards(AuthGuard('jwt-reset-password'))   
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(AuthGuard('jwt-reset-password'))
     @Post('/reset-password')
     @HttpCode(200)
-    async updateUserPassword(@Req() { user }, @Body() password : ResetPasswordDto) {
-       try{
-            if(!password) {
-                throw { status: '400', message: 'Invalid body'};
+    async updateUserPassword(@Req() { user }, @Body() password: ResetPasswordDto) {
+        try {
+            if (!password) {
+                throw { status: '400', message: 'Invalid body' };
             }
-            if(!user) {
-                throw { status: '400', message: 'Invalid request'};
+            if (!user) {
+                throw { status: '400', message: 'Invalid request' };
             }
-          return this.usersService.resetPassword(user.id , password.password);        
+            return this.usersService.resetPassword(user.id, password.password);
         } catch (error) {
             new ErrorHandling(error);
         }
@@ -204,9 +204,9 @@ export class UsersController {
     @ApiOperation({ summary: 'Update user account' })
     @ApiBearerAuth('Bearer')
     @ApiBody({ type: UserProfileUpdateDto })
-    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, description: 'Successfully updated', type: UserProfileDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @ApiConsumes('multipart/form-data')
@@ -215,14 +215,14 @@ export class UsersController {
         storage: memoryStorage(),
     }))
     @Put('/:id')
-    async updateUser(@Param('id') id, @UploadedFile() file, @Req() { user }, @Body() body : UserProfileUpdateDto) {
+    async updateUser(@Param('id') id, @UploadedFile() file, @Req() { user }, @Body() body: UserProfileUpdateDto) {
         try {
             if (user.id != id) {
                 throw new HttpException('User Not Authorized', 403);
             }
-            var userData : any = body;
+            var userData: any = body;
             userData.id = user.id;
-            
+
             return await this.usersService.updateUser(userData, file);
         } catch (error) {
             new ErrorHandling(error);
@@ -233,10 +233,10 @@ export class UsersController {
     @ApiTags('users')
     @ApiOperation({ summary: 'Update user dialog opened' })
     @ApiBearerAuth('Bearer')
-    @ApiParam({ name : "id", type: "string", description: "User ID" })
-    @ApiParam({ name : "type", type: "string", description: "Type of dialog from users that will be updated", enum: [ 'personal', 'city', 'global' ] })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "type", type: "string", description: "Type of dialog from users that will be updated", enum: ['personal', 'city', 'global'] })
     @ApiResponse({ status: 200, description: 'Successfully updated', type: CreatedUserDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
@@ -246,7 +246,7 @@ export class UsersController {
             if (user.id != id) {
                 throw new HttpException('User Not Authorized', 403);
             }
-            
+
             return await this.usersService.putDialogOpened(id, type);
         } catch (error) {
             new ErrorHandling(error);
@@ -256,9 +256,9 @@ export class UsersController {
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Get public details for a specific user' })
-    @ApiParam({name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, type: UserProfileDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Get('/:id/profile')
@@ -275,7 +275,7 @@ export class UsersController {
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Get data from the logged-in user, endpoint used to update local data on the user's device" })
     @ApiResponse({ status: 200, type: UserProfileDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
@@ -292,9 +292,9 @@ export class UsersController {
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Get user daily goal stats" })
-    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, type: UserDailyGoalStatsDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
@@ -314,10 +314,10 @@ export class UsersController {
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: "Record the time the user used the app" })
-    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
     @ApiBody({ type: UsersAppUsageTimeDto })
     @ApiResponse({ status: 200 })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
@@ -334,10 +334,10 @@ export class UsersController {
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
-    @ApiParam({ name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
     @ApiOperation({ summary: "Force daily goal checking for a user." })
     @ApiResponse({ status: 200 })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
@@ -357,9 +357,9 @@ export class UsersController {
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: 'Get public details for a specific user' })
-    @ApiParam({name : "id", type: "string", description: "User ID" })
+    @ApiParam({ name: "id", type: "string", description: "User ID" })
     @ApiResponse({ status: 200, type: UserInvitationsCodes })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @UseGuards(JwtAuthGuard)
@@ -379,9 +379,9 @@ export class UsersController {
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: 'Validate if invitation code exists' })
-    @ApiParam({name : "code", type: "string", description: "Invitation Code to validate" })
+    @ApiParam({ name: "code", type: "string", description: "Invitation Code to validate" })
     @ApiResponse({ status: 200, type: InvitationCodeValidateDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Get('/invitation-code/:code')
@@ -396,9 +396,9 @@ export class UsersController {
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
     @ApiOperation({ summary: 'Validate if email code exists' })
-    @ApiParam({name : "email", type: "string", description: "email to validate" })
+    @ApiParam({ name: "email", type: "string", description: "email to validate" })
     @ApiResponse({ status: 200, type: InvitationCodeValidateDto })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
     @Get('/email-exist/:email')
@@ -415,15 +415,16 @@ export class UsersController {
     @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: 'Admin delete user' })
-    @ApiParam({name : "id", type: "string", description: "userId to delete" })
+    @ApiParam({ name: "id", type: "string", description: "userId to delete" })
     @ApiResponse({ status: 200 })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
     @Delete('/:id')
     async deleteUser(@Param('id') id, @Req() { user }) {
         try {
-            return await this.usersService.deleteUser(user.id, id);
+            await this.usersService.deleteUser(user.id, id);
         } catch (error) {
             new ErrorHandling(error);
         }
