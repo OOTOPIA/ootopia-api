@@ -45,6 +45,12 @@ export class UsersRepository extends Repository<Users>{
         return this.delete(id);
     }
 
+    async selfDeleteUser(id) {
+        let data = await this.findOne(id)
+        data.bannedAt = new Date();
+        return await this.save(data);
+    }
+
     async resetPassword(id: string, password: string) {
         let result = await getConnection()
         .createQueryBuilder()

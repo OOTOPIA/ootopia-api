@@ -15,13 +15,17 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private emailsService: EmailsService
-  ) {}
+  ) { }
 
   async validateUser(email: string, password: string) {
-    
+
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
+      throw new HttpException({ status: 403, error: "User Not Authorized" }, 403);
+    }
+
+    if (user.bannedAt) {
       throw new HttpException({ status: 403, error: "User Not Authorized" }, 403);
     }
 
@@ -32,7 +36,7 @@ export class AuthService {
     }
 
     return await this.authenticatedUser(user);
-    
+
   }
 
   async authenticatedUser(user: any) {
@@ -42,7 +46,7 @@ export class AuthService {
     delete user.password;
 
     return Object.assign(user, {
-      token : token
+      token: token
     });
 
   }
@@ -51,19 +55,19 @@ export class AuthService {
 
     const payload: any = {
       id: user.id,
-      fullname : user.fullname,
-      email : user.email,
+      fullname: user.fullname,
+      email: user.email,
     };
 
     return this.jwtService.sign(payload, {
-        secret: jwtConstants.secret,
+      secret: jwtConstants.secret,
     });
   }
 
-  async recoverPassword(email: string, language : string) {
+  async recoverPassword(email: string, language: string) {
     const user = await this.usersService.getUserByEmail(email);
 
-    if(!user) {
+    if (!user) {
       throw new HttpException(
         {
           status: 404,
@@ -82,7 +86,7 @@ export class AuthService {
         url_recover_password: util.format('https://' + process.env.SITE_URL + '/users/auth/login?resetPasswordToken=%s', token)
       }
     );
-      // Delete unused data
+    // Delete unused data
 
 
   }
@@ -90,9 +94,9 @@ export class AuthService {
   async generateRecoverPasswordToken(user) {
 
     const payload: any = {
-      id : user.id,
-      email : user.email,
-      fullname : user.fullname
+      id: user.id,
+      email: user.email,
+      fullname: user.fullname
     };
 
     return this.jwtService.sign(payload, {

@@ -395,6 +395,25 @@ export class UsersController {
 
     @UseInterceptors(SentryInterceptor)
     @ApiTags('users')
+    @ApiOperation({ summary: 'Validate if email code exists' })
+    @ApiParam({name : "email", type: "string", description: "email to validate" })
+    @ApiResponse({ status: 200, type: InvitationCodeValidateDto })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @Get('/email-exist/:email')
+    async validateEmailExists(@Param('email') email) {
+        try {
+            return await this.usersService.validationEmail(email);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+
+    
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('users')
     @ApiBearerAuth('Bearer')
     @ApiOperation({ summary: 'Admin delete user' })
     @ApiParam({name : "id", type: "string", description: "userId to delete" })
@@ -402,13 +421,10 @@ export class UsersController {
     @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
     @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
     @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
     @Delete('/:id')
     async deleteUser(@Param('id') id, @Req() { user }) {
-        try {
-            return await this.usersService.deleteUser(user.id, id);
-        } catch (error) {
-            new ErrorHandling(error);
-        }
+        await this.usersService.deleteUser(user.id, id);
     }
 
 

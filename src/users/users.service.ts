@@ -607,7 +607,7 @@ export class UsersService {
                     404
                 );
             }
-            await this.usersRepository.deleteUser(id)
+            await this.usersRepository.selfDeleteUser(id)
         } else {
             throw new HttpException(
                 {
