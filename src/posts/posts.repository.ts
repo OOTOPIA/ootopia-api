@@ -251,7 +251,7 @@ export class PostsRepository extends Repository<Posts>{
                         )
                     ) as "usersTagged"
             FROM posts p
-            INNER JOIN users ON users.id = p.user_id
+            INNER JOIN users ON users.id = p.user_id and users.banned_at is null
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
             LEFT JOIN posts_comments_count pc ON pc.post_id = p.id
             LEFT JOIN addresses addr ON addr.id = p.address_id

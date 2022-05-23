@@ -79,7 +79,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
               where it.strapi_id = any(l.hashtags_strapi_id)
             ) as hashtags 
             FROM learning_tracks l
-            LEFT JOIN users u ON u.id = l.user_id
+            LEFT JOIN users u ON u.id = l.user_id and u.banned_at is null
             WHERE ${where}
             ORDER BY ${orderBy} DESC
             LIMIT ${limit} OFFSET ${offset}
