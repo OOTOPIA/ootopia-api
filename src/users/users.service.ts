@@ -601,11 +601,11 @@ export class UsersService {
         }
         let deleteUserAdmin = await this.adminUserRepository.getAdminById(id)
         if (deleteUserAdmin) {
-            throw new HttpException("User is admin", 404);
+            throw new HttpException("User is admin", 400);
         }
         let user = await this.usersRepository.getUserById(id)
         if (user.bannedAt) {
-            throw new HttpException("User already banned", 403);
+            throw new HttpException("User already banned", 400);
         }
         await this.usersRepository.selfDeleteUser(id)
     }
