@@ -22,17 +22,16 @@ export class AuthService {
     const user = await this.usersService.getUserByEmail(email);
 
     if (!user) {
-      throw new HttpException({ status: 403, error: "User Not Authorized" }, 403);
+      throw new HttpException("User Not Authorized", 403);
     }
-
     if (user.bannedAt) {
-      throw new HttpException({ status: 403, error: "User Not Authorized" }, 403);
+      throw new HttpException("User is Banned", 403);
     }
 
     const validPassword = await bcryptjs.compare(password, user.password);
 
     if (!validPassword) {
-      throw new HttpException({ status: 403, error: "User Not Authorized" }, 403);
+      throw new HttpException("User Not Authorized", 403);
     }
 
     return await this.authenticatedUser(user);

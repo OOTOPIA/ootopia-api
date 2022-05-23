@@ -59,7 +59,7 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
               where it.strapi_id = any(m.hashtags_strapi_id)
             ) as hashtags 
             FROM market_place_products m
-            LEFT JOIN users u ON u.id = m.user_id
+            LEFT JOIN users u ON u.id = m.user_id and u.banned_at is null
             WHERE ${where}
             ORDER BY m.strapi_id DESC
             LIMIT ${limit} OFFSET ${offset}

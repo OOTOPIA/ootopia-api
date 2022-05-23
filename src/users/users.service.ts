@@ -598,24 +598,16 @@ export class UsersService {
         let userAdmin = await this.adminUserRepository.getAdminById(adminId)
         if (userAdmin) {
             let deleteUserAdmin = await this.adminUserRepository.getAdminById(id)
+            let user = await this.usersRepository.getUserById(id)
             if (deleteUserAdmin) {
-                throw new HttpException(
-                    {
-                        status: 404,
-                        error: "User is admin",
-                    },
-                    404
-                );
+                throw new HttpException("User is admin", 404);
+            }
+            if (user.bannedAt) {
+                throw new HttpException("User already banned", 403);
             }
             await this.usersRepository.selfDeleteUser(id)
         } else {
-            throw new HttpException(
-                {
-                    status: 403,
-                    error: "User not admin",
-                },
-                403
-            );
+            throw new HttpException("UNAUTHORIZED", 403);
         }
     }
 
