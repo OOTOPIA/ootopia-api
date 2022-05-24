@@ -91,5 +91,23 @@ export class MarketPlaceProductsController {
       new ErrorHandling(error);
     }
   }
+  @UseInterceptors(SentryInterceptor)
+    @ApiTags('market-place')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'Admin delete market-place' })
+    @ApiParam({ name: "id", type: "string", description: "marketPlaceId to delete", required: true})
+    @ApiResponse({ status: 200 })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Delete('/:id')
+    async deleteUser(@Param('id') id: string, @Req() { user }) {
+        try {
+            await this.marketPlaceService.adminDeleteMarketPlace(user.id, id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
 
 }

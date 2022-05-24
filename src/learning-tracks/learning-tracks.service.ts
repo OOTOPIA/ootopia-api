@@ -1,11 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { LearningTracksFilterDto, LearningTrackDto, ChapterDto } from './learning-tracks.dto';
+import { LearningTracksFilterDto, LearningTrackDto, ChapterDto} from './learning-tracks.dto';
 import { LearningTracksRepository } from './learning-tracks.repository';
 import * as moment from 'moment-timezone';
 import { FilesUploadService } from 'src/files-upload/files-upload.service';
 import * as Axios from 'axios';
 import { VideoService } from 'src/video/video.service';
-import { PostsService } from 'src/posts/posts.service';
 import { GeneralConfigService } from 'src/general-config/general-config.service';
 import { ConfigName } from 'src/general-config/general-config.entity';
 import { LearningTrackCompletedChaptersRepository } from './repositories/learning-track-completed-chapters.repository';
@@ -14,7 +13,7 @@ import { WalletsService } from 'src/wallets/wallets.service';
 import { UsersService } from 'src/users/users.service';
 import * as Sentry from '@sentry/node';
 import { LinksService } from 'src/links/links.service';
-import { LearningTracks } from './learning-tracks.entity';
+import { AdminUserRepository } from '../users/repositories/admin-user.repository';
 
 const axios = Axios.default;
 
@@ -31,6 +30,7 @@ export class LearningTracksService {
         private readonly walletsService: WalletsService,
         private readonly walletTransfersService: WalletTransfersService,
         private usersService : UsersService,
+        private readonly adminUserRepository: AdminUserRepository
         ) {
 
     }
@@ -202,6 +202,14 @@ export class LearningTracksService {
 
     async deleteLearningTrack(strapiId: number) {
         return await this.learningTracksRepository.deleteLearningTrack(strapiId);
+    }
+
+    async adminDeleteLearningTrack(userId: string, learningTrackId: string) {
+        let userAdmin = await this.adminUserRepository.getAdminById(userId);
+        if(!userAdmin) {
+            throw new HttpException("User not admin", 403);
+        }
+        return await this.learningTracksRepository.adminDeleteLearningTrack(learningTrackId);
     }
 
     private msToTime(duration: number) {

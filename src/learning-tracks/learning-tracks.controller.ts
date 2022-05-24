@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpException, Param, Query, Req, UseInterceptors, UseGuards, HttpCode, Header } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, Param, Query, Req, UseInterceptors, UseGuards, HttpCode, Header, Delete } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { SentryInterceptor } from '../interceptors/sentry.interceptor';
@@ -129,6 +129,25 @@ export class LearningTracksController {
         @Param('chapterId') chapterId : string) {
         try {
             return this.learningTracksService.markLearningTrackChapterCompleted(learningTrackId, chapterId, user.id);
+        } catch (error) {
+            new ErrorHandling(error);
+        }
+    }
+
+    @UseInterceptors(SentryInterceptor)
+    @ApiTags('learning-tracks')
+    @ApiBearerAuth('Bearer')
+    @ApiOperation({ summary: 'Admin delete learning-tracks' })
+    @ApiParam({ name: "id", type: "string", description: "learningTrackId to delete", required: true})
+    @ApiResponse({ status: 200 })
+    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto })
+    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
+    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
+    @UseGuards(JwtAuthGuard)
+    @Delete('/:id')
+    async deleteUser(@Param('id') id: string, @Req() { user }) {
+        try {
+            await this.learningTracksService.adminDeleteLearningTrack(user.id, id);
         } catch (error) {
             new ErrorHandling(error);
         }

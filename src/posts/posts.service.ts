@@ -549,10 +549,7 @@ export class PostsService {
     userId = userAdmin ? null : userId;
     if (!isOwnerPost && !isAdmin) {
       throw new HttpException(
-        {
-          status: 403,
-          error: "User not admin",
-        },
+        "User not admin",
         403
       );
     }

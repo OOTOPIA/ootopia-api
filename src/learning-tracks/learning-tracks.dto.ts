@@ -5,41 +5,41 @@ import { isArray } from 'class-validator';
 export class ChapterDto {
 
     @ApiProperty()
-    id : number;
+    id: number;
 
     @ApiProperty()
-    title : string;
+    title: string;
 
     @ApiProperty()
-    videoUrl : string;
+    videoUrl: string;
 
     @ApiProperty()
-    videoThumbUrl : string;
+    videoThumbUrl: string;
 
     @ApiProperty()
     video?: string;
 
     @ApiProperty()
-    time : string;
+    time: string;
 
     @ApiProperty()
-    ooz : number;
+    ooz: number;
 
     @ApiProperty()
-    completed : boolean;
+    completed: boolean;
 
     @ApiProperty()
-    createdAt : Date;
+    createdAt: Date;
 
     @ApiProperty()
-    updatedAt : Date;
+    updatedAt: Date;
 
 }
 
 export class LearningTrackDto {
 
     @ApiProperty()
-    id : string;
+    id: string;
 
     @ApiProperty()
     strapiId: number;
@@ -54,24 +54,24 @@ export class LearningTrackDto {
     hashtagsStrapiId: number;
 
     @ApiProperty()
-    title : string;
+    title: string;
 
     @ApiProperty()
-    description : string;
+    description: string;
 
     @ApiProperty()
-    imageUrl : string;
+    imageUrl: string;
 
     @ApiProperty()
-    ooz : number;
+    ooz: number;
 
     @ApiProperty()
     totalTimeInMinutes?: number;
 
     @ApiProperty()
-    location? : string;
+    location?: string;
 
-    @ApiProperty({isArray : true, type: ChapterDto})
+    @ApiProperty({ isArray: true, type: ChapterDto })
     chapters: ChapterDto[];
 
     @ApiProperty()
@@ -98,23 +98,23 @@ export class LearningTrackDto {
     @ApiProperty()
     showAtTimeline?: boolean
 
-    
+
 
 }
 
 export class LearningTracksFilterDto {
-    
+
     @ApiProperty({ type: "string", required: false, enum: ["en", "pt-BR"] })
-    locale? : string;
+    locale?: string;
 
-    @ApiProperty({required: false, default: false })
-    showAtTimeline? : boolean;
-
-    @ApiProperty({ type: "number", required: false })
-    limit? : number;
+    @ApiProperty({ required: false, default: false })
+    showAtTimeline?: boolean;
 
     @ApiProperty({ type: "number", required: false })
-    offset? : number;
+    limit?: number;
+
+    @ApiProperty({ type: "number", required: false })
+    offset?: number;
 
     strapiId?: string;
 
@@ -124,6 +124,6 @@ export class LearningTracksFilterDto {
 export class LastLearningTracksFilterDto {
 
     @ApiProperty({ type: "string", required: true, enum: ["en", "pt-BR"] })
-    locale : string;
+    locale: string;
 
 }

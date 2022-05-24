@@ -13,12 +13,14 @@ import { WalletTransfersModule } from 'src/wallet-transfers/wallet-transfers.mod
 import { WalletsModule } from 'src/wallets/wallets.module';
 import { UsersModule } from 'src/users/users.module';
 import { LinksService } from 'src/links/links.service';
+import { AdminUserRepository } from '../users/repositories/admin-user.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       LearningTracksRepository,
-      LearningTrackCompletedChaptersRepository
+      LearningTrackCompletedChaptersRepository,
+      AdminUserRepository
     ]),
     StrapiModule,
     FilesUploadModule,
