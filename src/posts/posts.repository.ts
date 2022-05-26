@@ -194,11 +194,6 @@ export class PostsRepository extends Repository<Posts>{
             where = where + `p.user_id = $${params.length} AND `;
         }
 
-        if (userId) {
-            params.push(userId);
-            where += `users.id not in (select denounced_id from complaints where user_id = $${params.length} and visualizer_post_user is true) AND p.id not in (select post_id from complaints where user_id = $${params.length}) AND `;
-        }
-
         if (filters.limit && filters.offset) {
             if (filters.limit > 50) {
                 filters.limit = 50;

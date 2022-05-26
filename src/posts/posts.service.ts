@@ -26,11 +26,6 @@ import { InterestsTagsRepository } from '../interests-tags/repositories/interest
 
 import axios from 'axios';
 import { AdminUserRepository } from '../users/repositories/admin-user.repository';
-import { ComplaintCreateDTO } from './posts.dto';
-import { ComplaintsRepository } from './repositories/complaints.repository';
-import { EmailsService } from '../emails/emails.service';
-import * as fs from 'fs';
-import * as path from 'path';
 
 @Injectable()
 export class PostsService {
@@ -53,9 +48,7 @@ export class PostsService {
     private readonly interestsTagsRepository: InterestsTagsRepository,
     @Inject(forwardRef(() => WalletTransfersService))
     private readonly walletTransfersService: WalletTransfersService,
-    private readonly adminUserRepository: AdminUserRepository,
-    private readonly complaintsRepository: ComplaintsRepository,
-    private readonly emailsService: EmailsService,
+    private readonly adminUserRepository: AdminUserRepository
   ) { }
 
   async createPost(file, postData, userId) {
@@ -595,32 +588,5 @@ export class PostsService {
     if (notifications.length) {
       await this.notificationMessagesService.sendFirebaseMessages(notifications);
     }
-  }
-
-  async createComplaint(data: ComplaintCreateDTO) {
-    if (data.denouncedId == data.userId) {
-      throw new HttpException("User cannot report their own post", 400)
-    }
-    let user = await this.usersService.getUserById(data.userId)
-      , denouncedUser = await this.usersService.getUserById(data.denouncedId)
-      , complaint = await this.complaintsRepository.createComplaint(data)
-      , admins = await this.adminUserRepository.find({
-        relations: ['user']
-      })
-    let body = fs.readFileSync(path.resolve(`public/templates/denounce.html`), 'utf8');
-    let payload = {
-      link: data.postId,
-      username: user.fullname,
-      reason: data.reason,
-      email: user.email,
-      id: user.id,
-      denouncedUserName: denouncedUser.fullname,
-      denouncedEmail: denouncedUser.email,
-      denouncedId: denouncedUser.id
-    }
-    for (const admin of admins) {
-      await this.emailsService.sendEmail(admin.user.email, "Complaint", body, payload)
-    }
-    return complaint
   }
 }

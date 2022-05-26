@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Put, Request, UploadedFile,
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiExcludeEndpoint, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ErrorHandling } from 'src/config/error-handling';
-import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto, SendFileDto, CreateFileDto, CreateGalleryDto, ComplaintCreateDTO } from './posts.dto';
+import { CreatePostsDto, CreatedPostDto, PostsTimelineFilterDto, PostTimelineDto, PostLikeDto, WebhookDto, PostVideoWebhookUrl, DeleteCommentsDto, PostWatchedVideoTimeDto, PostTimelineViewTimeDto, PostsWatchedVideosTimeDto, SendFileDto, CreateFileDto, CreateGalleryDto } from './posts.dto';
 import { memoryStorage } from 'multer'
 import path, { extname } from 'path'
 import { PostsService } from './posts.service';
@@ -437,26 +437,6 @@ export class PostsController {
 
             return await this.postsTimelineViewTimeService.recordTimelineViewTime(data);
             
-        } catch (error) {
-            new ErrorHandling(error);
-        }
-    }
-
-    @UseInterceptors(SentryInterceptor)
-    @ApiTags('posts')
-    @ApiOperation({ summary: 'Create Complaint post' })
-    @ApiBearerAuth('Bearer')
-    @ApiBody({ type: ComplaintCreateDTO })
-    @ApiResponse({ status: 201, description: 'Successfully Denounced' })
-    @ApiResponse({ status: 400, description: 'Bad Request', type: HttpResponseDto})
-    @ApiResponse({ status: 403, description: 'Forbidden', type: HttpResponseDto })
-    @ApiResponse({ status: 500, description: "Internal Server Error", type: HttpResponseDto })
-    @UseGuards(JwtAuthGuard)
-    @Post('/complaint')
-    async complaint(@Req() { user }, @Body() data: ComplaintCreateDTO) {
-        try {
-            return await this.postsService.createComplaint({userId: user.id, ...data})
-        
         } catch (error) {
             new ErrorHandling(error);
         }

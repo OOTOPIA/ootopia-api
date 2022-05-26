@@ -27,9 +27,6 @@ import { UsersDeviceTokenModule } from 'src/users-device-token/users-device-toke
 import { MediasRepository } from './media.repository';
 import { InterestsTagsRepository } from '../interests-tags/repositories/interests-tags.repository';
 import { AdminUserRepository } from '../users/repositories/admin-user.repository';
-import { ComplaintsRepository } from './repositories/complaints.repository';
-import { EmailsService } from '../emails/emails.service';
-import { EmailsModule } from '../emails/emails.module';
 
 @Module({
   imports: [
@@ -43,8 +40,7 @@ import { EmailsModule } from '../emails/emails.module';
       PostsTimelineViewTimeRepository,
       PostsUsersRewardedRepository,
       InterestsTagsRepository,
-      AdminUserRepository,
-      ComplaintsRepository
+      AdminUserRepository
     ]),
     forwardRef(() => WalletsModule),
     forwardRef(() => WalletTransfersModule),
@@ -56,8 +52,7 @@ import { EmailsModule } from '../emails/emails.module';
     GeneralConfigModule,
     UsersModule,
     UsersDeviceTokenModule,
-    HttpModule,
-    EmailsModule
+    HttpModule
   ],
   providers: [
     NotificationMessagesService,
