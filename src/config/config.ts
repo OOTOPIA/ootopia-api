@@ -27,6 +27,7 @@ import { FriendsCircle } from '../friends/entities/friends.entity';
 import { PostCommentReplies } from 'src/post-comment-replies/entities/post-comment-replies.entity';
 import { Medias } from '../posts/media.entity';
 import { AdminUsers } from '../users/entities/admin-user.entity';
+import { Complaints } from '../posts/entities/complaints.entity';
 
 require('dotenv').config();
 
@@ -99,7 +100,8 @@ class ConfigService {
           LearningTrackCompletedChapters,
           PostsUsersRewarded,
           FriendsCircle,
-          AdminUsers
+          AdminUsers,
+          Complaints
         ],
         migrationsTableName: 'migration',
         migrations: ['src/migration/*.ts'],
