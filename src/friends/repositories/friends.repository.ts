@@ -84,7 +84,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         c.state, 
         c.country
         from friends_circle fc 
-        inner join users u on fc.friend_id = u.id
+        inner join users u on fc.friend_id = u.id and u.banned_at is null
         left join addresses a on a.id = u.address_id
         left join cities c on c.id = a.city_id
         where 
@@ -102,7 +102,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         return (await this.query(`
         select count(*)::int from users u
         where 
-        u.id != $1 and 
+        u.id != $1 and u.banned_at is null and
         (
             u.fullname ilike($2) or
             u.email = $3
@@ -144,7 +144,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 left join addresses a on a.id = u.address_id
                 left join cities c on c.id = a.city_id
                 where 
-                    u.id != $1 and 
+                    u.id != $1 and u.banned_at is null and
                     (
                         u.fullname ilike($2) or
                         u.email = $5
@@ -201,7 +201,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 ${where}
                 c.city , c.state , c.country
                 from friends_circle fc
-                inner join users as f on f.id = fc.friend_id
+                inner join users as f on f.id = fc.friend_id and f.banned_at is null
                 left join addresses ua on ua.id = f.address_id
                 left join cities c on c.id = ua.city_id
                 where fc.user_id = $1 
