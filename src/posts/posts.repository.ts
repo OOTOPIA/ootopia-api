@@ -194,6 +194,11 @@ export class PostsRepository extends Repository<Posts>{
             where = where + `p.user_id = $${params.length} AND `;
         }
 
+        if (userId) {
+            params.push(userId);
+            where += `users.id not in (select denounced_id from complaints where user_id = $${params.length} and visualizer_post_user is true) AND p.id not in (select post_id from complaints where user_id = $${params.length}) AND `;
+        }
+
         if (filters.limit && filters.offset) {
             if (filters.limit > 50) {
                 filters.limit = 50;
@@ -251,7 +256,7 @@ export class PostsRepository extends Repository<Posts>{
                         )
                     ) as "usersTagged"
             FROM posts p
-            INNER JOIN users ON users.id = p.user_id
+            INNER JOIN users ON users.id = p.user_id and users.banned_at is null
             LEFT JOIN posts_likes_count pl ON pl.post_id = p.id
             LEFT JOIN posts_comments_count pc ON pc.post_id = p.id
             LEFT JOIN addresses addr ON addr.id = p.address_id

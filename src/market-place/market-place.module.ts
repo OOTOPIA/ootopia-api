@@ -11,11 +11,13 @@ import { EmailsModule } from 'src/emails/emails.module';
 import { AddressesRepository } from 'src/addresses/addresses.repository';
 import { UsersModule } from 'src/users/users.module';
 import { LinksService } from 'src/links/links.service';
+import { AdminUserRepository } from '../users/repositories/admin-user.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       MarketPlaceRepository,
+      AdminUserRepository
     ]),
     StrapiModule,
     FilesUploadModule,

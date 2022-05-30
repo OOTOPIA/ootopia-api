@@ -344,6 +344,9 @@ export class UsersService {
 
     async getUserProfile(id: string) {
         let user = await this.getUserById(id);
+        if(!user) {
+            throw new HttpException('User not found', 404);
+        }
         delete user.email;
         delete user.dailyLearningGoalInMinutes;
         delete user.enableSustainableAds;
@@ -596,27 +599,18 @@ export class UsersService {
     }
     async deleteUser(adminId: string, id: string) {
         let userAdmin = await this.adminUserRepository.getAdminById(adminId)
-        if (userAdmin) {
-            let deleteUserAdmin = await this.adminUserRepository.getAdminById(id)
-            if (deleteUserAdmin) {
-                throw new HttpException(
-                    {
-                        status: 404,
-                        error: "User is admin",
-                    },
-                    404
-                );
-            }
-            await this.usersRepository.deleteUser(id)
-        } else {
-            throw new HttpException(
-                {
-                    status: 403,
-                    error: "User not admin",
-                },
-                403
-            );
+        if (!userAdmin) {
+            throw new HttpException("UNAUTHORIZED", 403);
         }
+        let deleteUserAdmin = await this.adminUserRepository.getAdminById(id)
+        if (deleteUserAdmin) {
+            throw new HttpException("User is admin", 400);
+        }
+        let user = await this.usersRepository.getUserById(id)
+        if (user.bannedAt) {
+            throw new HttpException("User already banned", 400);
+        }
+        await this.usersRepository.selfDeleteUser(id)
     }
 
 }

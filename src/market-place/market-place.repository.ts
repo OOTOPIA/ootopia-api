@@ -23,7 +23,7 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
 
         let limit = 50, 
             offset = 0, 
-            where = 'deleted_at IS NULL AND ', 
+            where = 'deleted_at IS NULL AND u.banned_at is null AND ', 
             locale = "en",
             params = [];
 
@@ -92,6 +92,18 @@ export class MarketPlaceRepository extends Repository<MarketPlaceProducts>{
         });
         if (!data) {
             return;
+        }
+        data.deletedAt = new Date();
+        return await this.save(data);
+    }
+    async adminDeleteLearningTrack(id: string) {
+        const data = await this.findOne({
+            where: {
+                id
+            }
+        });
+        if (!data) {
+            throw new HttpException("Market Place not found", 404);
         }
         data.deletedAt = new Date();
         return await this.save(data);
