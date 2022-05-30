@@ -344,6 +344,9 @@ export class UsersService {
 
     async getUserProfile(id: string) {
         let user = await this.getUserById(id);
+        if(!user) {
+            throw new HttpException('User not found', 404);
+        }
         delete user.email;
         delete user.dailyLearningGoalInMinutes;
         delete user.enableSustainableAds;

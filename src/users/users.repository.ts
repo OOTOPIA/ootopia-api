@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection, ILike, Not, In } from 'typeorm';
+import { EntityRepository, Repository, UpdateResult, getConnection, ILike, Not, In, IsNull } from 'typeorm';
 import * as camelcaseKeys from 'camelcase-keys';
 import { Users } from "./users.entity";
 import { SuggestedFriendsRepositoryDto } from "./users.dto";
@@ -15,7 +15,7 @@ export class UsersRepository extends Repository<Users>{
     async createOrUpdateUser(userData) {
         const user = this.create();
         if (userData.birthdate) {
-            var birthdateSplit : any = userData.birthdate;
+            var birthdateSplit: any = userData.birthdate;
             birthdateSplit = birthdateSplit.split("/");
             var year = birthdateSplit[0].split(" ").join("");
             var month = birthdateSplit[1].split(" ").join("");
@@ -53,35 +53,35 @@ export class UsersRepository extends Repository<Users>{
 
     async resetPassword(id: string, password: string) {
         let result = await getConnection()
-        .createQueryBuilder()
-        .update(Users)
-        .set({ password })
-        .where("id = :id", { id })
-        .execute();
-        if (result && result.affected){
+            .createQueryBuilder()
+            .update(Users)
+            .set({ password })
+            .where("id = :id", { id })
+            .execute();
+        if (result && result.affected) {
             return { status: "ok" }
-        }else{
+        } else {
             return null;
         }
     }
 
     async updateDailyGoalAchieved(id: string, dailyGoalAchieved: boolean) {
         let result = await getConnection()
-        .createQueryBuilder()
-        .update(Users)
-        .set({ dailyGoalAchieved })
-        .where("id = :id", { id })
-        .execute();
-        if (result && result.affected){
+            .createQueryBuilder()
+            .update(Users)
+            .set({ dailyGoalAchieved })
+            .where("id = :id", { id })
+            .execute();
+        if (result && result.affected) {
             return { status: "ok" }
-        }else{
+        } else {
             return null;
         }
     }
 
     async getUserByEmail(email: string) {
         const user = await this.findOne({
-          where: { email },
+            where: { email },
         });
         return user;
     }
@@ -105,15 +105,15 @@ export class UsersRepository extends Repository<Users>{
             FROM users u
             left join addresses a on a.id = u.address_id
             left join cities c on c.id = a.city_id
-            WHERE u.id = $1
-        `, [id]), { deep : true });
+            WHERE u.id = $1 and u.banned_at is null
+        `, [id]), { deep: true });
 
         let user = results.length ? results[0] : null;
 
         if (!user) return user;
 
         let trophies = await this.getUserTrophies(user.id);
-        
+
         user.personalTrophyQuantity = trophies && trophies.personal ? +trophies.personal.quantity : 0;
         user.cityTrophyQuantity = trophies && trophies.city ? +trophies.city.quantity : 0;
         user.globalTrophyQuantity = trophies && trophies.global ? +trophies.global.quantity : 0;
@@ -124,27 +124,27 @@ export class UsersRepository extends Repository<Users>{
     }
 
     async getUserTrophies(userId: string) {
-        let results : any[] = camelcaseKeys(await getConnection().query(`
+        let results: any[] = camelcaseKeys(await getConnection().query(`
             SELECT * FROM users_trophies WHERE user_id = $1
-        `, [userId]), { deep : true });
-        let trophies : any = results.length ? results : null;
+        `, [userId]), { deep: true });
+        let trophies: any = results.length ? results : null;
         if (trophies) {
             let personalTrophy = results.filter((t) => t.trophyType == "personal");
             let cityTrophy = results.filter((t) => t.trophyType == "city");
             let globalTrophy = results.filter((t) => t.trophyType == "global");
             trophies = {
-                "personal" : personalTrophy.length ? personalTrophy[0] : null,
-                "city" : cityTrophy.length ? cityTrophy[0] : null,
-                "global" : globalTrophy.length ? globalTrophy[0] : null,
-                "total" : results.map((t) => +t.quantity).reduce((total, value) => total + value),
+                "personal": personalTrophy.length ? personalTrophy[0] : null,
+                "city": cityTrophy.length ? cityTrophy[0] : null,
+                "global": globalTrophy.length ? globalTrophy[0] : null,
+                "total": results.map((t) => +t.quantity).reduce((total, value) => total + value),
             };
         }
         return trophies;
     }
 
-    async putDialogOpened(id : string, dialogType : string){
-        let data : any = {};
-        switch(dialogType) {
+    async putDialogOpened(id: string, dialogType: string) {
+        let data: any = {};
+        switch (dialogType) {
             case "personal":
                 data.personalDialogOpened = true;
                 break;
@@ -157,16 +157,16 @@ export class UsersRepository extends Repository<Users>{
             default:
                 throw new HttpException("Undefined type", 401);
         }
-        
+
         let result = await getConnection()
-        .createQueryBuilder()
-        .update(Users)
-        .set(data)
-        .where("id = :id", { id })
-        .execute();
-        if (result && result.affected){
+            .createQueryBuilder()
+            .update(Users)
+            .set(data)
+            .where("id = :id", { id })
+            .execute();
+        if (result && result.affected) {
             return { status: "ok" }
-        }else{
+        } else {
             return null;
         }
 
@@ -174,19 +174,19 @@ export class UsersRepository extends Repository<Users>{
 
     async usersList(skip: number, limit: number, fullname: string, excludedUsers: string[]) {
         return this.find({
-            select: [ "id","email","fullname", "photoUrl"],
-            where: { fullname: ILike(`%${fullname}%`) , ...(excludedUsers && {id: Not(In(excludedUsers))})},
+            select: ["id", "email", "fullname", "photoUrl"],
+            where: { fullname: ILike(`%${fullname}%`), ...(excludedUsers && { id: Not(In(excludedUsers)) }), bannedAt: IsNull() },
             skip: skip,
             take: limit,
-            order: {createdAt: "ASC"},
+            order: { createdAt: "ASC" },
         });
     }
 
-    async updateDontAskToConfirmGratitudeReward(id : string, value : boolean) {
+    async updateDontAskToConfirmGratitudeReward(id: string, value: boolean) {
         return getConnection()
             .createQueryBuilder()
             .update(Users)
-            .set({ dontAskAgainToConfirmGratitudeReward : true })
+            .set({ dontAskAgainToConfirmGratitudeReward: true })
             .where("id = :id", { id })
             .execute();
     }
@@ -252,7 +252,7 @@ export class UsersRepository extends Repository<Users>{
                 left join addresses a on a.id = u.address_id
                 left join cities c on c.id = a.city_id
                 where 
-                    u.id != $1 and 
+                    u.id != $1 and u.banned_at is null and
                     (
                         (
                             ((select id from friends_circle fc where fc.friend_id = u.id and fc.id = $1) is not null and
@@ -406,7 +406,7 @@ export class UsersRepository extends Repository<Users>{
                 from users u
                 left join addresses a on a.id = u.address_id
                 left join cities c on c.id = a.city_id
-                where u.id != $1 and 
+                where u.id != $1 and u.banned_at is null
                 (
                         (select id from friends_circle fc where fc.friend_id = u.id and fc.user_id = $1) is null and
                         (
