@@ -12,6 +12,7 @@ import { AddressesRepository } from 'src/addresses/addresses.repository';
 import * as Sentry from '@sentry/node';
 import { LinksService } from 'src/links/links.service';
 import { AdminUserRepository } from '../users/repositories/admin-user.repository';
+import { StrapiService } from '../strapi/strapi.service';
 
 const axios = Axios.default;
 
@@ -25,7 +26,8 @@ export class MarketPlaceService {
     private walletTransfersService : WalletTransfersService,
     private emailsService: EmailsService,
     private usersService: UsersService,
-    private readonly adminUserRepository: AdminUserRepository
+    private readonly adminUserRepository: AdminUserRepository,
+    private readonly strapiService: StrapiService
   ) {}
 
   async createOrUpdate(marketPlaceData, strapiEvent : string) {
@@ -109,7 +111,11 @@ export class MarketPlaceService {
     if(!userAdmin) {
         throw new HttpException("User not admin", 403);
     }
-    return await this.marketPlaceRepository.adminDeleteLearningTrack(marketPlaceId);
+    let mp = await this.marketPlaceRepository.adminDeleteLearningTrack(marketPlaceId);
+    if(mp.strapiId) {
+      await this.strapiService.deleteMarketPlace(mp.strapiId)
+    }
+    return mp
 }
 
   async getMarketPlaceProducts(filters: MarketPlaceFilterDto) {

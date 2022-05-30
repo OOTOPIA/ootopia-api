@@ -14,6 +14,7 @@ import { UsersService } from 'src/users/users.service';
 import * as Sentry from '@sentry/node';
 import { LinksService } from 'src/links/links.service';
 import { AdminUserRepository } from '../users/repositories/admin-user.repository';
+import { StrapiService } from 'src/strapi/strapi.service';
 
 const axios = Axios.default;
 
@@ -30,7 +31,8 @@ export class LearningTracksService {
         private readonly walletsService: WalletsService,
         private readonly walletTransfersService: WalletTransfersService,
         private usersService : UsersService,
-        private readonly adminUserRepository: AdminUserRepository
+        private readonly adminUserRepository: AdminUserRepository,
+        private readonly strapiService: StrapiService
         ) {
 
     }
@@ -209,7 +211,11 @@ export class LearningTracksService {
         if(!userAdmin) {
             throw new HttpException("User not admin", 403);
         }
-        return await this.learningTracksRepository.adminDeleteLearningTrack(learningTrackId);
+        let lt = await this.learningTracksRepository.adminDeleteLearningTrack(learningTrackId);
+        if(lt.strapiId){
+            await this.strapiService.deleteLearningTrack(lt.strapiId);
+        }
+        return lt
     }
 
     private msToTime(duration: number) {
