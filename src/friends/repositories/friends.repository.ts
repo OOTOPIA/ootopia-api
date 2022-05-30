@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { EntityRepository, Repository, UpdateResult, getConnection } from "typeorm";
+import { EntityRepository, Repository, UpdateResult, getConnection, IsNull } from "typeorm";
 import { FriendsCircle } from '../entities/friends.entity';
 import * as camelcaseKeys from 'camelcase-keys';
 import { FriendSearchParametersDto, NonFriendsSearchParametersDto } from "../dto/friends.dto";
@@ -210,7 +210,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 )
             ),
             this.count({
-                where: { userId: filter.userId}
+                where: { userId: filter.userId, bannedAt: IsNull()}
             }),
         ])
         return {
