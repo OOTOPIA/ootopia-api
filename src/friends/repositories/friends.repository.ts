@@ -174,7 +174,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         }
         
         order.orderBy = order.orderBy == 'fullname' ? 'f.fullname' : 'fc.created_at';
-        const [friends, total ] = await Promise.all([
+        const [friends, total] = await Promise.all([
             camelcaseKeys( 
                 await this.query(`
                 select
@@ -209,13 +209,17 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
                 offset $2 limit $3`, params
                 )
             ),
-            this.count({
-                where: { userId: filter.userId, bannedAt: IsNull()}
-            }),
+            await this.query(`
+            select count(*)::int from friends_circle fc
+            inner join users as f on f.id = fc.user_id and f.banned_at is null
+            where 
+            fc.user_id = $1`, [filter.userId]
+            ),
+            
         ])
         return {
-            total,
-            friends
+            friends,
+            total: total[0].count
         };
     }
 
