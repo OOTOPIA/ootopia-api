@@ -38,7 +38,6 @@ export class StrapiService {
                 email: process.env.STRAPI_EMAIL,
                 password: process.env.STRAPI_PASSWORD
             })
-            console.log(login)
             return login.data.data.token
         } catch (error) {
             throw new HttpException(error, 400)
