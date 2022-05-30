@@ -2,7 +2,7 @@ import { HttpException, Injectable } from "@nestjs/common";
 import { EntityRepository, Repository, UpdateResult, getConnection, IsNull } from "typeorm";
 import * as camelcaseKeys from 'camelcase-keys';
 import { LearningTracks } from "./learning-tracks.entity";
-import { LearningTracksFilterDto } from "./learning-tracks.dto";
+import { LearningTracksFilterDto} from './learning-tracks.dto';
 
 @Injectable()
 @EntityRepository(LearningTracks)
@@ -22,7 +22,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
 
         let limit = 50,
             offset = 0,
-            where = 'deleted_at IS NULL AND ',
+            where = 'deleted_at IS NULL AND u.banned_at is null AND ',
             // locale = "en",
             orderBy = filters.showAtTimeline ? " (CASE WHEN l.show_at_timeline THEN  1 else 2 END), l.updated_at " : " l.strapi_id ",
             params = [];
@@ -60,7 +60,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         //         where += `locale = $${params.length} AND `;
         //     }
         // }
-        if(usersLang && usersLang.length) {
+        if (usersLang && usersLang.length) {
             where += `(`
             for (const lang of usersLang) {
                 where += `locale = '${lang}' OR `;
@@ -70,7 +70,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         } else {
             where = where.substring(0, where.length - 5);
         }
-        
+
         return camelcaseKeys(await getConnection().query(`
             SELECT ${columns}, 
             array(
@@ -79,7 +79,7 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
               where it.strapi_id = any(l.hashtags_strapi_id)
             ) as hashtags 
             FROM learning_tracks l
-            LEFT JOIN users u ON u.id = l.user_id and u.banned_at is null
+            LEFT JOIN users u ON u.id = l.user_id
             WHERE ${where}
             ORDER BY ${orderBy} DESC
             LIMIT ${limit} OFFSET ${offset}
@@ -110,6 +110,18 @@ export class LearningTracksRepository extends Repository<LearningTracks>{
         });
         if (!data) {
             throw new HttpException("Permission denied", 403);
+        }
+        data.deletedAt = new Date();
+        return await this.save(data);
+    }
+    async adminDeleteLearningTrack(id: string) {
+        const data = await this.findOne({
+            where: {
+                id
+            }
+        });
+        if (!data) {
+            throw new HttpException("Learning Track not found", 404);
         }
         data.deletedAt = new Date();
         return await this.save(data);
