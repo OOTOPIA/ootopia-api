@@ -48,7 +48,6 @@ export class StrapiService {
     async deleteLearningTrack(strapiId: number) {
         try {
             let token = await this.login()
-            console.log(token)
             let deleted = await axios.delete(`${process.env.STRAPI_URL}/content-manager/collection-types/application::learning-tracks.learning-tracks/${strapiId}`, {
                 headers: {
                     authorization: `Bearer ${token}`

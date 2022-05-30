@@ -102,7 +102,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
         return (await this.query(`
         select count(*)::int from users u
         where 
-        u.id != $1 and 
+        u.id != $1 and u.banned_at is null and 
         (
             u.fullname ilike($2) or
             u.email = $3
