@@ -211,7 +211,7 @@ export class FriendRequestsRepository extends Repository<FriendsCircle>{
             ),
             await this.query(`
             select count(*)::int from friends_circle fc
-            inner join users as f on f.id = fc.user_id and f.banned_at is null
+            inner join users as f on f.id = fc.friend_id and f.banned_at is null
             where 
             fc.user_id = $1`, [filter.userId]
             ),
