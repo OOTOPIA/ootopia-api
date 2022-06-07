@@ -30,7 +30,7 @@ import { AdminUserRepository } from './repositories/admin-user.repository';
     TypeOrmModule.forFeature([AddressesRepository, UsersTrophiesRepository]),
     forwardRef(() => AuthModule),
     FilesUploadModule,
-    InterestsTagsModule,
+    forwardRef(() => InterestsTagsModule),
     CitiesModule,
     WalletsModule,
     BadgesModule,

@@ -22,7 +22,7 @@ import { AdminUserRepository } from '../users/repositories/admin-user.repository
       LearningTrackCompletedChaptersRepository,
       AdminUserRepository
     ]),
-    StrapiModule,
+    forwardRef(() => StrapiModule),
     FilesUploadModule,
     VideoModule,
     GeneralConfigModule,
