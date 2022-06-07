@@ -29,7 +29,6 @@ export class InterestsTagsRepository extends Repository<InterestsTags>{
         });
     }
     createOrUpdateHashtag(hashTagData) {
-        console.log(hashTagData)
         const hashTag = this.create();
         Object.assign(hashTag, hashTagData);
         return this.save(hashTag);
@@ -40,7 +39,7 @@ export class InterestsTagsRepository extends Repository<InterestsTags>{
 
         if (data.name) {
             params.push(`%${data.name}%`);
-            where += ` AND i.name like $${params.length}`;
+            where += ` AND i.name ilike $${params.length}`;
         }
         if (data.language) {
             params.push(data.language);
