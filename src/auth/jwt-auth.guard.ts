@@ -15,12 +15,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     // @ts-ignore: Unreachable code error
     async handleRequest(err, user, info) {
         let findUser = await this.usersService.getUserByEmail(user.email)
-        if (findUser.bannedAt) {
+        if(!findUser) {
             throw new HttpException(
-                {
-                    status: 401,
-                    error: `Not Authorized`,
-                },
+                `Not Authorized`,
+                401,
+            );
+        }
+        if (findUser?.bannedAt) {
+            throw new HttpException(
+                `Not Authorized`,
                 401,
             );
         }
