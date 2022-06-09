@@ -19,7 +19,7 @@ import { AdminUserRepository } from '../users/repositories/admin-user.repository
       MarketPlaceRepository,
       AdminUserRepository
     ]),
-    StrapiModule,
+    forwardRef(() => StrapiModule),
     FilesUploadModule,
     forwardRef(() => EmailsModule),
     forwardRef(() => UsersModule),

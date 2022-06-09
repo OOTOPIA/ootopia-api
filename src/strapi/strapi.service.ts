@@ -1,34 +1,35 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import axios from 'axios';
 import { SqsWorkerService } from 'src/sqs-worker/sqs-worker.service';
+import { CreateTagDto } from '../interests-tags/interests-tags.dto';
 
 @Injectable()
 export class StrapiService {
 
     constructor(
-        private readonly sqsWorkerService : SqsWorkerService,
-    ){};
+        private readonly sqsWorkerService: SqsWorkerService,
+    ) { };
 
     async webhook(data) {
-        
+
         if (!data) {
             return;
         }
-        
+
         if (data.event == "entry.publish" || data.event == "entry.update" || data.event == "entry.delete" || data.event == "entry.unpublish") {
-            switch(data.model) {
+            switch (data.model) {
                 case "learning-tracks":
-                        await this.sqsWorkerService.sendStrapiWebhookMessage(data);
-                break;
-                case "market-place":
-                        await this.sqsWorkerService.sendStrapiWebhookMessage(data);
-                break;
-                case "hashtags" : 
                     await this.sqsWorkerService.sendStrapiWebhookMessage(data);
-                break;
+                    break;
+                case "market-place":
+                    await this.sqsWorkerService.sendStrapiWebhookMessage(data);
+                    break;
+                case "hashtags":
+                    await this.sqsWorkerService.sendStrapiWebhookMessage(data);
+                    break;
             }
         }
-        return { "status" : "success" };
+        return { "status": "success" };
 
     }
 
@@ -65,10 +66,32 @@ export class StrapiService {
                     authorization: `Bearer ${token}`
                 }
             })
-    
+
             return deleted.data
         } catch (error) {
             throw new HttpException(error, 400)
+        }
+    }
+
+    async createHashTag(data: CreateTagDto): Promise<string> {
+        try {
+            if(data.language == 'en-US') data.language = 'en'
+            let token = await this.login();
+            let create = await axios.post(`${process.env.STRAPI_URL}/content-manager/collection-types/application::hashtags.hashtags?plugins[i18n][locale]=${data.language}`, {
+                name: data.name
+            }, {
+                headers: {
+                    authorization: `Bearer ${token}`
+                },
+            });
+            await axios.post(`${process.env.STRAPI_URL}/content-manager/collection-types/application::hashtags.hashtags/${create.data.id}/actions/publish`, {}, {
+                headers: {
+                    authorization: `Bearer ${token}`
+                },
+            });
+            return create.data.id;
+        } catch (error) {
+            throw new HttpException(error, 400);
         }
     }
 

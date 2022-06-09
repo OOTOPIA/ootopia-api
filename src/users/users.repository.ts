@@ -80,10 +80,14 @@ export class UsersRepository extends Repository<Users>{
     }
 
     async getUserByEmail(email: string) {
-        const user = await this.findOne({
-            where: { email },
-        });
-        return user;
+        const user = camelcaseKeys(await getConnection().query(`
+        SELECT 
+            u.*,
+            EXISTS(select 1 from admin_users au where au.user_id = u.id) as "is_admin"
+        FROM users u
+        WHERE u.email = $1
+    `, [email]), { deep: true });
+        return user[0]
     }
 
     //I use the manual query because the typeOrm does not return related tables without the join, in this case, it would not return the address_id column
@@ -406,7 +410,7 @@ export class UsersRepository extends Repository<Users>{
                 from users u
                 left join addresses a on a.id = u.address_id
                 left join cities c on c.id = a.city_id
-                where u.id != $1 and u.banned_at is null
+                where u.id != $1 and u.banned_at is null and 
                 (
                         (select id from friends_circle fc where fc.friend_id = u.id and fc.user_id = $1) is null and
                         (
