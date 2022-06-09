@@ -110,7 +110,7 @@ export class InterestsTagsService {
 
     async createOrUpdateHashTags(tag) {
         try {
-            let idTag = (await this.interestsTagsRepository.tagByStrapiId(tag.strapiId)) || null;
+            let idTag = (await this.interestsTagsRepository.tagByStrapiId(tag.strapiId)) || (await this.interestsTagsRepository.tagByName(tag.name)) || null;
             if(!!idTag) tag.id = idTag.id;
             await this.interestsTagsRepository.createOrUpdateHashtag(tag)
         } catch (error) {
@@ -119,8 +119,11 @@ export class InterestsTagsService {
     }
 
     async createTag(data: CreateTagDto) {
-        let strapiId = await this.strapiService.createHashTag(data);
-        return this.interestsTagsRepository.tagByStrapiId(strapiId);
+        let hastag = await this.interestsTagsRepository.createOrUpdateHashtag({...data, type: 'top'})
+        await this.strapiService.createHashTag(data);
+
+        return hastag
+        
     }
 
     async searchTag(data: FilterSearchHashtagDto) {
