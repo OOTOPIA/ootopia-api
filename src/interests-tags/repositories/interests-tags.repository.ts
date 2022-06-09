@@ -28,6 +28,11 @@ export class InterestsTagsRepository extends Repository<InterestsTags>{
             where: { strapiId: id }
         });
     }
+    tagByName(name: string) {
+        return this.findOne({
+            where: { name }
+        });
+    }
     createOrUpdateHashtag(hashTagData) {
         const hashTag = this.create();
         Object.assign(hashTag, hashTagData);
