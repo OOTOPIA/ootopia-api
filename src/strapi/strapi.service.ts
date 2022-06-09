@@ -75,6 +75,7 @@ export class StrapiService {
 
     async createHashTag(data: CreateTagDto): Promise<string> {
         try {
+            if(data.language == 'en-US') data.language = 'en'
             let token = await this.login();
             let create = await axios.post(`${process.env.STRAPI_URL}/content-manager/collection-types/application::hashtags.hashtags?plugins[i18n][locale]=${data.language}`, {
                 name: data.name
